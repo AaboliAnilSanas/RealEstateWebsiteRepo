@@ -79,8 +79,8 @@ export default function Navbar() {
 
   const navigation = [
     // { title: "Properties", path: "/properties" },
-    { title: "Buy", path: "/sell" },
-    { title: "Post Property", path: "/properties" },
+    { title: "Buy", path: "/properties" },
+    { title: "Post Property", path: "/sell" },
     { title: "Contact US", path: "/contact" },
     { 
       title: (

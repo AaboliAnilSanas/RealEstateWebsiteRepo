@@ -220,7 +220,7 @@ const SellerForm = () => {
           </motion.h1>
         </motion.div>
 
-        <div className='w-[80%]' style={{paddingTop:'4%',paddingRight:'2%' }}>
+        <div className='w-[80%]' style={{paddingRight:'2%' }}>
           <VerticalLinearStepper SellerFormDetails={SellerFormDetailsData}/>
         </div>
       </div>

@@ -40,7 +40,7 @@ const PropertyListing = () => {
           "Beautiful 3BHK apartment with modern amenities and great location.",
       },
       media: {
-        videoUrl: "/real-estate-hero.mp4",
+        imageUrl: "/house1.jpg",
         photos: ["/property1.jpg", "/property2.jpg"],
       },
     },
@@ -73,7 +73,7 @@ const PropertyListing = () => {
           "Spacious villa with garden and modern amenities in prime location.Spacious villa with garden and modern amenities in prime location.Spacious villa with garden and modern amenities in prime location.Spacious villa with garden and modern amenities in prime location.Spacious villa with garden and modern amenities in prime location.Spacious villa with garden and modern amenities in prime location.Spacious villa with garden and modern amenities in prime location.Spacious villa with garden and modern amenities in prime location.",
       },
       media: {
-        videoUrl: "/real-estate-hero.mp4",
+        imageUrl: "/house1.jpg",
         photos: ["/villa1.jpg", "/villa2.jpg"],
       },
     },
@@ -106,7 +106,7 @@ const PropertyListing = () => {
           "Premium office space in central business district with great connectivity.",
       },
       media: {
-        videoUrl: "/real-estate-hero.mp4",
+        imageUrl: "/house1.jpg",
         photos: ["/office1.jpg", "/office2.jpg"],
       },
     },
@@ -139,7 +139,7 @@ const PropertyListing = () => {
           "Cozy PG accommodation with all modern facilities and security.",
       },
       media: {
-        videoUrl: "/real-estate-hero.mp4",
+        imageUrl: "/house1.jpg",
         photos: ["/pg1.jpg", "/pg2.jpg"],
       },
     },
@@ -173,9 +173,9 @@ const PropertyListing = () => {
   }
 
   return (
-    <Box sx={{ padding: 3, width: '100%' }}>
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: "bold" }}>
+    <Box sx={{ padding: 2, width: '100%' }}>
+      <Box sx={{ mb: 2 }}>
+        <Typography variant="h5" component="h1" gutterBottom sx={{ fontWeight: "bold" }}>
           Property Listings : <span>{properties.length} properties found</span> 
         </Typography>
       

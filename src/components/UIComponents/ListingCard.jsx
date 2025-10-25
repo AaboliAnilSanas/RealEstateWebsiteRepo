@@ -27,25 +27,22 @@ const ListingCard = ({ propertyData }) => {
       mb: 2,
       boxSizing: 'border-box'
     }}>
-      {/* Left Section - Video */}
+      {/* Left Section - Image */}
       <Box sx={{ 
         width: '30%', 
         flexShrink: 0 
       }}>
-        <video 
-          autoPlay 
-          muted 
-          loop 
-          style={{ 
-            width: '100%', 
-            height: '100%', 
+        <Box
+          component="img"
+          src={media?.imageUrl || "/real-estate-hero.jpg"}
+          alt="Real Estate Hero"
+          sx={{
+            width: '100%',
+            height: '100%',
             objectFit: 'cover',
             display: 'block'
           }}
-        >
-          <source src={media?.videoUrl || "/real-estate-hero.mp4"} type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
+        />
       </Box>
 
       {/* Right Section - Content */}
