@@ -11,7 +11,7 @@ const LocationCard = ({ image, location, index }) => {
       className="relative overflow-hidden rounded-2xl group cursor-pointer"
       style={cardStyle}
     >
-      <div className="relative h-64">
+      <div className="relative h-56 sm:h-60 lg:h-64">
         <img 
           src={image} 
           alt={location}
@@ -130,7 +130,7 @@ const LocationSection = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white py-12 px-4 sm:px-6 lg:px-8">
+    <div className="relative h-screen overflow-hidden py-8 px-4 sm:px-6 lg:px-8 flex items-center">
       <style>{`
         @keyframes fadeInUp {
           from {
@@ -152,31 +152,161 @@ const LocationSection = () => {
           }
         }
         
+        @keyframes gradientShift {
+          0% {
+            background-position: 0% center;
+          }
+          50% {
+            background-position: 100% center;
+          }
+          100% {
+            background-position: 0% center;
+          }
+        }
+        
+        @keyframes float {
+          0%, 100% {
+            transform: translate(0, 0) rotate(0deg);
+          }
+          33% {
+            transform: translate(30px, -30px) rotate(5deg);
+          }
+          66% {
+            transform: translate(-20px, 20px) rotate(-5deg);
+          }
+        }
+        
+        @keyframes floatReverse {
+          0%, 100% {
+            transform: translate(0, 0) rotate(0deg);
+          }
+          33% {
+            transform: translate(-30px, 30px) rotate(-5deg);
+          }
+          66% {
+            transform: translate(20px, -20px) rotate(5deg);
+          }
+        }
+        
         .animate-pulse-border {
           animation: pulseBorder 2s ease-in-out infinite;
         }
       `}</style>
       
-      <div className="max-w-7xl mx-auto">
+      {/* Animated Background Gradients */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Top Left Gradient Orb */}
+        <div 
+          className="absolute -top-40 -left-40 w-96 h-96 rounded-full opacity-20 blur-3xl"
+          style={{
+            background: 'radial-gradient(circle, #d2a63f 0%, #f3b524 50%, transparent 70%)',
+            animation: 'float 20s ease-in-out infinite'
+          }}
+        ></div>
+        
+        {/* Top Right Gradient Orb */}
+        <div 
+          className="absolute -top-20 -right-20 w-80 h-80 rounded-full opacity-15 blur-3xl"
+          style={{
+            background: 'radial-gradient(circle, #A87CA0 0%, #5E2B6D 50%, transparent 70%)',
+            animation: 'floatReverse 25s ease-in-out infinite'
+          }}
+        ></div>
+        
+        {/* Middle Left Accent */}
+        <div 
+          className="absolute top-1/3 -left-32 w-72 h-72 rounded-full opacity-10 blur-3xl"
+          style={{
+            background: 'radial-gradient(circle, #5E2B6D 0%, #E6E6FA 50%, transparent 70%)',
+            animation: 'float 30s ease-in-out infinite 5s'
+          }}
+        ></div>
+        
+        {/* Bottom Right Gradient Orb */}
+        <div 
+          className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full opacity-15 blur-3xl"
+          style={{
+            background: 'radial-gradient(circle, #f3b524 0%, #d2a63f 50%, transparent 70%)',
+            animation: 'floatReverse 22s ease-in-out infinite 3s'
+          }}
+        ></div>
+        
+        {/* Center Bottom Accent */}
+        <div 
+          className="absolute bottom-20 left-1/2 -translate-x-1/2 w-80 h-80 rounded-full opacity-10 blur-3xl"
+          style={{
+            background: 'radial-gradient(circle, #A87CA0 0%, transparent 70%)',
+            animation: 'float 28s ease-in-out infinite 7s'
+          }}
+        ></div>
+      </div>
+      
+      {/* Subtle Grid Pattern Overlay */}
+      <div 
+        className="absolute inset-0 opacity-5 pointer-events-none"
+        style={{
+          backgroundImage: `
+            linear-gradient(#d2a63f 1px, transparent 1px),
+            linear-gradient(90deg, #d2a63f 1px, transparent 1px)
+          `,
+          backgroundSize: '50px 50px'
+        }}
+      ></div>
+      
+      <div className="relative max-w-7xl mx-auto z-10 w-full">
         {/* Section Header */}
         <div 
-          className="text-center mb-16"
+          className="text-center mb-8"
           style={{
             animation: 'fadeInUp 0.8s ease-out forwards',
             opacity: 0
           }}
         >
-          <h2 className="text-5xl font-light mb-6 tracking-tight" style={{ color: 'var(--tertiary-color)' }}>
+          {/* Decorative element above title */}
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div 
+              className="w-12 h-0.5"
+              style={{ 
+                background: 'linear-gradient(to right, transparent, #d2a63f, transparent)'
+              }}
+            ></div>
+            <div 
+              className="w-2 h-2 rounded-full"
+              style={{ backgroundColor: '#d2a63f' }}
+            ></div>
+            <div 
+              className="w-12 h-0.5"
+              style={{ 
+                background: 'linear-gradient(to right, transparent, #d2a63f, transparent)'
+              }}
+            ></div>
+          </div>
+          
+          <h2 
+            className="text-4xl lg:text-5xl font-light mb-4 tracking-tight"
+            style={{
+              background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 25%, #d97706 50%, #b45309 75%, #fbbf24 100%)',
+              WebkitBackgroundClip: 'text',
+              backgroundClip: 'text',
+              WebkitTextFillColor: 'transparent'
+            }}
+          >
             Explore Prime Locations
           </h2>
+          
+          {/* Decorative line below title */}
           <div 
-            className="w-16 h-0.5 mx-auto" 
-            style={{ backgroundColor: 'var(--primary-color)' }}
+            className="w-24 h-1 mx-auto rounded-full"
+            style={{ 
+              background: 'linear-gradient(to right, #5E2B6D, #d2a63f, #A87CA0)',
+              boxShadow: '0 4px 15px rgba(210, 166, 63, 0.3)'
+            }}
           ></div>
+          
         </div>
 
         {/* Location Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
           {locations.map((loc, index) => (
             <LocationCard
               key={loc.id}
