@@ -7,9 +7,9 @@ import Contactus from '../components/ContactUs/contactUsPage.jsx';
 import SellerForm from '../components/SellerForm/SellerForm.jsx';
 import FilterComponent from '../components/UIComponents/FilterComponent.jsx';
 import PropertyListing from '../components/PropertyPages/PropertListing.jsx';
-import HomePage from '../components/HomePage/HomePage.jsx';
+import HomePage from '../components/Homepage/homepage.jsx';
 import Layout from '../components/Layout/layout.jsx';
-import Login from '../components/Authentication/Login.jsx'
+// import Login from '../components/Authentication/Login.jsx'
 // import Login from '../components/Auth/Login.jsx'; // Create this component
 
 // Create router configuration
@@ -38,10 +38,10 @@ const router = createBrowserRouter([
         path: 'contact',
         element: <Contactus />,
       },
-      {
-        path: 'login',
-        element: <Login />,
-      },
+      // {
+      //   path: 'login',
+      //   element: <Login />,
+      // },
     ],
   },
 ]);
