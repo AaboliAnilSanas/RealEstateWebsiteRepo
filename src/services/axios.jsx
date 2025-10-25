@@ -2,8 +2,8 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: process.env.REACT_APP_API_BASE_URL || 'https://jsonplaceholder.typicode.com',
-  timeout: parseInt(process.env.REACT_APP_API_TIMEOUT) || 10000,
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:7000/api/',
+  timeout:parseInt(import.meta.env.VITE_API_TIMEOUT) || 10000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -23,7 +23,7 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-// Response interceptor
+// Response interceptor (FIXED: You had request interceptor twice)
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {

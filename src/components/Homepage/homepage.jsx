@@ -9,7 +9,7 @@ const HomePage = () => {
   return (
     <div className="min-h-screen flex flex-col overflow-hidden relative">
       {/* SVG Background */}
-     <svg 
+     {/* <svg 
         className="absolute -right-40 -top-130 z-10 scale-x-300 rotate-20"
         width="1500"
         height="1040"
@@ -28,10 +28,10 @@ const HomePage = () => {
           fill={'url(#hexagonGradient)'}
           strokeWidth="2"
         />
-      </svg>
+      </svg> */}
       
       {/* Video on top of SVG */}
-      <div className=" relative z-20 w-[96%] mt-16  pl-15"> {/* Added relative and z-20 */}
+      <div className=" relative z-20 w-[96%] mt-2  pl-15"> {/* Added relative and z-20 */}
         <Video />
       </div>
       

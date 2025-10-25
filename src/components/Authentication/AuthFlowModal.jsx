@@ -26,27 +26,52 @@ export default function AuthFlowModal({
 }) {
   const [step, setStep] = useState(STEPS.REGISTER);
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [email, setEmail] = useState('');
+  const [authToken, setAuthToken] = useState('');
+  const [userEmail, setUserEmail] = useState('');
 
   if (!isOpen) return null;
 
   // --- Flow Handlers ---
 
   // Step 1 -> Step 2
-  const handleContinue = (phone) => {
-    setPhoneNumber(phone);
+  const handleContinue = (emailOrPhone) => {
+    // Check if it's email or phone
+    if (emailOrPhone.includes('@')) {
+      setEmail(emailOrPhone);
+      setUserEmail(emailOrPhone);
+      localStorage.setItem('userEmail', emailOrPhone);
+    } else {
+      setPhoneNumber(emailOrPhone);
+    }
     setStep(STEPS.OTP);
   };
 
   // Step 2 -> Step 3
-  const handleVerifyOtp = (otp) => {
-    console.log('OTP Verified:', otp);
-    setStep(STEPS.DETAILS);
+  const handleVerifyOtp = (result) => {
+    if (result.success && result.token) {
+      setAuthToken(result.token);
+      localStorage.setItem('authToken', result.token);
+      setStep(STEPS.DETAILS);
+    }
+    // If verification fails, OtpForm will handle the error display
   };
-
+  
   // Step 3 -> Finish
-  const handleCreateAccount = (details) => {
-    console.log('Account Created with details:', details);
-    onClose(); // Close the modal after successful registration
+  const handleCreateAccount = (result) => {
+    if (result.success) {
+      console.log('Account Created successfully:', result);
+      // Store user data if needed
+      if (result.user) {
+        localStorage.setItem('userData', JSON.stringify(result.user));
+      }
+      onClose(); // Close the modal after successful registration
+      
+      // Optional: Redirect to dashboard or show success message
+      // window.location.href = '/dashboard';
+    } else {
+      console.log('Account creation failed:', result);
+    }
   };
 
   const handleBack = () => {
@@ -57,7 +82,7 @@ export default function AuthFlowModal({
   const getModalTitle = () => {
     switch (step) {
       case STEPS.OTP:
-        return 'Verify Phone Number';
+        return 'Verify Code';
       case STEPS.DETAILS:
         return 'Complete Your Profile';
       case STEPS.REGISTER:
@@ -115,14 +140,18 @@ export default function AuthFlowModal({
 
         {step === STEPS.OTP && (
           <OtpForm
-            phoneNumber={`${countryCodePrefix} ${phoneNumber}`}
-            onVerify={handleVerifyOtp} 
+            phoneNumber={phoneNumber ? `${countryCodePrefix} ${phoneNumber}` : ''}
+            email={email}
+            onVerify={handleVerifyOtp}
+            onBack={handleBack}
           />
         )}
 
         {step === STEPS.DETAILS && (
-          <DetailsForm
-            onCreateAccount={handleCreateAccount} 
+          <DetailsForm 
+            onCreateAccount={handleCreateAccount}
+            countryCodePrefix={countryCodePrefix}
+            authToken={authToken}
           />
         )}
       </div>

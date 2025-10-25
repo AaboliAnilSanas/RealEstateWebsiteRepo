@@ -1,96 +1,152 @@
 import React, { useState } from 'react';
-
-const colorTheme = {
-  '--primary-color': '#d2a63f', 
-  '--primary-color-light': '#d2a63fb5', 
-  '--secondary-color': 'rgb(138, 136, 136)', 
-  '--tertiary-color': 'black', 
-};
-
-/**
- * * @param {object} props
- * @param {function} props.onContinue - Function called on button click to move to OTP step.
- */
+import axiosInstance from '../../services/axios'; // Adjust path as needed
 
 export default function RegisterForm({ 
-  onContinue
+  onContinue = () => {}
 }) {
-  const [email, setEmail] = useState(''); 
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleContinue = () => {
+  const getCssVar = (varName, fallback) => `var(${varName}, ${fallback})`;
+
+  const handleContinue = async (e) => {
+    e.preventDefault();
+    
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (emailRegex.test(email)) { 
-      onContinue(email);
-    } else {
+    if (!emailRegex.test(email)) {
       alert("Please enter a valid email address.");
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await axiosInstance.post('/auth/send-otp', {
+        email: email
+      });
+
+      if (response.status === 200) {
+        // Store email for later use in OTP verification
+        localStorage.setItem('userEmail', email);
+        
+        // Call the parent callback to proceed to OTP step
+        onContinue(email);
+      } else {
+        setError('Failed to send OTP. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error sending OTP:', error);
+      
+      if (error.response?.data?.message) {
+        setError(error.response.data.message);
+      } else if (error.response?.status === 400) {
+        setError('Invalid email address.');
+      } else if (error.response?.status === 429) {
+        setError('Too many attempts. Please try again later.');
+      } else {
+        setError('Network error. Please check your connection.');
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Common input styles for reusability
   const inputStyle = {
-    borderColor: colorTheme['--secondary-color'],
-    color: colorTheme['--tertiary-color'],
+    borderColor: getCssVar('--secondary-color', 'rgb(138, 136, 136)'),
+    color: getCssVar('--tertiary-color', 'black'),
+    boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.05)',
   };
 
-  // Enhanced focus/blur handlers to use the primary color as the focus ring
   const inputFocus = (e) => {
-    e.target.style.borderColor = colorTheme['--primary-color'];
-    e.target.style.boxShadow = `0 0 0 2px ${colorTheme['--primary-color-light']}`;
+    e.target.style.borderColor = getCssVar('--primary-color', '#d2a63f');
+    e.target.style.boxShadow = `0 0 0 2px ${getCssVar('--primary-color-light', '#d2a63fb5')}`;
   };
+  
   const inputBlur = (e) => {
-    e.target.style.borderColor = colorTheme['--secondary-color'];
+    e.target.style.borderColor = getCssVar('--secondary-color', 'rgb(138, 136, 136)');
     e.target.style.boxShadow = 'inset 0 1px 2px rgba(0,0,0,0.05)';
   };
 
   return (
-    // Only return the form content div
-    <div className="pt-3 px-6 pb-6 sm:pt-4 sm:px-8 sm:pb-8">
-      <div className="space-y-6">
-        <p className="text-black-600 text-base">
-          Please enter your Email Address
-        </p>
-
-        {/* Email Input Field */}
+    <div className="pt-6 px-6 pb-8 sm:pt-8 sm:px-8 sm:pb-10">
+      <form onSubmit={handleContinue} className="space-y-6">
+        {/* Removed the email/phone toggle */}
+        
         <div>
-          <label 
-            className="block font-normal mb-2 text-sm text-gray-500" 
-            htmlFor="email-input"
-          >
+          <label className="block font-medium mb-2 text-sm text-gray-700" htmlFor="email-input">
             Email Address
           </label>
-          
           <input
             id="email-input"
             type="email"
             placeholder="Enter your email address"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full border rounded-lg py-3 px-4 focus:outline-none transition placeholder-gray-400 text-base"
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setError(''); // Clear error when user types
+            }}
+            className="w-full border rounded-lg py-2.5 px-3.5 focus:outline-none transition placeholder-gray-400 text-sm bg-white"
             style={inputStyle}
             onFocus={inputFocus}
             onBlur={inputBlur}
+            disabled={loading}
+            required
           />
         </div>
 
-        {/* Continue Button - Primary Golden Color Only */}
+        {/* Error Message */}
+        {error && (
+          <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
+            {error}
+          </div>
+        )}
+
         <button
-          onClick={handleContinue}
-          className="w-full text-white font-bold text-lg py-3 rounded-lg transition duration-200 ease-in-out mt-4 active:scale-[0.98] shadow-md hover:scale-[1.02]"
+          type="submit"
+          disabled={loading}
+          className="w-full text-white font-medium text-base py-3 rounded-lg transition-all duration-200 mt-2 relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed"
           style={{ 
-            background: 'linear-gradient(135deg, #fbbf24 0%, #555000ff 100%)',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.25)'
+            background: loading 
+              ? '#ccc' 
+              : 'linear-gradient(135deg, #d2a63f 0%, #c09935 50%, #d2a63f 100%)',
+            boxShadow: loading 
+              ? 'none' 
+              : '0 2px 8px rgba(210,166,63,0.25)'
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
+            if (!loading) {
+              e.target.style.transform = 'translateY(-1px)';
+              e.target.style.boxShadow = '0 4px 12px rgba(210,166,63,0.3)';
+            }
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.25)';
+            if (!loading) {
+              e.target.style.transform = 'translateY(0)';
+              e.target.style.boxShadow = '0 2px 8px rgba(210,166,63,0.25)';
+            }
+          }}
+          onMouseDown={(e) => {
+            if (!loading) {
+              e.target.style.transform = 'scale(0.98)';
+            }
+          }}
+          onMouseUp={(e) => {
+            if (!loading) {
+              e.target.style.transform = 'translateY(-1px)';
+            }
           }}
         >
-          Continue
+          {loading ? 'Sending OTP...' : 'Continue'}
         </button>
-      </div>
+
+        {/* Optional: Info message */}
+        <p className="text-xs text-gray-500 text-center">
+          We'll send a verification code to your email address
+        </p>
+      </form>
     </div>
   );
 }
