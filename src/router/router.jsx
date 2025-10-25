@@ -9,8 +9,7 @@ import FilterComponent from '../components/UIComponents/FilterComponent.jsx';
 import PropertyListing from '../components/PropertyPages/PropertListing.jsx';
 import HomePage from '../components/Homepage/homepage.jsx';
 import Layout from '../components/Layout/layout.jsx';
-// import Login from '../components/Authentication/Login.jsx'
-// import Login from '../components/Auth/Login.jsx'; // Create this component
+import RegisterForm from '../components/Authentication/RegisterForm.jsx';
 
 // Create router configuration
 const router = createBrowserRouter([
@@ -38,10 +37,10 @@ const router = createBrowserRouter([
         path: 'contact',
         element: <Contactus />,
       },
-      // {
-      //   path: 'login',
-      //   element: <Login />,
-      // },
+      {
+        path: 'login',
+        element: <RegisterForm/>,
+      },
     ],
   },
 ]);
