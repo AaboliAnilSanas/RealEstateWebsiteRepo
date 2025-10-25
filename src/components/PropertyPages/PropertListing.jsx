@@ -173,7 +173,8 @@ const PropertyListing = () => {
   }
 
   return (
-    <Box sx={{ padding: 2, width: '100%' }}>
+    
+    <Box sx={{ padding: 2, width: '100%' }} className="mt-10">
       <Box sx={{ mb: 2 }}>
         <Typography variant="h5" component="h1" gutterBottom sx={{ fontWeight: "bold" }}>
           Property Listings : <span>{properties.length} properties found</span> 

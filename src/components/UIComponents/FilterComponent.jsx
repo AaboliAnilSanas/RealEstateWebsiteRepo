@@ -50,12 +50,12 @@ const FilterComponent = ({
 
   // Use props if provided, otherwise use default data
   const data = propData || {
-    label: "Search Here...", // No asterisk - autocomplete is NOT required
+    label: "Search Here...",
     placeholder: "Search by Property Id, Pincode",
     fieldType: "CreatableDropdown",
     fieldData: [
       {
-        label: "Select City*", // Has asterisk - textfield IS required
+        label: "Select City*",
         units: [
           "Bangalore",
           "Mumbai",
@@ -214,8 +214,8 @@ const FilterComponent = ({
     const { textField, autocomplete } = selectedValues.creatableDropdown;
     
     // Check if each field is required based on asterisk in their respective labels
-    const isTextFieldRequired = isFieldRequired(data.label); // "Select City*"
-    const isAutocompleteRequired = isFieldRequired(data.fieldData[0].label); // "Search Here..."
+    const isTextFieldRequired = isFieldRequired(data.label);
+    const isAutocompleteRequired = isFieldRequired(data.fieldData[0].label);
     
     const textFieldEmpty = !textField || textField.trim() === '';
     const autocompleteEmpty = !autocomplete || autocomplete.trim() === '';
@@ -292,22 +292,22 @@ const FilterComponent = ({
   const isTextFieldRequired = isFieldRequired(data.label);
   const isAutocompleteRequired = isFieldRequired(data.fieldData[0].label);
 
-  // Filter content component with inline styles
+  // Filter content component with reduced spacing
   const FilterContent = () => (
     <div style={{ 
-      padding: '12px', 
-      borderRadius: '20px'
+      padding: '8px', // Reduced from 12px
+      borderRadius: '16px' // Reduced from 20px
     }}>
       {/* Buy/Rent Toggle Buttons at Top */}
       <div style={{ 
         display: 'flex', 
-        gap: '12px', 
-        marginBottom: '12px'
+        gap: '8px', // Reduced from 12px
+        marginBottom: '8px' // Reduced from 12px
       }}>
         <Button
           variant={transactionType === "buy" ? "contained" : "outlined"}
           onClick={() => setTransactionType("buy")}
-          size="large"
+          size="medium" // Changed from large
           fullWidth={isMobile}
           sx={{
             "&.MuiButton-contained": {
@@ -324,6 +324,9 @@ const FilterComponent = ({
                 backgroundColor: "rgba(210, 166, 63, 0.04)",
               },
             },
+            fontSize: '14px', // Smaller font
+            padding: '6px 12px', // Reduced padding
+            minHeight: '36px' // Reduced height
           }}
         >
           Buy
@@ -331,7 +334,7 @@ const FilterComponent = ({
         <Button
           variant={transactionType === "rent" ? "contained" : "outlined"}
           onClick={() => setTransactionType("rent")}
-          size="large"
+          size="medium" // Changed from large
           fullWidth={isMobile}
           sx={{
             "&.MuiButton-contained": {
@@ -348,13 +351,16 @@ const FilterComponent = ({
                 backgroundColor: "rgba(210, 166, 63, 0.04)",
               },
             },
+            fontSize: '14px', // Smaller font
+            padding: '6px 12px', // Reduced padding
+            minHeight: '36px' // Reduced height
           }}
         >
           Rent
         </Button>
       </div>
 
-      <div style={{ marginTop: '1.25rem' }}>
+      <div style={{ marginTop: '12px' }}> {/* Reduced from 1.25rem (20px) */}
         <CreatableDropdown
           dropdownLabel={data.label}
           key={`${selectedValues.creatableDropdown.textField}-${selectedValues.creatableDropdown.autocomplete}`}
@@ -373,31 +379,32 @@ const FilterComponent = ({
       </div>
 
       {/* Budget Slider Section */}
-      <div style={{ marginTop: '12px' }}>
+      <div style={{ marginTop: '8px' }}> {/* Reduced from 12px */}
         <div style={{ 
           display: 'flex', 
           alignItems: 'center', 
-          gap: '24px',
-          padding: '12px',
-          borderRadius: '12px',
+          gap: '16px', // Reduced from 24px
+          padding: '2px 8px', // Reduced from 12px
+          borderRadius: '8px', // Reduced from 12px
           backgroundColor: 'rgba(210, 166, 63, 0.05)',
           border: '1px solid #e5e5e5'
         }}>
           <div style={{ 
-            width: '20%', 
-            minWidth: '150px'
+            width: '25%', // Adjusted width
+            minWidth: '120px' // Reduced from 150px
           }}>
             <p style={{ 
               fontWeight: 600, 
               color: '#374151',
-              margin: 0
+              margin: 0,
+              fontSize: '14px' // Smaller font
             }}>
               {transactionType === "buy"
                 ? "Buy Price Range:"
                 : "Monthly Rent Range:"}
               <span style={{ 
                 paddingLeft: '4px', 
-                fontSize: '15px', 
+                fontSize: '13px', // Smaller font
                 fontWeight: 'bold', 
                 color: '#d2a63f'
               }}>
@@ -405,7 +412,7 @@ const FilterComponent = ({
               </span>
             </p>
           </div>
-          <Box sx={{ width: isMobile ? "100%" : "80%", mt: isMobile ? 2 : 0 }}>
+          <Box sx={{ width: isMobile ? "100%" : "75%", mt: isMobile ? 1 : 0 }}> {/* Reduced margin */}
             <Slider
               getAriaLabel={() =>
                 transactionType === "buy"
@@ -424,16 +431,20 @@ const FilterComponent = ({
                 color: "#d2a63f",
                 "& .MuiSlider-thumb": {
                   backgroundColor: "#d2a63f",
+                  width: 16, // Smaller thumb
+                  height: 16,
                 },
                 "& .MuiSlider-track": {
                   backgroundColor: "#d2a63f",
+                  height: 4, // Thinner track
                 },
                 "& .MuiSlider-rail": {
                   backgroundColor: "#e5e5e5",
+                  height: 4, // Thinner rail
                 },
                 "& .MuiSlider-markLabel": {
                   color: "#666666",
-                  fontSize: "13px",
+                  fontSize: "11px", // Smaller font
                 },
               }}
             />
@@ -446,14 +457,14 @@ const FilterComponent = ({
           flexDirection: isMobile ? 'column' : 'row',
           justifyContent: isMobile ? 'flex-start' : 'space-between',
           alignItems: isMobile ? 'stretch' : 'flex-start',
-          gap: '24px',
-          marginTop: '15px'
+          gap: '16px', // Reduced from 24px
+          marginTop: '12px' // Reduced from 15px
         }}>
           <div style={{
             display: 'flex',
             flexDirection: isMobile ? 'column' : 'row',
             flexWrap: isMobile ? 'nowrap' : 'wrap',
-            gap: '12px',
+            gap: '8px', // Reduced from 12px
             flex: 1
           }}>
             {/* Property Type Dropdown */}
@@ -516,22 +527,22 @@ const FilterComponent = ({
           <Button
             onClick={handleSearch}
             sx={{
-              width: isMobile ? "100%" : "200px",
-              height: "56px",
+              width: isMobile ? "100%" : "160px", // Reduced from 200px
+              height: "55px", // Reduced from 56px
               background: "linear-gradient(135deg, #d2a63f, #d2a63fb5) !important",
               color: "white !important",
               border: "none !important",
-              borderRadius: "20px !important",
+              borderRadius: "12px !important", // Reduced from 20px
               fontWeight: "600 !important",
-              fontSize: "15px !important",
-              boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important",
+              fontSize: "14px !important", // Smaller font
+              boxShadow: "0 2px 4px -1px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.06) !important",
               transition: "all 0.3s ease !important",
               "&:hover": {
                 background: "linear-gradient(135deg, #d2a63fb5, #d2a63f) !important",
-                transform: "scale(1.05)",
-                boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important",
+                transform: "scale(1.03)", // Reduced from 1.05
+                boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.05) !important",
               },
-              marginTop: isMobile ? 2 : 0,
+              marginTop: isMobile ? 1 : 0, // Reduced margin
             }}
           >
             Search
@@ -546,8 +557,8 @@ const FilterComponent = ({
       {/* Mobile Filter Button */}
       {isMobile && (
         <div style={{ 
-          padding: '24px', 
-          borderRadius: '12px', 
+          padding: '16px', // Reduced from 24px
+          borderRadius: '8px', // Reduced from 12px
           backgroundColor: 'white'
         }}>
           <Button
@@ -555,7 +566,7 @@ const FilterComponent = ({
             startIcon={<FilterListIcon />}
             onClick={handleMobileOpen}
             fullWidth
-            size="large"
+            size="medium" // Changed from large
             sx={{
               borderColor: "#d2a63f",
               color: "#d2a63f",
@@ -563,6 +574,8 @@ const FilterComponent = ({
                 borderColor: "#d2a63fb5",
                 backgroundColor: "rgba(210, 166, 63, 0.04)",
               },
+              fontSize: '14px', // Smaller font
+              padding: '8px 16px', // Reduced padding
             }}
           >
             Filters
@@ -570,16 +583,16 @@ const FilterComponent = ({
               selectedValues.bedroom.length > 0 ||
               selectedValues.bathroom.length > 0) && (
               <span style={{
-                marginLeft: '8px',
+                marginLeft: '6px', // Reduced from 8px
                 backgroundColor: '#ef4444',
                 color: 'white',
                 borderRadius: '50%',
-                width: '24px',
-                height: '24px',
+                width: '20px', // Reduced from 24px
+                height: '20px', // Reduced from 24px
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '12px'
+                fontSize: '11px' // Smaller font
               }}>
                 {selectedValues.propertyType.length +
                   selectedValues.bedroom.length +
@@ -593,9 +606,9 @@ const FilterComponent = ({
       {/* Desktop View */}
       {!isMobile && (
         <div style={{ 
-          borderRadius: '12px', 
+          borderRadius: '8px', // Reduced from 12px
           backgroundColor: 'white',
-          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
+          boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' // Lighter shadow
         }}>
           <FilterContent />
         </div>
@@ -609,7 +622,7 @@ const FilterComponent = ({
         sx={{
           "& .MuiDrawer-paper": {
             width: "100vw",
-            maxWidth: "400px",
+            maxWidth: "380px", // Slightly smaller
             backgroundColor: "white",
             color: "#333333",
           },
@@ -620,12 +633,12 @@ const FilterComponent = ({
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            padding: "12px",
+            padding: "12px", // Reduced from 16px
             borderBottom: "1px solid #e5e5e5"
           }}
         >
           <h2 style={{ 
-            fontSize: "20px", 
+            fontSize: "18px", // Smaller font
             fontWeight: "bold",
             margin: 0
           }}>
@@ -640,7 +653,7 @@ const FilterComponent = ({
         </div>
         <div style={{ 
           overflowY: "auto", 
-          padding: "24px"
+          padding: "16px" // Reduced from 24px
         }}>
           <FilterContent />
         </div>

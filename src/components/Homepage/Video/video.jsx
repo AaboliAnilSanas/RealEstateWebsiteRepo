@@ -9,7 +9,7 @@ const VideoHero = () => {
   };
 
   return (
-    <div className="relative h-[500px] flex items-center justify-center overflow-hidden">
+    <div className="relative h-[500px] rounded-[16px] flex items-center justify-center overflow-hidden">
       
       <video 
         autoPlay 

@@ -27,3 +27,8 @@ echo "public/real-estate-hero.mp4" >> .gitignore
 echo "path/to/large-file" >> .gitignore
 echo "*.zip" >> .gitignore
 echo "*.mp4" >> .gitignore
+
+echo "*.mp4" >> .gitignore
+echo "*.mov" >> .gitignore  
+echo "*.avi" >> .gitignore
+echo "*.mkv" >> .gitignore
