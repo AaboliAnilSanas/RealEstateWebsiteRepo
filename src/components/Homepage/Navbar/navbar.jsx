@@ -78,13 +78,13 @@ export default function Navbar() {
   const location = useLocation();
 
   const navigation = [
-    // { title: "Properties", path: "/properties" },
+    { title: "Home", path: "/" },
     { title: "Buy", path: "/properties" },
     { title: "Post Property", path: "/sell" },
     { title: "Contact US", path: "/contact" },
     { 
       title: (
-        <span className="navbar-phone">
+        <span className="flex items-center gap-2 text-white">
           <svg 
             xmlns="http://www.w3.org/2000/svg" 
             width="24" 
@@ -128,12 +128,13 @@ export default function Navbar() {
   }, [location]);
 
   return (
-    <nav className="navbar">
-      <div className="navbar-container">
-        <div className="navbar-header">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-transparent py-2 ">
+      <div className="max-w-[96vw] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+        {/* Logo */}
+        <div className="flex items-center">
           <Link 
             to="/"
-            className="navbar-logo"
+            className="flex items-center transition-transform duration-300 hover:scale-105"
             onMouseEnter={handleLogoMouseEnter}
             onMouseLeave={handleLogoMouseLeave}
           >
@@ -143,11 +144,13 @@ export default function Navbar() {
               width={80} 
               height={45}
               alt="Float UI logo"
+              className="rounded-lg"
             />
           </Link>
           
+          {/* Mobile menu button */}
           <button 
-            className="navbar-toggle"
+            className="md:hidden ml-4 p-2 text-white hover:text-gray-200 transition-colors"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? (
@@ -162,10 +165,11 @@ export default function Navbar() {
           </button>
         </div>
         
-        <div className={`navbar-menu ${isMenuOpen ? '' : 'navbar-menu-hidden'}`}>
-          <ul className="navbar-list">
+        {/* Navigation Links - Desktop */}
+        <div className="hidden md:flex items-center justify-center flex-1">
+          <ul className="flex items-center space-x-8">
             {navigation.map((item, idx) => (
-              <li key={idx} className="navbar-item">
+              <li key={idx} className="relative">
                 <AnimatedContent
                   direction="vertical"
                   distance={60}
@@ -180,14 +184,16 @@ export default function Navbar() {
                   {item.path.startsWith('tel:') ? (
                     <a 
                       href={item.path} 
-                      className="navbar-link"
+                      className="text-white hover:text-gray-200 transition-colors duration-300 px-4 py-2 rounded-full flex items-center gap-2"
                     >
                       {item.title}
                     </a>
                   ) : (
                     <Link 
                       to={item.path} 
-                      className={`navbar-link ${location.pathname === item.path ? 'navbar-link-active' : ''}`}
+                      className={`text-white hover:text-gray-200 transition-colors duration-300 px-4 py-2 rounded-full ${
+                        location.pathname === item.path ? 'bg-[#d2a63f] bg-opacity-30 text-[#d2a63f]' : ''
+                      }`}
                     >
                       {item.title}
                     </Link>
@@ -198,7 +204,8 @@ export default function Navbar() {
           </ul>
         </div>
         
-        <div className="navbar-button-container">
+        {/* Login Button - Desktop */}
+        <div className="hidden md:block">
           <AnimatedContent
             direction="horizontal"
             distance={80}
@@ -209,11 +216,52 @@ export default function Navbar() {
           >
             <Link 
               to="/login" 
-              className="navbar-button"
+              className="bg-gradient-to-br from-[#f3b524] to-[#e0a10cb5] text-white px-6 py-2 rounded-full font-semibold transition-all duration-300 hover:shadow-lg hover:scale-105"
             >
               Login
             </Link>
           </AnimatedContent>
+        </div>
+
+        {/* Mobile Menu */}
+        <div className={`md:hidden absolute top-full left-0 right-0 bg-transparent transition-all duration-300 ${
+          isMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+        }`}>
+          <div className="bg-transparent py-4">
+            <ul className="flex flex-col items-center space-y-4">
+              {navigation.map((item, idx) => (
+                <li key={idx} className="w-full text-center">
+                  {item.path.startsWith('tel:') ? (
+                    <a 
+                      href={item.path} 
+                      className="block text-white hover:text-gray-200 transition-colors duration-300 py-3 text-lg"
+                    >
+                      {item.title}
+                    </a>
+                  ) : (
+                    <Link 
+                      to={item.path} 
+                      className={`block text-white hover:text-gray-200 transition-colors duration-300 py-3 text-lg ${
+                        location.pathname === item.path ? 'text-[#d2a63f]' : ''
+                      }`}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      {item.title}
+                    </Link>
+                  )}
+                </li>
+              ))}
+              <li className="w-full text-center pt-4">
+                <Link 
+                  to="/login" 
+                  className="bg-gradient-to-br from-[#d2a63f] to-[#d2a63fb5] text-white px-8 py-3 rounded-full font-semibold transition-all duration-300 hover:shadow-lg inline-block"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Login
+                </Link>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </nav>
