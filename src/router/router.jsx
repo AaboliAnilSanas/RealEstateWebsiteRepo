@@ -10,6 +10,7 @@ import PropertyListing from '../components/PropertyPages/PropertListing.jsx';
 import HomePage from '../components/Homepage/homepage.jsx';
 import Layout from '../components/Layout/layout.jsx';
 import RegisterForm from '../components/Authentication/RegisterForm.jsx';
+import AuthFlowModal from '../components/Authentication/AuthFlowModal.jsx'; // Import the new flow controller
 
 // Create router configuration
 const router = createBrowserRouter([
@@ -39,7 +40,7 @@ const router = createBrowserRouter([
       },
       {
         path: 'login',
-        element: <RegisterForm/>,
+        element: <AuthFlowModal isOpen={true} />
       },
     ],
   },

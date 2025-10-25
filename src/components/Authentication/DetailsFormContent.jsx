@@ -1,33 +1,28 @@
 import React, { useState } from 'react';
-import { X } from 'lucide-react'; 
 
 /**
  * @param {object} props
- * @param {boolean} props.isOpen - Controls the visibility of the modal. Defaults to true to show the form.
- * @param {function} props.onClose - Function called when the user closes the modal (inert).
- * @param {function} props.onCreateAccount - Function called on button click (inert).
+ * @param {function} props.onCreateAccount 
+ * @param {string} props.countryCodePrefix - The default country code prefix (e.g., '+91').
  */
 
 export default function DetailsForm({ 
-  isOpen = true, 
-  onClose = () => { console.log('Close clicked (inert)'); }, 
-  onCreateAccount = (details) => { console.log('Create Account clicked (inert):', details); }, 
+  onCreateAccount = (details) => { console.log('Create Account clicked (inert):', details); },
+  countryCodePrefix = '+91'
 }) {
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [role, setRole] = useState('buyer');
-
-  if (!isOpen) return null;
 
   const getCssVar = (varName, fallback) => `var(${varName}, ${fallback})`;
 
   const handleCreateAccount = (e) => {
     e.preventDefault();
-    onCreateAccount({ name, email, role });
-  };
-
-  const handleClose = () => {
-    onClose(); 
+    if (name && phone.length >= 6) { // Simple validation
+        onCreateAccount({ name, phone, role }); // Triggers closure in parent
+    } else {
+        alert("Please fill in all required fields.");
+    }
   };
 
   const inputStyle = {
@@ -45,44 +40,12 @@ export default function DetailsForm({
     e.target.style.boxShadow = 'inset 0 1px 2px rgba(0,0,0,0.05)';
   };
 
+  // The component now renders only the inner content, relying on the parent (AuthFlowModal) for the overlay and header.
   return (
-    <div className="fixed inset-0 flex items-center justify-center p-4 z-50 font-sans"
-      style={{
-        background: 'rgba(0,0,0,0.75)',
-        backdropFilter: 'blur(8px)'
-      }}
-    >
-      
-      <div 
-        className="rounded-xl w-full max-w-sm sm:max-w-md overflow-hidden transform transition-all duration-300 scale-100 opacity-100"
-        style={{ 
-          boxShadow: '0 20px 60px rgba(0,0,0,0.15), 0 0 1px rgba(0,0,0,0.1)',
-          borderRadius: '16px',
-          background: '#ffffff'
-        }}
-      >
-        
-        <div 
-          className="p-6 flex justify-between items-center relative" 
-          style={{ 
-            backgroundColor: '#ffffff',
-            borderBottom: '1px solid #f0f0f0'
-          }}
-        >
-          <h2 className="text-2xl font-semibold tracking-tight text-gray-900">Your Details</h2>
-          <button
-            onClick={handleClose}
-            className="text-gray-400 hover:text-gray-600 p-1.5 rounded-full transition-colors"
-          >
-            <X size={20} strokeWidth={2} />
-          </button>
-        </div>
-
-        <div className="pt-6 px-6 pb-8 sm:pt-8 sm:px-8 sm:pb-10">
-          
-          <div className="space-y-5">
+    <div className="pt-6 px-6 pb-8 sm:pt-8 sm:px-8 sm:pb-10">
+        <form onSubmit={handleCreateAccount} className="space-y-5">
             <p className="text-black-500 text-sm leading-relaxed">
-              Please complete your account profile.
+                Please complete your account profile.
             </p>
 
             <div>
@@ -109,22 +72,39 @@ export default function DetailsForm({
             <div>
               <label 
                 className="block font-medium mb-2 text-sm text-gray-700"
-                htmlFor="email-input"
+                htmlFor="phone-input"
               >
-                Email Address
+                Phone Number
               </label>
-              <input
-                id="email-input"
-                type="email"
-                placeholder="Enter your email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full border rounded-lg py-2.5 px-3.5 focus:outline-none transition placeholder-gray-400 text-sm bg-white"
-                style={inputStyle}
-                onFocus={inputFocus}
-                onBlur={inputBlur}
-                required
-              />
+              
+              <div className="flex gap-2">
+                {/* Country Code Prefix Box */}
+                <div 
+                  className="flex-shrink-0 flex items-center border rounded-lg py-2.5 px-3" 
+                  style={{ 
+                    ...inputStyle,
+                    minWidth: '70px',
+                    backgroundColor: 'white'
+                  }}
+                >
+                  <span className="font-medium text-sm">{countryCodePrefix}</span>
+                </div>
+                
+                {/* Actual Phone Input */}
+                <input
+                  id="phone-input"
+                  type="tel"
+                  placeholder="Enter your phone number"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, ''))} // only allow digits
+                  className="flex-grow border rounded-lg py-2.5 px-3.5 focus:outline-none transition placeholder-gray-400 text-sm bg-white"
+                  style={inputStyle}
+                  onFocus={inputFocus}
+                  onBlur={inputBlur}
+                  maxLength={15}
+                  required
+                />
+              </div>
             </div>
 
             <div>
@@ -168,7 +148,6 @@ export default function DetailsForm({
 
             <button
               type="submit"
-              onClick={handleCreateAccount}
               className="w-full text-white font-medium text-base py-3 rounded-lg transition-all duration-200 mt-2 relative overflow-hidden"
               style={{ 
                 background: 'linear-gradient(135deg, #d2a63f 0%, #c09935 50%, #d2a63f 100%)',
@@ -192,10 +171,7 @@ export default function DetailsForm({
               Create Account
             </button>
             
-          </div>
-
-        </div>
-      </div>
+          </form>
     </div>
   );
 }
