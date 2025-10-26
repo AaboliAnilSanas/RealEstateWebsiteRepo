@@ -57,7 +57,7 @@ const CustomAutocomplete = ({
       onInputChange={(event, newInputValue) => {
         setInputValue(newInputValue);
       }}
-      style={{ width: 180, minWidth: 180 }}
+      style={{ width: 200, minWidth: '100%' }}
       renderInput={(params) => (
         <TextField 
           {...params} 

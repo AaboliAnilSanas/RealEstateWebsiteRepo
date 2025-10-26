@@ -286,266 +286,320 @@ const FilterComponent = ({
     }
   };
 
+  const handleClearAll = () => {
+    setSelectedValues({
+      city: "",
+      budget: "",
+      propertyType: [],
+      bedroom: [],
+      bathroom: [],
+      parking: [],
+      possessionStatus: [],
+      furnishingStatus: [],
+      creatableDropdown: {
+        textField: "",
+        autocomplete: "",
+      },
+    });
+    setBuySliderValue([0, 100]);
+    setRentSliderValue([10, 50]);
+    setValidationErrors({
+      textField: false,
+      autocomplete: false
+    });
+  };
+
   const sliderConfig = getSliderConfig();
 
   // Check if each field is required separately
   const isTextFieldRequired = isFieldRequired(data.label);
   const isAutocompleteRequired = isFieldRequired(data.fieldData[0].label);
 
-  // Filter content component with reduced spacing
+  // Filter content component with uniform spacing
   const FilterContent = () => (
     <div style={{ 
-      padding: '8px', // Reduced from 12px
-      borderRadius: '16px' // Reduced from 20px
+      padding: '4px',
+      borderRadius: '16px'
     }}>
-      {/* Buy/Rent Toggle Buttons at Top */}
+      {/* Top Row: Buy/Rent Toggle + Budget Slider */}
       <div style={{ 
         display: 'flex', 
-        gap: '8px', // Reduced from 12px
-        marginBottom: '8px' // Reduced from 12px
+        alignItems: 'center',
+        gap: '16px',
+        marginBottom: '16px',
+        flexWrap: isMobile ? 'wrap' : 'nowrap'
       }}>
-        <Button
-          variant={transactionType === "buy" ? "contained" : "outlined"}
-          onClick={() => setTransactionType("buy")}
-          size="medium" // Changed from large
-          fullWidth={isMobile}
-          sx={{
-            "&.MuiButton-contained": {
-              backgroundColor: "#d2a63f",
-              "&:hover": {
-                backgroundColor: "#d2a63fb5",
-              },
-            },
-            "&.MuiButton-outlined": {
-              borderColor: "#d2a63f",
-              color: "#d2a63f",
-              "&:hover": {
-                borderColor: "#d2a63fb5",
-                backgroundColor: "rgba(210, 166, 63, 0.04)",
-              },
-            },
-            fontSize: '14px', // Smaller font
-            padding: '6px 12px', // Reduced padding
-            minHeight: '36px' // Reduced height
-          }}
-        >
-          Buy
-        </Button>
-        <Button
-          variant={transactionType === "rent" ? "contained" : "outlined"}
-          onClick={() => setTransactionType("rent")}
-          size="medium" // Changed from large
-          fullWidth={isMobile}
-          sx={{
-            "&.MuiButton-contained": {
-              backgroundColor: "#d2a63f",
-              "&:hover": {
-                backgroundColor: "#d2a63fb5",
-              },
-            },
-            "&.MuiButton-outlined": {
-              borderColor: "#d2a63f",
-              color: "#d2a63f",
-              "&:hover": {
-                borderColor: "#d2a63fb5",
-                backgroundColor: "rgba(210, 166, 63, 0.04)",
-              },
-            },
-            fontSize: '14px', // Smaller font
-            padding: '6px 12px', // Reduced padding
-            minHeight: '36px' // Reduced height
-          }}
-        >
-          Rent
-        </Button>
-      </div>
-
-      <div style={{ marginTop: '12px' }}> {/* Reduced from 1.25rem (20px) */}
-        <CreatableDropdown
-          dropdownLabel={data.label}
-          key={`${selectedValues.creatableDropdown.textField}-${selectedValues.creatableDropdown.autocomplete}`}
-          fieldData={data.fieldData}
-          value={{
-            textField: selectedValues.creatableDropdown.textField,
-            autocomplete: selectedValues.creatableDropdown.autocomplete,
-          }}
-          onChange={handleCityChange}
-          inputFirst={data.inputFirst}
-          dropdownisRequired={isAutocompleteRequired}
-          dropdownError={validationErrors.autocomplete}
-          textfieldisRequired={isTextFieldRequired}
-          textfieldError={validationErrors.textField}
-        />
-      </div>
-
-      {/* Budget Slider Section */}
-      <div style={{ marginTop: '8px' }}> {/* Reduced from 12px */}
+        {/* Buy/Rent Toggle Buttons */}
         <div style={{ 
           display: 'flex', 
-          alignItems: 'center', 
-          gap: '16px', // Reduced from 24px
-          padding: '2px 8px', // Reduced from 12px
-          borderRadius: '8px', // Reduced from 12px
-          backgroundColor: 'rgba(210, 166, 63, 0.05)',
-          border: '1px solid #e5e5e5'
+          gap: '4px',
+          flex: isMobile ? '1 1 100%' : 'none'
         }}>
-          <div style={{ 
-            width: '25%', // Adjusted width
-            minWidth: '120px' // Reduced from 150px
-          }}>
-            <p style={{ 
-              fontWeight: 600, 
-              color: '#374151',
-              margin: 0,
-              fontSize: '14px' // Smaller font
-            }}>
-              {transactionType === "buy"
-                ? "Buy Price Range:"
-                : "Monthly Rent Range:"}
-              <span style={{ 
-                paddingLeft: '4px', 
-                fontSize: '13px', // Smaller font
-                fontWeight: 'bold', 
-                color: '#d2a63f'
-              }}>
-                {getRangeText()}
-              </span>
-            </p>
-          </div>
-          <Box sx={{ width: isMobile ? "100%" : "75%", mt: isMobile ? 1 : 0 }}> {/* Reduced margin */}
-            <Slider
-              getAriaLabel={() =>
-                transactionType === "buy"
-                  ? "Buy price range"
-                  : "Monthly rent range"
-              }
-              value={getCurrentSliderValue()}
-              onChange={handleSliderChange}
-              valueLabelDisplay="auto"
-              valueLabelFormat={formatValue}
-              getAriaValueText={valuetext}
-              min={sliderConfig.min}
-              max={sliderConfig.max}
-              step={sliderConfig.step}
-              sx={{
+          <Button
+            variant={transactionType === "buy" ? "contained" : "outlined"}
+            onClick={() => setTransactionType("buy")}
+            size="medium"
+            fullWidth={isMobile}
+            sx={{
+              "&.MuiButton-contained": {
+                backgroundColor: "#d2a63f",
+                "&:hover": {
+                  backgroundColor: "#d2a63fb5",
+                },
+              },
+              "&.MuiButton-outlined": {
+                borderColor: "#d2a63f",
                 color: "#d2a63f",
-                "& .MuiSlider-thumb": {
-                  backgroundColor: "#d2a63f",
-                  width: 16, // Smaller thumb
-                  height: 16,
+                "&:hover": {
+                  borderColor: "#d2a63fb5",
+                  backgroundColor: "rgba(210, 166, 63, 0.04)",
                 },
-                "& .MuiSlider-track": {
-                  backgroundColor: "#d2a63f",
-                  height: 4, // Thinner track
+              },
+              fontSize: '14px',
+              padding: '13px 23px',
+              minHeight: '36px'
+            }}
+          >
+            Buy
+          </Button>
+          <Button
+            variant={transactionType === "rent" ? "contained" : "outlined"}
+            onClick={() => setTransactionType("rent")}
+            size="medium"
+            fullWidth={isMobile}
+            sx={{
+              "&.MuiButton-contained": {
+                backgroundColor: "#d2a63f",
+                "&:hover": {
+                  backgroundColor: "#d2a63fb5",
                 },
-                "& .MuiSlider-rail": {
-                  backgroundColor: "#e5e5e5",
-                  height: 4, // Thinner rail
+              },
+              "&.MuiButton-outlined": {
+                borderColor: "#d2a63f",
+                color: "#d2a63f",
+                "&:hover": {
+                  borderColor: "#d2a63fb5",
+                  backgroundColor: "rgba(210, 166, 63, 0.04)",
                 },
-                "& .MuiSlider-markLabel": {
-                  color: "#666666",
-                  fontSize: "11px", // Smaller font
-                },
-              }}
-            />
-          </Box>
+              },
+              fontSize: '14px',
+              padding: '13px 18px',
+              minHeight: '36px'
+            }}
+          >
+            Rent
+          </Button>
         </div>
 
-        {/* Filter Dropdowns Section */}
-        <div style={{
-          display: isMobile ? 'flex' : 'flex',
-          flexDirection: isMobile ? 'column' : 'row',
-          justifyContent: isMobile ? 'flex-start' : 'space-between',
-          alignItems: isMobile ? 'stretch' : 'flex-start',
-          gap: '16px', // Reduced from 24px
-          marginTop: '12px' // Reduced from 15px
+        {/* Budget Slider */}
+        {/* Budget Slider */}
+<div style={{ 
+  flex: 1,
+  display: 'flex',
+  alignItems: 'center',
+  gap: '24px',
+  padding: '8px 12px',
+  borderRadius: '8px',
+  backgroundColor: 'rgba(210, 166, 63, 0.05)',
+  border: '1px solid #e5e5e5',
+  minWidth: isMobile ? '100%' : '300px'
+}}>
+  {/* Range Display - Changed to inline row layout */}
+  <div style={{ 
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    flexShrink: 0,
+    whiteSpace: 'nowrap'
+  }}>
+    <span style={{ 
+      fontWeight: 600, 
+      color: '#374151',
+      fontSize: '14px', // Slightly larger for better readability
+    }}>
+      {transactionType === "buy" ? "Buy Price:" : "Monthly Rent:"}
+    </span>
+    <span style={{ 
+      fontWeight: 'bold', 
+      color: '#d2a63f',
+      fontSize: '14px'
+    }}>
+      {getRangeText()}
+    </span>
+  </div>
+
+  {/* Slider */}
+  <Box sx={{ width: "100%" }}>
+    <Slider
+      getAriaLabel={() =>
+        transactionType === "buy"
+          ? "Buy price range"
+          : "Monthly rent range"
+      }
+      value={getCurrentSliderValue()}
+      onChange={handleSliderChange}
+      valueLabelDisplay="off"
+      valueLabelFormat={formatValue}
+      getAriaValueText={valuetext}
+      min={sliderConfig.min}
+      max={sliderConfig.max}
+      step={sliderConfig.step}
+      sx={{
+        color: "#d2a63f",
+        "& .MuiSlider-thumb": {
+          backgroundColor: "#d2a63f",
+          width: 14,
+          height: 14,
+        },
+        "& .MuiSlider-track": {
+          backgroundColor: "#d2a63f",
+          height: 3,
+        },
+        "& .MuiSlider-rail": {
+          backgroundColor: "#e5e5e5",
+          height: 3,
+        },
+      }}
+    />
+  </Box>
+</div>
+
+      </div>
+
+      {/* Filter Dropdowns Section with Uniform Spacing */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(200px, 1fr))',
+        gap: '8px',
+        marginBottom: '16px'
+      }}>
+        {/* Property Type Dropdown */}
+        <CustomAutocomplete
+          label="Property Type"
+          multiple={true}
+          value={selectedValues.propertyType}
+          onChange={handleAutocompleteChange("propertyType")}
+          options={PropertyType.fieldData}
+        />
+
+        {/* Other filter components */}
+        <CustomAutocomplete
+          label="Bedroom"
+          multiple={true}
+          value={selectedValues.bedroom}
+          onChange={handleAutocompleteChange("bedroom")}
+          options={Bedroom.fieldData}
+        />
+
+        <CustomAutocomplete
+          label="Bathroom"
+          multiple={true}
+          value={selectedValues.bathroom}
+          onChange={handleAutocompleteChange("bathroom")}
+          options={Bathroom.fieldData}
+        />
+
+        <CustomAutocomplete
+          label="Parking"
+          multiple={true}
+          value={selectedValues.parking}
+          onChange={handleAutocompleteChange("parking")}
+          options={Parking.fieldData}
+        />
+
+        {/* Conditional filters */}
+        {transactionType === "buy" && (
+          <CustomAutocomplete
+            label="Possession"
+            multiple={true}
+            value={selectedValues.possessionStatus}
+            onChange={handleAutocompleteChange("possessionStatus")}
+            options={PossessionStatus.fieldData}
+          />
+        )}
+
+        {transactionType === "rent" && (
+          <CustomAutocomplete
+            label="Furnishing"
+            multiple={true}
+            value={selectedValues.furnishingStatus}
+            onChange={handleAutocompleteChange("furnishingStatus")}
+            options={FurnishingStatus.fieldData}
+          />
+        )}
+      </div>
+
+      {/* City Search Dropdown and Buttons Row */}
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'flex-start',
+        gap: '12px',
+        marginBottom: '12px',
+        flexWrap: isMobile ? 'wrap' : 'nowrap'
+      }}>
+        <div style={{ flex: 1, minWidth: isMobile ? '100%' : 'auto' }}>
+          <CreatableDropdown
+            dropdownLabel={data.label}
+            key={`${selectedValues.creatableDropdown.textField}-${selectedValues.creatableDropdown.autocomplete}`}
+            fieldData={data.fieldData}
+            value={{
+              textField: selectedValues.creatableDropdown.textField,
+              autocomplete: selectedValues.creatableDropdown.autocomplete,
+            }}
+            onChange={handleCityChange}
+            inputFirst={data.inputFirst}
+            dropdownisRequired={isAutocompleteRequired}
+            dropdownError={validationErrors.autocomplete}
+            textfieldisRequired={isTextFieldRequired}
+            textfieldError={validationErrors.textField}
+          />
+        </div>
+        
+        <div style={{ 
+          display: 'flex', 
+          gap: '8px',
+          flex: isMobile ? '1 1 100%' : 'none'
         }}>
-          <div style={{
-            display: 'flex',
-            flexDirection: isMobile ? 'column' : 'row',
-            flexWrap: isMobile ? 'nowrap' : 'wrap',
-            gap: '8px', // Reduced from 12px
-            flex: 1
-          }}>
-            {/* Property Type Dropdown */}
-            <CustomAutocomplete
-              label="Property Type"
-              multiple={true}
-              value={selectedValues.propertyType}
-              onChange={handleAutocompleteChange("propertyType")}
-              options={PropertyType.fieldData}
-            />
-
-            {/* Other filter components */}
-            <CustomAutocomplete
-              label="Bedroom"
-              multiple={true}
-              value={selectedValues.bedroom}
-              onChange={handleAutocompleteChange("bedroom")}
-              options={Bedroom.fieldData}
-            />
-
-            <CustomAutocomplete
-              label="Bathroom"
-              multiple={true}
-              value={selectedValues.bathroom}
-              onChange={handleAutocompleteChange("bathroom")}
-              options={Bathroom.fieldData}
-            />
-
-            <CustomAutocomplete
-              label="Parking"
-              multiple={true}
-              value={selectedValues.parking}
-              onChange={handleAutocompleteChange("parking")}
-              options={Parking.fieldData}
-            />
-
-            {/* Conditional filters */}
-            {transactionType === "buy" && (
-              <CustomAutocomplete
-                label="Possession Status"
-                multiple={true}
-                value={selectedValues.possessionStatus}
-                onChange={handleAutocompleteChange("possessionStatus")}
-                options={PossessionStatus.fieldData}
-              />
-            )}
-
-            {transactionType === "rent" && (
-              <CustomAutocomplete
-                label="Furnishing Status"
-                multiple={true}
-                value={selectedValues.furnishingStatus}
-                onChange={handleAutocompleteChange("furnishingStatus")}
-                options={FurnishingStatus.fieldData}
-              />
-            )}
-          </div>
-
-          {/* Search Button */}
           <Button
             onClick={handleSearch}
             sx={{
-              width: isMobile ? "100%" : "160px", // Reduced from 200px
-              height: "55px", // Reduced from 56px
+              minWidth: '120px',
+              height: "53px",
               background: "linear-gradient(135deg, #d2a63f, #d2a63fb5) !important",
               color: "white !important",
               border: "none !important",
-              borderRadius: "12px !important", // Reduced from 20px
+              borderRadius: "12px !important",
               fontWeight: "600 !important",
-              fontSize: "14px !important", // Smaller font
+              fontSize: "14px !important",
               boxShadow: "0 2px 4px -1px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.06) !important",
               transition: "all 0.3s ease !important",
               "&:hover": {
                 background: "linear-gradient(135deg, #d2a63fb5, #d2a63f) !important",
-                transform: "scale(1.03)", // Reduced from 1.05
+                transform: "scale(1.03)",
                 boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.05) !important",
               },
-              marginTop: isMobile ? 1 : 0, // Reduced margin
             }}
           >
             Search
+          </Button>
+          <Button
+            onClick={handleClearAll}
+            variant="outlined"
+            sx={{
+              minWidth: '120px',
+              height: "53px",
+              borderColor: "#d2a63f",
+              color: "#d2a63f",
+              borderRadius: "12px",
+              fontWeight: "600",
+              fontSize: "14px",
+              "&:hover": {
+                borderColor: "#d2a63fb5",
+                backgroundColor: "rgba(210, 166, 63, 0.04)",
+              },
+            }}
+          >
+            Clear All
           </Button>
         </div>
       </div>
@@ -557,8 +611,8 @@ const FilterComponent = ({
       {/* Mobile Filter Button */}
       {isMobile && (
         <div style={{ 
-          padding: '16px', // Reduced from 24px
-          borderRadius: '8px', // Reduced from 12px
+          padding: '16px',
+          borderRadius: '8px',
           backgroundColor: 'white'
         }}>
           <Button
@@ -566,7 +620,7 @@ const FilterComponent = ({
             startIcon={<FilterListIcon />}
             onClick={handleMobileOpen}
             fullWidth
-            size="medium" // Changed from large
+            size="medium"
             sx={{
               borderColor: "#d2a63f",
               color: "#d2a63f",
@@ -574,8 +628,8 @@ const FilterComponent = ({
                 borderColor: "#d2a63fb5",
                 backgroundColor: "rgba(210, 166, 63, 0.04)",
               },
-              fontSize: '14px', // Smaller font
-              padding: '8px 16px', // Reduced padding
+              fontSize: '14px',
+              padding: '8px 16px',
             }}
           >
             Filters
@@ -583,16 +637,16 @@ const FilterComponent = ({
               selectedValues.bedroom.length > 0 ||
               selectedValues.bathroom.length > 0) && (
               <span style={{
-                marginLeft: '6px', // Reduced from 8px
+                marginLeft: '6px',
                 backgroundColor: '#ef4444',
                 color: 'white',
                 borderRadius: '50%',
-                width: '20px', // Reduced from 24px
-                height: '20px', // Reduced from 24px
+                width: '20px',
+                height: '20px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '11px' // Smaller font
+                fontSize: '11px'
               }}>
                 {selectedValues.propertyType.length +
                   selectedValues.bedroom.length +
@@ -606,9 +660,9 @@ const FilterComponent = ({
       {/* Desktop View */}
       {!isMobile && (
         <div style={{ 
-          borderRadius: '8px', // Reduced from 12px
+          borderRadius: '8px',
           backgroundColor: 'white',
-          boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' // Lighter shadow
+          boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
         }}>
           <FilterContent />
         </div>
@@ -622,7 +676,7 @@ const FilterComponent = ({
         sx={{
           "& .MuiDrawer-paper": {
             width: "100vw",
-            maxWidth: "380px", // Slightly smaller
+            maxWidth: "380px",
             backgroundColor: "white",
             color: "#333333",
           },
@@ -633,12 +687,12 @@ const FilterComponent = ({
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            padding: "12px", // Reduced from 16px
+            padding: "12px",
             borderBottom: "1px solid #e5e5e5"
           }}
         >
           <h2 style={{ 
-            fontSize: "18px", // Smaller font
+            fontSize: "18px",
             fontWeight: "bold",
             margin: 0
           }}>
@@ -653,7 +707,7 @@ const FilterComponent = ({
         </div>
         <div style={{ 
           overflowY: "auto", 
-          padding: "16px" // Reduced from 24px
+          padding: "16px"
         }}>
           <FilterContent />
         </div>

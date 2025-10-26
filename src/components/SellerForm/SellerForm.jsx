@@ -202,7 +202,7 @@ const SellerForm = () => {
       {/* --- Page Layout --- */}
       <div className="flex flex-row">
         {/* --- Left 30%: Animated Gradient Text --- */}
-        <motion.div
+        {/* <motion.div
           variants={textContainerVariants}
           initial="hidden"
           animate="visible"
@@ -218,9 +218,9 @@ const SellerForm = () => {
           >
             Sell or Rent <br /> House Form
           </motion.h1>
-        </motion.div>
+        </motion.div> */}
 
-        <div className='w-[80%]' style={{paddingRight:'2%' }}>
+        <div className='w-[100%]'>
           <VerticalLinearStepper SellerFormDetails={SellerFormDetailsData}/>
         </div>
       </div>

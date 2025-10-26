@@ -26,7 +26,7 @@ const Footer = () => {
       {/* Subtle Top Accent */}
       <div className="h-1 bg-gradient-to-r from-transparent via-amber-400 to-transparent"></div>
 
-      <div className="mx-auto max-w-screen-xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-screen-2xl  py-8 sm:px-6 lg:px-8">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10">
           {/* About Section */}

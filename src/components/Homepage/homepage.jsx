@@ -31,12 +31,12 @@ const HomePage = () => {
       </svg> */}
       
       {/* Video on top of SVG */}
-      <div className=" relative z-20 w-[96%] mt-2  pl-15"> {/* Added relative and z-20 */}
+      <div className=" relative z-20 mt-2 "> {/* Added relative and z-20 */}
         <Video />
       </div>
       
       {/* Filter Section */}
-      <div className="mx-[250px] shadow-xl/20 -mt-20 z-30 relative">
+      <div className="mx-[150px] shadow-xl/20 -mt-20 z-30 relative">
         <FilterSearchPage/>
         {/* <FilterComponent/> */}
       </div>

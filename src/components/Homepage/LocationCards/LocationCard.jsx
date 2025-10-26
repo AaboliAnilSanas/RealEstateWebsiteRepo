@@ -130,7 +130,8 @@ const LocationSection = () => {
   ];
 
   return (
-    <div className="relative h-screen overflow-hidden py-8 px-4 sm:px-6 lg:px-8 flex items-center">
+    // REMOVED overflow-hidden and fixed the rounded corners
+    <div className="mx-4 mt-10 rounded-[16px] mb-6 relative pb-6 px-4 sm:px-6 lg:px-8 flex items-center bg-white/10 backdrop-blur-sm border border-white/20">
       <style>{`
         @keyframes fadeInUp {
           from {
@@ -193,8 +194,8 @@ const LocationSection = () => {
         }
       `}</style>
       
-      {/* Animated Background Gradients */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {/* Animated Background Gradients - Moved outside the rounded container */}
+      <div className="absolute inset-0 mt-10 overflow-hidden pointer-events-none rounded-[16px]">
         {/* Top Left Gradient Orb */}
         <div 
           className="absolute -top-40 -left-40 w-96 h-96 rounded-full opacity-20 blur-3xl"
@@ -241,19 +242,7 @@ const LocationSection = () => {
         ></div>
       </div>
       
-      {/* Subtle Grid Pattern Overlay */}
-      <div 
-        className="absolute inset-0 opacity-5 pointer-events-none"
-        style={{
-          backgroundImage: `
-            linear-gradient(#d2a63f 1px, transparent 1px),
-            linear-gradient(90deg, #d2a63f 1px, transparent 1px)
-          `,
-          backgroundSize: '50px 50px'
-        }}
-      ></div>
-      
-      <div className="relative max-w-7xl mx-auto z-10 w-full">
+      <div className="relative z-10 w-full mt-10">
         {/* Section Header */}
         <div 
           className="text-center mb-8"
@@ -263,7 +252,7 @@ const LocationSection = () => {
           }}
         >
           {/* Decorative element above title */}
-          <div className="flex items-center justify-center gap-3 mb-4">
+          <div className="flex items-center mt-5  justify-center gap-3 mb-4">
             <div 
               className="w-12 h-0.5"
               style={{ 
