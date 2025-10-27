@@ -165,7 +165,7 @@ const LocationSection = () => {
   };
 
   return (
-    <div className="relative py-20 px-4 mb-30 mt-10 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-white overflow-hidden">
+    <div className="relative py-20 px-4 mb-30 mt-0 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-white overflow-hidden">
       <style>{`
         @keyframes fadeIn {
           from {
