@@ -72,39 +72,19 @@ const AnimatedContent = ({
   return <div ref={ref}>{children}</div>;
 };
 
-export default function Navbar() {
+const  Navbar=() =>{
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [hoveredItem, setHoveredItem] = useState(null);
+  const [isLoginHovered, setIsLoginHovered] = useState(false);
   const logoRef = useRef(null);
+  const loginRef = useRef(null);
   const location = useLocation();
 
   const navigation = [
     { title: "Home", path: "/" },
     { title: "Buy", path: "/properties" },
     { title: "Post Property", path: "/sell" },
-    { title: "Contact", path: "/contact" },
-    { 
-      title: (
-        <span className="navbar-phone">
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            width="24" 
-            height="24" 
-            fill="none" 
-            viewBox="0 0 24 24" 
-            stroke="currentColor"
-          >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
-              d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" 
-            />
-          </svg>
-          508-228-2266
-        </span>
-      ), 
-      path: "tel:5082282266" 
-    }
+    { title: "Contact", path: "/contact" }
   ];
 
   const handleLogoMouseEnter = () => {
@@ -122,13 +102,59 @@ export default function Navbar() {
     });
   };
 
+  const handleMouseEnter = (index) => {
+    setHoveredItem(index);
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredItem(null);
+  };
+
+  const handleLoginMouseEnter = () => {
+    setIsLoginHovered(true);
+    if (loginRef.current) {
+      gsap.to(loginRef.current, {
+        scale: 1.05,
+        y: -2,
+        boxShadow: "0 8px 20px rgba(94, 43, 109, 0.3)",
+        duration: 0.3,
+        ease: "power2.out"
+      });
+    }
+  };
+
+  const handleLoginMouseLeave = () => {
+    setIsLoginHovered(false);
+    if (loginRef.current) {
+      gsap.to(loginRef.current, {
+        scale: 1,
+        y: 0,
+        boxShadow: "0 4px 12px rgba(94, 43, 109, 0.2)",
+        duration: 0.3,
+        ease: "power2.out"
+      });
+    }
+  };
+
+  const handleLoginClick = () => {
+    if (loginRef.current) {
+      gsap.to(loginRef.current, {
+        scale: 0.95,
+        duration: 0.1,
+        yoyo: true,
+        repeat: 1,
+        ease: "power2.inOut"
+      });
+    }
+  };
+
   // Close mobile menu when route changes
   useEffect(() => {
     setIsMenuOpen(false);
   }, [location]);
 
   return (
-    <nav className="navbar">
+    <nav className="navbar bg-white shadow-md">
       <div className="navbar-container">
         <div className="navbar-header">
           <Link 
@@ -165,7 +191,12 @@ export default function Navbar() {
         <div className={`navbar-menu ${isMenuOpen ? '' : 'navbar-menu-hidden'}`}>
           <ul className="navbar-list">
             {navigation.map((item, idx) => (
-              <li key={idx} className="navbar-item">
+              <li 
+                key={idx} 
+                className="navbar-item relative"
+                onMouseEnter={() => handleMouseEnter(idx)}
+                onMouseLeave={handleMouseLeave}
+              >
                 <AnimatedContent
                   direction="vertical"
                   distance={60}
@@ -177,24 +208,63 @@ export default function Navbar() {
                   scale={0.8}
                   reverse={true}
                 >
-                  {item.path.startsWith('tel:') ? (
-                    <a 
-                      href={item.path} 
-                      className="navbar-link"
-                    >
-                      {item.title}
-                    </a>
-                  ) : (
-                    <Link 
-                      to={item.path} 
-                      className={`navbar-link ${location.pathname === item.path ? 'navbar-link-active' : ''}`}
-                    >
-                      {item.title}
-                    </Link>
-                  )}
+                  <Link 
+                    to={item.path} 
+                    className={`navbar-link group ${location.pathname === item.path ? 'navbar-link-active' : ''}`}
+                  >
+                    {item.title}
+                    {/* Triangle indicator */}
+                    <span className={`triangle-indicator ${hoveredItem === idx || location.pathname === item.path ? 'triangle-visible' : ''}`}></span>
+                  </Link>
                 </AnimatedContent>
               </li>
             ))}
+            
+            {/* Phone Section */}
+            <li className="navbar-item">
+              <AnimatedContent
+                direction="vertical"
+                distance={60}
+                duration={2.6}
+                delay={0.5}
+                ease="elastic.out(1, 0.8)"
+                initialOpacity={0}
+                animateOpacity={true}
+                scale={0.8}
+                reverse={true}
+              >
+                <a href="tel:34567876545" className="navbar-phone-section">
+                  <div className="phone-icon-container">
+                    <div className="phone-circle">
+                      <svg 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        width="20" 
+                        height="20" 
+                        fill="none" 
+                        viewBox="0 0 24 24" 
+                        stroke="currentColor"
+                        className="phone-icon"
+                      >
+                        <path 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                          strokeWidth={2} 
+                          d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" 
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                  <div className="phone-content">
+                    <div className="phone-number">
+                      34567876545 / 546576767564
+                    </div>
+                    <div className="phone-text">
+                      Call our experts
+                    </div>
+                  </div>
+                </a>
+              </AnimatedContent>
+            </li>
           </ul>
         </div>
         
@@ -210,8 +280,15 @@ export default function Navbar() {
             <Link 
               to="/login" 
               className="navbar-button"
+              ref={loginRef}
+              onMouseEnter={handleLoginMouseEnter}
+              onMouseLeave={handleLoginMouseLeave}
+              onClick={handleLoginClick}
             >
-              Login
+              <span className="login-content">
+                <span className="login-text">Login</span>
+                <span className={`login-arrow ${isLoginHovered ? 'login-arrow-visible' : ''}`}>→</span>
+              </span>
             </Link>
           </AnimatedContent>
         </div>
@@ -219,3 +296,5 @@ export default function Navbar() {
     </nav>
   );
 }
+
+export default Navbar;
