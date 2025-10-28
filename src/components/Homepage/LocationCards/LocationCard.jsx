@@ -3,8 +3,8 @@ import React, { useState, useEffect, useRef } from 'react';
 const LocationCard = ({ image, location }) => {
   return (
     <div className="flex flex-col items-center text-center group cursor-pointer relative">
-      {/* Square Card Container with Rounded Image */}
-      <div className="relative mb-4 rounded-2xl overflow-hidden border-4 border-white shadow-2xl group-hover:shadow-2xl transition-all duration-300 w-48 h-48 sm:w-56 sm:h-56 lg:w-64 lg:h-64 xl:w-80 xl:h-80">
+      {/* Square Card Container with Rounded Image - Updated hover effect */}
+      <div className="relative mb-4 rounded-2xl overflow-hidden border-4 border-white shadow-2xl group-hover:shadow-2xl transition-all duration-300 w-48 h-48 sm:w-56 sm:h-56 lg:w-64 lg:h-64 xl:w-80 xl:h-80 group-hover:-translate-y-4 group-hover:border-b-8 group-hover:border-b-[#FDBA74]">
         <img 
           src={image} 
           alt={location}
@@ -165,7 +165,7 @@ const LocationSection = () => {
   };
 
   return (
-    <div className="relative py-20 px-4 mb-30 mt-0 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-white overflow-hidden">
+    <div className="relative pt-60 pb-40 px-4  -mt-55 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-white overflow-hidden">
       <style>{`
         @keyframes fadeIn {
           from {
@@ -192,6 +192,24 @@ const LocationSection = () => {
         }
       `}</style>
 
+      {/* Top-left PNG Image */}
+      {/* <div className="absolute top-0 left-0 z-10 ">
+        <img 
+          src="/svgLinePng.png" 
+          alt="Zaceler Data Protector" 
+          className="h-[200px] w-[1000px] opacity-90 hover:opacity-100 transition-opacity duration-300"
+        />
+      </div> */}
+
+      {/* Bottom-right PNG Image */}
+      {/* <div className="absolute bottom-0 right-0 z-10 -rotate-180">
+        <img 
+          src="/svgLinePng.png" 
+          alt="Zaceler Data Protector" 
+          className="h-[200px] w-[1000px] opacity-90 hover:opacity-100 transition-opacity duration-300"
+        />
+      </div> */}
+
       {/* Custom Cursor Glow Effect */}
       <div 
         className="fixed pointer-events-none z-50 transition-all duration-100 ease-out opacity-20"
@@ -207,13 +225,13 @@ const LocationSection = () => {
       />
 
       {/* Enhanced Background Gradients */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {/* <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-gradient-to-r from-yellow-200 to-orange-200 opacity-25 blur-3xl animate-pulse"></div>
         <div className="absolute -bottom-40 -right-40 w-96 h-96 rounded-full bg-gradient-to-r from-purple-200 to-pink-200 opacity-25 blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full bg-gradient-to-r from-blue-100 to-cyan-100 opacity-20 blur-3xl"></div>
-      </div>
+      </div> */}
 
-      <div className="relative z-10 max-w-7xl mx-auto">
+      <div className="relative z-10 max-w-7xl mx-auto ">
         {/* Section Header - Centered without arrows */}
         <div className="text-center mb-20">
           <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
@@ -227,7 +245,7 @@ const LocationSection = () => {
 
         {/* Carousel Container - Centered with square cards */}
         <div 
-          className="flex justify-center items-center gap-10 lg:gap-10 xl:gap-25 transition-all duration-700 ease-in-out"
+          className="flex justify-center items-center gap-6 lg:gap-6 xl:gap-18 transition-all duration-700 ease-in-out"
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >

@@ -804,6 +804,7 @@ const FilterComponent = ({
             flex: isMobile ? '1 1 100%' : 'none'
           }}>
             <Button
+            className="button"
               onClick={handleSearch}
               sx={{
                 minWidth: '120px',
@@ -818,14 +819,17 @@ const FilterComponent = ({
                 transition: "all 0.3s ease !important",
                 "&:hover": {
                   background: "linear-gradient(135deg, #d2a63fb5, #d2a63f) !important",
-                  transform: "scale(1.03)",
-                  boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.05) !important",
+                  // transform: "scale(1.03)",
+                  // boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.05) !important",
+                   transform: "translateY(-2px) translateZ(0) !important",
+                  boxShadow:" 0 8px 20px rgba(94, 43, 109, 0.3) !important"
                 },
               }}
             >
               Search
             </Button>
             <Button
+            
               onClick={handleClearAll}
               variant="outlined"
               sx={{
@@ -839,6 +843,8 @@ const FilterComponent = ({
                 "&:hover": {
                   borderColor: "#d2a63fb5",
                   backgroundColor: "rgba(210, 166, 63, 0.04)",
+                  transform: "translateY(-2px) translateZ(0)",
+                  boxShadow:" 0 8px 20px rgba(94, 43, 109, 0.3)"
                 },
               }}
             >

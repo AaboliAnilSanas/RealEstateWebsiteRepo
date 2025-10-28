@@ -31,13 +31,6 @@
   --tertiary-color-light: #E0F2FE; /* Sky-100 - very light blue */
   --tertiary-color-dark: #0EA5E9; /* Sky-500 - darker blue */
   
-  /* Neutral Colors */
-  --neutral-white: #FFFFFF;
-    --neutral-color: #f59f0b05;
-  --neutral-gray-light: #F8FAFC; /* from your gray-50 */
-  --neutral-gray: #64748B; /* from your gray-600 */
-  --neutral-gray-dark: #1E293B; /* from your gray-900 */
-  
   /* Gold Accent - For special effects */
   --gold-accent: rgba(245, 158, 11, 0.3); /* Based on your primary */
   --gold-accent-light: rgba(251, 191, 36, 0.2);
