@@ -1,11 +1,14 @@
 package com.realestate.realestateapp.SellProperty.entity;
 
+// Import your existing User entity
+import com.realestate.realestateapp.user.Entity.User; 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,13 +24,15 @@ public class Property {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // --- This is the main change ---
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seller_id", nullable = false)
-    private Seller seller;
+    @JoinColumn(name = "user_id", nullable = false) // <-- CHANGED
+    private User user; // <-- CHANGED (from Seller to User)
 
     @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<Media> mediaFiles;
 
+    // ... all other fields remain exactly the same ...
     @Column(name = "looking_to", length = 50)
     private String lookingTo;
     @Column(name = "property_type", length = 50)
@@ -72,7 +77,7 @@ public class Property {
     @Lob
     private String description;
     @Column(name = "submission_date")
-    private LocalDateTime submissionDate;
+    private LocalDateTime submissionDate; // This is correct for your 'Z'-less string
     @Column(name = "form_version", length = 10)
     private String formVersion;
     @CreationTimestamp

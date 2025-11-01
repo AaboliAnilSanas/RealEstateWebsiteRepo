@@ -9,28 +9,30 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal; // <-- CHANGED: Import Principal
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/seller")
+@RequestMapping("/api/property") // <-- CHANGED: A more generic base path
 public class PropertyController {
 
     @Autowired
     private PropertyService propertyService;
 
-    /**
-     * Step 1: Define endpoint
-     * Step 2: Accept data from frontend
-     * Step 6: Return a response
-     */
-    @PostMapping("/{sellerId}/addProperty")
+    // CHANGED: The endpoint is now just '/add'
+    @PostMapping("/add")
     public ResponseEntity<Map<String, Object>> addProperty(
-            @PathVariable Long sellerId,
-            @RequestBody PropertyListingDTO listingDTO) {
+            // CHANGED: No @PathVariable, we use Principal
+            @RequestBody PropertyListingDTO listingDTO,
+            Principal principal 
+    ) {
 
-        // Steps 3, 4, 5 are handled by the service
-        Property savedProperty = propertyService.createProperty(listingDTO, sellerId);
+        // CHANGED: Get the user's email from the JWT token
+        String userEmail = principal.getName(); 
+
+        // Steps 3, 4, 5: Pass the user's email to the service
+        Property savedProperty = propertyService.createProperty(listingDTO, userEmail);
 
         // Step 6: Return response
         Map<String, Object> response = new LinkedHashMap<>();
