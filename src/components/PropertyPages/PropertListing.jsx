@@ -1,16 +1,76 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import ListingCard from "../UIComponents/ListingCard.jsx";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import CircularProgress from "@mui/material/CircularProgress";
+import Paper from "@mui/material/Paper";
+import FormGroup from "@mui/material/FormGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Checkbox from "@mui/material/Checkbox";
+import Button from "@mui/material/Button";
+import MenuItem from "@mui/material/MenuItem";
+import Slider from "@mui/material/Slider";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
+import Pagination from "@mui/material/Pagination";
+import Stack from "@mui/material/Stack";
+import debounce from "lodash/debounce";
+import { motion, AnimatePresence } from "framer-motion";
 
 const PropertyListing = () => {
   const [properties, setProperties] = useState([]);
+  const [filteredProperties, setFilteredProperties] = useState([]);
+  const [displayedProperties, setDisplayedProperties] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [filterLoading, setFilterLoading] = useState(false);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [propertiesPerPage] = useState(4); // Show 4 properties per page
 
-  // ... (your dummyProperties data remains the same)
-    const dummyProperties = [
+  // Price range configurations
+  const priceRanges = {
+    buy: {
+      min: 0,
+      max: 100000000, // 1 Cr
+      step: 500000,
+      displayMin: "0 L",
+      displayMax: "1 Cr+"
+    },
+    rent: {
+      min: 5000,
+      max: 6000000, // 60 L
+      step: 5000,
+      displayMin: "₹5K",
+      displayMax: "60 L+"
+    }
+  };
+
+  // Updated filters state to match your JSON structure
+  const [filters, setFilters] = useState({
+    transaction_type: "buy",
+    filters: {
+      city: "",
+      budget_range: {
+        min: priceRanges.buy.min,
+        max: priceRanges.buy.max,
+        display: `${priceRanges.buy.displayMin} - ${priceRanges.buy.displayMax}`,
+        unit: "buy_price"
+      },
+      property_type: [],
+      bedroom: [],
+      bathroom: [],
+      parking: [],
+      possession_status: []
+    },
+    search_metadata: {
+      text_input: "",
+      selected_option: ""
+    }
+  });
+
+  const dummyProperties = [
     {
       id: 1,
       basicDetails: {
@@ -29,15 +89,14 @@ const PropertyListing = () => {
         bedrooms: "3",
         bathrooms: "2",
         balconies: "2",
-        carpetArea: "1200 sq.ft",
+        carpetArea: "1200",
         floor: "5",
         totalFloors: "12",
         availability: "Ready to Move",
         possession: "2024",
         ownership: "Freehold",
-        price: "₹2.5 Cr",
-        description:
-          "Beautiful 3BHK apartment with modern amenities and great location.",
+        price: 25000000,
+        description: "Beautiful 3BHK apartment with modern amenities and great location.",
       },
       media: {
         imageUrl: "/house1.jpg",
@@ -62,15 +121,14 @@ const PropertyListing = () => {
         bedrooms: "4",
         bathrooms: "3",
         balconies: "3",
-        carpetArea: "1800 sq.ft",
+        carpetArea: "1800",
         floor: "2",
         totalFloors: "2",
         availability: "Ready to Move",
         possession: "2023",
         ownership: "Freehold",
-        price: "₹85,000/month",
-        description:
-          "Spacious villa with garden and modern amenities in prime location.Spacious villa with garden and modern amenities in prime location.Spacious villa with garden and modern amenities in prime location.Spacious villa with garden and modern amenities in prime location.Spacious villa with garden and modern amenities in prime location.Spacious villa with garden and modern amenities in prime location.Spacious villa with garden and modern amenities in prime location.Spacious villa with garden and modern amenities in prime location.",
+        price: 85000,
+        description: "Spacious villa with garden and modern amenities in prime location.",
       },
       media: {
         imageUrl: "/house1.jpg",
@@ -92,18 +150,17 @@ const PropertyListing = () => {
         houseNo: "Office-305",
       },
       propertyProfile: {
-        bedrooms: "1", // Conference rooms
+        bedrooms: "1",
         bathrooms: "2",
         balconies: "1",
-        carpetArea: "800 sq.ft",
+        carpetArea: "800",
         floor: "3",
         totalFloors: "10",
         availability: "Ready to Move",
         possession: "2024",
         ownership: "Leasehold",
-        price: "₹1.2 Cr",
-        description:
-          "Premium office space in central business district with great connectivity.",
+        price: 12000000,
+        description: "Premium office space in central business district with great connectivity.",
       },
       media: {
         imageUrl: "/house1.jpg",
@@ -113,7 +170,7 @@ const PropertyListing = () => {
     {
       id: 4,
       basicDetails: {
-        transactionType: "PG",
+        transactionType: "BUY",
         propertyCategory: "Residential",
         propertyType: "Builder Floor",
       },
@@ -128,29 +185,151 @@ const PropertyListing = () => {
         bedrooms: "2",
         bathrooms: "2",
         balconies: "1",
-        carpetArea: "900 sq.ft",
+        carpetArea: "900",
         floor: "1",
         totalFloors: "3",
         availability: "Ready to Move",
         possession: "2024",
         ownership: "Freehold",
-        price: "₹15,000/month",
-        description:
-          "Cozy PG accommodation with all modern facilities and security.",
+        price: 15000,
+        description: "Cozy PG accommodation with all modern facilities and security.",
       },
       media: {
         imageUrl: "/house1.jpg",
         photos: ["/pg1.jpg", "/pg2.jpg"],
       },
     },
+    {
+      id: 5,
+      basicDetails: {
+        transactionType: "Sell",
+        propertyCategory: "Residential",
+        propertyType: "Flat/Apartment",
+      },
+      location: {
+        city: "Bangalore",
+        locality: "Electronic City",
+        apartment: "Tech Park Residences",
+        subLocality: "Electronic City",
+        houseNo: "B-304",
+      },
+      propertyProfile: {
+        bedrooms: "2",
+        bathrooms: "2",
+        balconies: "1",
+        carpetArea: "1100",
+        floor: "3",
+        totalFloors: "8",
+        availability: "Ready to Move",
+        possession: "2024",
+        ownership: "Freehold",
+        price: 8500000,
+        description: "Modern 2BHK apartment in tech hub with great amenities.",
+      },
+      media: {
+        imageUrl: "/house1.jpg",
+        photos: ["/property5.jpg", "/property6.jpg"],
+      },
+    },
+    {
+      id: 6,
+      basicDetails: {
+        transactionType: "Rent/Lease",
+        propertyCategory: "Residential",
+        propertyType: "Flat/Apartment",
+      },
+      location: {
+        city: "Mumbai",
+        locality: "Andheri West",
+        apartment: "Skyline Towers",
+        subLocality: "Andheri",
+        houseNo: "C-1201",
+      },
+      propertyProfile: {
+        bedrooms: "3",
+        bathrooms: "2",
+        balconies: "2",
+        carpetArea: "1300",
+        floor: "12",
+        totalFloors: "15",
+        availability: "Ready to Move",
+        possession: "2024",
+        ownership: "Freehold",
+        price: 55000,
+        description: "Luxurious 3BHK with sea view and premium amenities.",
+      },
+      media: {
+        imageUrl: "/house1.jpg",
+        photos: ["/property7.jpg", "/property8.jpg"],
+      },
+    },
   ];
-  // Simulate API call
+
+  // Updated filter options to match your JSON structure
+  const filterOptions = {
+    transaction_type: ["buy", "rent"],
+    property_type: ["Apartment", "Independent House/Villa", "Office Space", "Builder Floor"],
+    city: ["Mumbai", "Bangalore", "Delhi", "Pune"],
+    bedroom: ["1", "2", "3", "4", "4+"],
+    bathroom: ["1", "2", "3", "4", "5+"],
+    parking: ["0", "1", "2", "3", "4+"],
+    possession_status: ["Ready To Move", "Under Construction"]
+  };
+
+  // Format price for display
+  const formatPrice = (price, type = "buy") => {
+    if (type === "rent") {
+      if (price >= 100000) {
+        return `₹${(price / 100000).toFixed(1)}L`;
+      } else if (price >= 1000) {
+        return `₹${(price / 1000).toFixed(0)}K`;
+      }
+      return `₹${price}`;
+    } else {
+      if (price >= 10000000) {
+        return `₹${(price / 10000000).toFixed(1)}Cr`;
+      }
+      return `₹${(price / 100000).toFixed(0)}L`;
+    }
+  };
+
+  // Get current price range based on transaction type
+  const getCurrentPriceRange = () => {
+    return priceRanges[filters.transaction_type];
+  };
+
+  // Pagination logic
+  const indexOfLastProperty = currentPage * propertiesPerPage;
+  const indexOfFirstProperty = indexOfLastProperty - propertiesPerPage;
+
+  // Update displayed properties when filtered properties or page changes
+  useEffect(() => {
+    const currentProperties = filteredProperties.slice(indexOfFirstProperty, indexOfLastProperty);
+    setDisplayedProperties(currentProperties);
+  }, [filteredProperties, currentPage, indexOfFirstProperty, indexOfLastProperty]);
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filteredProperties]);
+
+  // Calculate total pages
+  const totalPages = Math.ceil(filteredProperties.length / propertiesPerPage);
+
+  // Handle page change
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Simulate API call for initial data
   useEffect(() => {
     const fetchProperties = async () => {
       try {
         setLoading(true);
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 800));
         setProperties(dummyProperties);
+        setFilteredProperties(dummyProperties);
       } catch (error) {
         console.error("Error fetching properties:", error);
       } finally {
@@ -161,43 +340,612 @@ const PropertyListing = () => {
     fetchProperties();
   }, []);
 
+  // Update price range when transaction type changes
+  useEffect(() => {
+    const currentRange = getCurrentPriceRange();
+    setFilters(prev => ({
+      ...prev,
+      filters: {
+        ...prev.filters,
+        budget_range: {
+          min: currentRange.min,
+          max: currentRange.max,
+          display: `${currentRange.displayMin} - ${currentRange.displayMax}`,
+          unit: `${prev.transaction_type}_price`
+        }
+      }
+    }));
+  }, [filters.transaction_type]);
+
+  // Debounced API call for filters
+  const debouncedApiCall = useCallback(
+    debounce(async (filters) => {
+      try {
+        setFilterLoading(true);
+        
+        // Prepare the API payload
+        const apiPayload = {
+          transaction_type: filters.transaction_type,
+          filters: {
+            ...filters.filters,
+            budget_range: {
+              ...filters.filters.budget_range,
+              display: `${formatPrice(filters.filters.budget_range.min, filters.transaction_type)} - ${formatPrice(filters.filters.budget_range.max, filters.transaction_type)}`
+            }
+          },
+          search_metadata: {
+            text_input: "",
+            selected_option: filters.filters.city
+          }
+        };
+        
+        console.log("API Call - Sending filters to backend:", JSON.stringify(apiPayload, null, 2));
+        
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        
+        // Client-side filtering
+        const filtered = dummyProperties.filter(property => {
+          // Transaction Type filter mapping
+          if (apiPayload.transaction_type === "buy" && property.basicDetails.transactionType !== "Sell") {
+            return false;
+          }
+          if (apiPayload.transaction_type === "rent" && !["Rent/Lease", "PG"].includes(property.basicDetails.transactionType)) {
+            return false;
+          }
+          
+          // City filter
+          if (apiPayload.filters.city && property.location.city !== apiPayload.filters.city) {
+            return false;
+          }
+          
+          // Property Type filter mapping
+          if (apiPayload.filters.property_type.length > 0) {
+            const propertyTypeMap = {
+              "Flat/Apartment": "Apartment",
+              "Independent House/Villa": "Independent House/Villa", 
+              "Office Space": "Office Space",
+              "Builder Floor": "Builder Floor"
+            };
+            const mappedPropertyType = propertyTypeMap[property.basicDetails.propertyType];
+            if (!apiPayload.filters.property_type.includes(mappedPropertyType)) {
+              return false;
+            }
+          }
+          
+          // Bedroom filter
+          if (apiPayload.filters.bedroom.length > 0) {
+            const propertyBedrooms = property.propertyProfile.bedrooms;
+            if (!apiPayload.filters.bedroom.some(filterBedroom => {
+              if (filterBedroom === "4+") return parseInt(propertyBedrooms) >= 4;
+              return propertyBedrooms === filterBedroom;
+            })) {
+              return false;
+            }
+          }
+          
+          // Bathroom filter
+          if (apiPayload.filters.bathroom.length > 0) {
+            const propertyBathrooms = property.propertyProfile.bathrooms;
+            if (!apiPayload.filters.bathroom.some(filterBathroom => {
+              if (filterBathroom === "5+") return parseInt(propertyBathrooms) >= 5;
+              return propertyBathrooms === filterBathroom;
+            })) {
+              return false;
+            }
+          }
+          
+          // Parking filter
+          if (apiPayload.filters.parking.length > 0) {
+            const propertyParking = property.propertyProfile.balconies;
+            if (!apiPayload.filters.parking.some(filterParking => {
+              if (filterParking === "4+") return parseInt(propertyParking) >= 4;
+              return propertyParking === filterParking;
+            })) {
+              return false;
+            }
+          }
+          
+          // Price Range filter
+          const price = property.propertyProfile.price;
+          if (price < apiPayload.filters.budget_range.min || price > apiPayload.filters.budget_range.max) {
+            return false;
+          }
+          
+          // Possession Status filter mapping
+          if (apiPayload.filters.possession_status.length > 0) {
+            const availabilityMap = {
+              "Ready to Move": "Ready To Move",
+              "Under Construction": "Under Construction"
+            };
+            const mappedAvailability = availabilityMap[property.propertyProfile.availability];
+            if (!apiPayload.filters.possession_status.includes(mappedAvailability)) {
+              return false;
+            }
+          }
+          
+          return true;
+        });
+        
+        setFilteredProperties(filtered);
+      } catch (error) {
+        console.error("Error applying filters:", error);
+      } finally {
+        setFilterLoading(false);
+      }
+    }, 400),
+    []
+  );
+
+  // Call API whenever filters change
+  useEffect(() => {
+    const hasActiveFilters = 
+      filters.transaction_type !== "buy" ||
+      filters.filters.city !== "" ||
+      filters.filters.property_type.length > 0 ||
+      filters.filters.bedroom.length > 0 ||
+      filters.filters.bathroom.length > 0 ||
+      filters.filters.parking.length > 0 ||
+      filters.filters.possession_status.length > 0 ||
+      filters.filters.budget_range.min > getCurrentPriceRange().min ||
+      filters.filters.budget_range.max < getCurrentPriceRange().max;
+    
+    if (hasActiveFilters && properties.length > 0) {
+      debouncedApiCall(filters);
+    } else if (properties.length > 0) {
+      setFilteredProperties(properties);
+    }
+  }, [filters, properties, debouncedApiCall]);
+
+  // Handle filter changes
+  const handleFilterChange = (filterType, value, isNested = false) => {
+    if (isNested) {
+      setFilters(prev => ({
+        ...prev,
+        filters: {
+          ...prev.filters,
+          [filterType]: value
+        }
+      }));
+    } else {
+      setFilters(prev => ({
+        ...prev,
+        [filterType]: value
+      }));
+    }
+  };
+
+  // Handle nested budget range changes
+  const handleBudgetRangeChange = (field, value) => {
+    setFilters(prev => ({
+      ...prev,
+      filters: {
+        ...prev.filters,
+        budget_range: {
+          ...prev.filters.budget_range,
+          [field]: value
+        }
+      }
+    }));
+  };
+
+  // Handle checkbox changes for array filters
+  const handleCheckboxChange = (filterType, option, isNested = false) => {
+    if (isNested) {
+      setFilters(prev => ({
+        ...prev,
+        filters: {
+          ...prev.filters,
+          [filterType]: prev.filters[filterType].includes(option)
+            ? prev.filters[filterType].filter(item => item !== option)
+            : [...prev.filters[filterType], option]
+        }
+      }));
+    }
+  };
+
+  // Reset filters
+  const resetFilters = () => {
+    const currentRange = getCurrentPriceRange();
+    setFilters({
+      transaction_type: "buy",
+      filters: {
+        city: "",
+        budget_range: {
+          min: currentRange.min,
+          max: currentRange.max,
+          display: `${currentRange.displayMin} - ${currentRange.displayMax}`,
+          unit: "buy_price"
+        },
+        property_type: [],
+        bedroom: [],
+        bathroom: [],
+        parking: [],
+        possession_status: []
+      },
+      search_metadata: {
+        text_input: "",
+        selected_option: ""
+      }
+    });
+  };
+
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5
+      }
+    }
+  };
+
+  const FilterSection = ({ title, options, filterType, type = "checkbox" }) => (
+    <Box sx={{ mb: 1 }}>
+      <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold", fontSize: "1rem" }}>
+        {title}
+      </Typography>
+      {type === "checkbox" ? (
+        <FormGroup>
+          {options.map(option => (
+            <FormControlLabel
+              key={option}
+              control={
+                <Checkbox
+                  size="small"
+                  checked={filters.filters[filterType].includes(option)}
+                  onChange={() => handleCheckboxChange(filterType, option, true)}
+                />
+              }
+              label={option}
+            />
+          ))}
+        </FormGroup>
+      ) : type === "select" ? (
+        <FormControl fullWidth size="small">
+          <Select
+            value={filters.filters[filterType]}
+            onChange={(e) => handleFilterChange(filterType, e.target.value, true)}
+          >
+            <MenuItem value="">All</MenuItem>
+            {options.map(option => (
+              <MenuItem key={option} value={option}>
+                {option}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      ) : null}
+    </Box>
+  );
+
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
-        <CircularProgress />
-        <Typography variant="h6" sx={{ ml: 2 }}>
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '60vh',
+        flexDirection: 'column',
+        gap: 2
+      }}>
+        <CircularProgress size={40} />
+        <Typography variant="h6" color="text.secondary">
           Loading properties...
         </Typography>
       </Box>
     );
   }
 
-  return (
-    
-    <Box sx={{ padding: 2, width: '100%' }}>
-      <Box sx={{ mb: 2 }}>
-        <Typography variant="h5" component="h1" gutterBottom sx={{ fontWeight: "bold" }}>
-          Property Listings : <span>{properties.length} properties found</span> 
-        </Typography>
-      
-      </Box>
+  const currentPriceRange = getCurrentPriceRange();
 
-      {properties.length === 0 ? (
-        <Box sx={{ textAlign: "center", mt: 8 }}>
-          <Typography variant="h6" color="text.secondary">
-            No properties found
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Try adjusting your search criteria
-          </Typography>
-        </Box>
-      ) : (
-        <Box sx={{ width: '100%' }}>
-          {properties.map((property) => (
-            <ListingCard key={property.id} propertyData={property} />
-          ))}
-        </Box>
-      )}
+  return (
+    <Box sx={{ padding: { xs: 1, sm: 2 }, width: '100%',  }} className="-mt-1">
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <Typography variant="h5" component="h1" gutterBottom sx={{ fontWeight: "bold", mb: 3 }}>
+          Property Listings: <span>{filteredProperties.length} properties found</span> 
+        </Typography>
+      </motion.div>
+
+      <Grid container spacing={2}  className="-mt-2" >
+        {/* Filters Sidebar - Responsive width */}
+        <Grid item xs={12} md={4} lg={2.4} sx={{width: '20%',}}>
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <Paper sx={{ 
+              p: 3, 
+              position: 'sticky', 
+              top: 10, 
+              maxHeight: '83vh', 
+              overflowY: 'auto',
+              overflowX: 'hidden', // Prevent horizontal scroll
+              '&::-webkit-scrollbar': {
+                width: '6px',
+              },
+              '&::-webkit-scrollbar-track': {
+                background: '#f1f1f1',
+              },
+              '&::-webkit-scrollbar-thumb': {
+                background: '#c1c1c1',
+                borderRadius: '3px',
+              },
+              '&::-webkit-scrollbar-thumb:hover': {
+                background: '#a1a1a1',
+              }
+            }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                  Filters
+                </Typography>
+                <Button onClick={resetFilters} size="small" variant="outlined">
+                  Reset All
+                </Button>
+              </Box>
+
+              {/* Price Range */}
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold", fontSize: "1rem" }}>
+                  Price Range ({filters.transaction_type === "buy" ? "Buy" : "Rent"})
+                </Typography>
+                <Slider
+                  value={[filters.filters.budget_range.min, filters.filters.budget_range.max]}
+                  onChange={(_, newValue) => {
+                    handleBudgetRangeChange('min', newValue[0]);
+                    handleBudgetRangeChange('max', newValue[1]);
+                  }}
+                  valueLabelDisplay="auto"
+                  valueLabelFormat={(value) => formatPrice(value, filters.transaction_type)}
+                  min={currentPriceRange.min}
+                  max={currentPriceRange.max}
+                  step={currentPriceRange.step}
+                />
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
+                  <Typography variant="body2">
+                    {formatPrice(filters.filters.budget_range.min, filters.transaction_type)}
+                  </Typography>
+                  <Typography variant="body2">
+                    {formatPrice(filters.filters.budget_range.max, filters.transaction_type)}
+                  </Typography>
+                </Box>
+              </Box>
+
+              {/* Transaction Type */}
+              <Box sx={{ mb: 3, }}>
+                <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold", fontSize: "1rem" }}>
+                  Transaction Type
+                </Typography>
+                <FormControl fullWidth size="small">
+                  <Select
+                    value={filters.transaction_type}
+                    onChange={(e) => handleFilterChange('transaction_type', e.target.value)}
+                  >
+                    {filterOptions.transaction_type.map(option => (
+                      <MenuItem key={option} value={option}>
+                        {option === "buy" ? "Buy" : "Rent"}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
+
+              {/* City Dropdown */}
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold", fontSize: "1rem" }}>
+                  City
+                </Typography>
+                <FormControl fullWidth size="small">
+                  <Select
+                    value={filters.filters.city}
+                    onChange={(e) => handleFilterChange('city', e.target.value, true)}
+                  >
+                    <MenuItem value="">All Cities</MenuItem>
+                    {filterOptions.city.map(option => (
+                      <MenuItem key={option} value={option}>
+                        {option}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
+              
+              {/* Property Type */}
+              <FilterSection
+                title="Property Type"
+                options={filterOptions.property_type}
+                filterType="property_type"
+              />
+
+              {/* Possession Status */}
+              <FilterSection
+                title="Possession Status"
+                options={filterOptions.possession_status}
+                filterType="possession_status"
+              />
+
+              {/* Bedrooms */}
+              <FilterSection
+                title="Bedrooms"
+                options={filterOptions.bedroom}
+                filterType="bedroom"
+              />
+
+              {/* Bathrooms */}
+              <FilterSection
+                title="Bathrooms"
+                options={filterOptions.bathroom}
+                filterType="bathroom"
+              />
+
+              {/* Parking */}
+              <FilterSection
+                title="Parking"
+                options={filterOptions.parking}
+                filterType="parking"
+              />
+
+              {filterLoading && (
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 2, py: 1 }}>
+                  <CircularProgress size={16} />
+                  <Typography variant="body2" sx={{ ml: 1 }}>
+                    Updating results...
+                  </Typography>
+                </Box>
+              )}
+            </Paper>
+          </motion.div>
+        </Grid>
+
+        {/* Property Listings - Responsive width */}
+        <Grid item xs={12} md={8} lg={9.6} flex={1}>
+          {filterLoading ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Box sx={{ 
+                display: 'flex', 
+                justifyContent: 'center', 
+                alignItems: 'center', 
+                height: '200px',
+                flexDirection: 'column',
+                gap: 2
+              }}>
+                <CircularProgress />
+                <Typography variant="body1" color="text.secondary">
+                  Updating results...
+                </Typography>
+              </Box>
+            </motion.div>
+          ) : filteredProperties.length === 0 ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Box sx={{ textAlign: "center", mt: 8, py: 4 }}>
+                <Typography variant="h6" color="text.secondary" gutterBottom>
+                  No properties found
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Try adjusting your search criteria or reset filters
+                </Typography>
+              </Box>
+            </motion.div>
+          ) : (
+            <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', minHeight: '82vh' }}>
+              {/* Properties List */}
+              <motion.div
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+                style={{ flex: 1 }}
+              >
+                <AnimatePresence>
+                  {displayedProperties.map((property) => (
+                    <motion.div
+                      key={property.id}
+                      variants={itemVariants}
+                      layout
+                      initial="hidden"
+                      animate="visible"
+                      exit="hidden"
+                    >
+                      <Box sx={{ width: '100%', mb: 2 }}>
+                        <ListingCard propertyData={property} />
+                      </Box>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </motion.div>
+
+              {/* Pagination Section */}
+              <Box sx={{ 
+                position: 'sticky' , 
+                bottom: 0, 
+                backgroundColor: 'background.paper', 
+                py: 2, 
+                borderTop: 1, 
+                borderColor: 'divider',
+                mt: 'auto',
+                px:2
+              }}>
+                <Box sx={{ 
+                  display: 'flex', 
+                  flexDirection: { xs: 'column', sm: 'row' }, 
+                  justifyContent: 'space-between', 
+                  alignItems: { xs: 'flex-start', sm: 'center' },
+                  gap: 2, 
+                  
+                }}>
+                  {/* Page info */}
+                  <Typography variant="body2" color="text.secondary">
+                    Showing {indexOfFirstProperty + 1}-{Math.min(indexOfLastProperty, filteredProperties.length)} of {filteredProperties.length} properties
+                  </Typography>
+                  
+                  {/* Pagination */}
+                  {totalPages > 1 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, delay: 0.2 }}
+                    >
+                      <Pagination 
+                        count={totalPages} 
+                        page={currentPage}
+                        onChange={handlePageChange}
+                        color="primary" 
+                        size={window.innerWidth < 600 ? "small" : "medium"}
+                        showFirstButton 
+                        showLastButton
+                        
+                        sx={{
+                          '& .MuiPaginationItem-root': {
+                            borderRadius: '8px',
+                            margin: '0 2px',
+                            fontWeight: 'bold',
+                          },
+                          '& .MuiPaginationItem-page.Mui-selected': {
+                            backgroundColor: 'primary.main',
+                            color: 'white',
+                            '&:hover': {
+                              backgroundColor: 'primary.dark',
+                            }
+                          },
+                          '& .MuiPaginationItem-page': {
+                            '&:hover': {
+                              backgroundColor: 'primary.light',
+                              color: 'white',
+                            }
+                          }
+                        }}
+                      />
+                    </motion.div>
+                  )}
+                </Box>
+              </Box>
+            </Box>
+          )}
+        </Grid>
+      </Grid>
     </Box>
   );
 };

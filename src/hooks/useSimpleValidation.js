@@ -4,45 +4,47 @@ import { useState } from 'react';
 export const useSimpleValidation = () => {
   const [errors, setErrors] = useState({});
 
-  // Validation for CreatableDropdown with multiple fields
-  const validateCreatableDropdown = (value, isRequired) => {
+  // Updated validation for CreatableDropdown - matches FilterComponent logic
+  const validateCreatableDropdown = (value, isRequired, fieldData = []) => {
     if (!isRequired) return true;
     
     // If no value at all
     if (!value) return false;
     
-    // If value exists but no values array
-    if (!value.values || !Array.isArray(value.values)) return false;
+    // Extract field requirements from fieldData (same as FilterComponent)
+    const isTextFieldRequired = fieldData[0]?.InputLabel ? 
+      fieldData[0].InputLabel.includes('*') : false;
+    const isAutocompleteRequired = fieldData[0]?.DropdownLabel ? 
+      fieldData[0].DropdownLabel.includes('*') : false;
     
-    // Check if ALL values are empty (for CreatableDropdown, at least one should be filled)
-    const allEmpty = value.values.every(val => !val || val.trim() === '');
+    const textFieldValue = value.textField || '';
+    const autocompleteValue = value.autocomplete || '';
     
-    return !allEmpty;
+    // Validate each field separately based on their own requirement
+    const textFieldValid = !isTextFieldRequired || (textFieldValue && textFieldValue.trim() !== '');
+    const autocompleteValid = !isAutocompleteRequired || (autocompleteValue && autocompleteValue.trim() !== '');
+    
+    // Return true only if all required fields are valid
+    return textFieldValid && autocompleteValid;
   };
 
-  // Validation for file uploads
+  // Rest of your validation functions remain exactly the same
   const validateFileUpload = (value, isRequired) => {
     if (!isRequired) return true;
-    
-    // Check if files were selected
     return value && value.length > 0;
   };
 
-  // Validation for array fields (Chips, RadioButton)
   const validateArrayField = (value, isRequired) => {
     if (!isRequired) return true;
-    
     return value && value !== '' && !(Array.isArray(value) && value.length === 0);
   };
 
-  // Validation for text fields (InputField, TextArea)
   const validateTextField = (value, isRequired) => {
     if (!isRequired) return true;
-    
     return value && value !== '' && !(Array.isArray(value) && value.length === 0);
   };
 
-  // Main step validation function
+  // Main step validation function - only change is passing fieldData
   const validateStep = (stepFields, formData) => {
     const newErrors = {};
     let isValid = true;
@@ -55,10 +57,9 @@ export const useSimpleValidation = () => {
       if (isRequired) {
         let fieldValid = true;
         
-        // Different validation based on field type
         switch (field.fieldType) {
           case "CreatableDropdown":
-            fieldValid = validateCreatableDropdown(value, isRequired);
+            fieldValid = validateCreatableDropdown(value, isRequired, field.fieldData);
             break;
             
           case "UploadFile":
@@ -76,7 +77,6 @@ export const useSimpleValidation = () => {
             break;
             
           default:
-            // Default validation for unknown field types
             fieldValid = value && value !== '' && !(Array.isArray(value) && value.length === 0);
             break;
         }
@@ -92,17 +92,16 @@ export const useSimpleValidation = () => {
     return isValid;
   };
 
-  // Validate a single field (useful for real-time validation)
-  const validateField = (fieldName, fieldType, value, isRequired = false) => {
+  // Validate a single field - only change is passing fieldData
+  const validateField = (fieldName, fieldType, value, isRequired = false, fieldData = []) => {
     const newErrors = { ...errors };
     
     if (isRequired) {
       let fieldValid = true;
       
-      // Different validation based on field type
       switch (fieldType) {
         case "CreatableDropdown":
-          fieldValid = validateCreatableDropdown(value, isRequired);
+          fieldValid = validateCreatableDropdown(value, isRequired, fieldData);
           break;
           
         case "UploadFile":
@@ -137,7 +136,7 @@ export const useSimpleValidation = () => {
     return !newErrors[fieldName];
   };
 
-  // Clear error for a specific field
+  // Rest of your functions remain exactly the same
   const clearFieldError = (fieldName) => {
     setErrors(prev => {
       const newErrors = { ...prev };
@@ -146,13 +145,10 @@ export const useSimpleValidation = () => {
     });
   };
 
-  // Clear all errors
   const clearErrors = () => setErrors({});
 
-  // Check if form has any errors
   const hasErrors = () => Object.keys(errors).length > 0;
 
-  // Get error message for a specific field
   const getFieldError = (fieldName) => errors[fieldName];
 
   return {
@@ -163,7 +159,6 @@ export const useSimpleValidation = () => {
     clearErrors,
     hasErrors,
     getFieldError,
-    // Export individual validators if needed elsewhere
     validateCreatableDropdown,
     validateFileUpload,
     validateArrayField,

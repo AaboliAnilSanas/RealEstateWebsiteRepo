@@ -45,9 +45,9 @@ const PropertyListingBanner = () => {
               </button>
 
               {/* Secondary CTA */}
-              {/* <button className="border-2 border-orange-500 text-orange-600 px-8 py-4 rounded-2xl font-semibold text-lg hover:bg-orange-500 hover:text-white transition-all duration-300 transform hover:-translate-y-1">
+              <button className="border-2 border-orange-500 text-orange-600 px-8 py-4 rounded-2xl font-semibold text-lg hover:bg-orange-500 hover:text-white transition-all duration-300 transform hover:-translate-y-1">
                 Learn More
-              </button> */}
+              </button>
             </div>
 
             {/* Features List */}

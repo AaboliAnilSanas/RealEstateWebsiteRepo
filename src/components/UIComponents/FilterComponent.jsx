@@ -49,27 +49,7 @@ const FilterComponent = ({
   });
 
   // Use props if provided, otherwise use default data
-  const data = propData || {
-    label: "Search Here...",
-    placeholder: "Search by Property Id, Pincode",
-    fieldType: "CreatableDropdown",
-    fieldData: [
-      {
-        label: "Select City*",
-        units: [
-          "Bangalore",
-          "Mumbai",
-          "Delhi",
-          "Chennai",
-          "Hyderabad",
-          "Pune",
-          "Kolkata",
-          "Ahmedabad"
-        ],
-      },
-    ],
-    inputFirst: false,
-  };
+  const data = propData;
 
   const PossessionStatus = propFilterOptions?.possessionStatus || {
     fieldType: "RadioButton",
@@ -211,27 +191,26 @@ const FilterComponent = ({
   };
 
   const validateCity = () => {
-    const { textField, autocomplete } = selectedValues.creatableDropdown;
-    
-    // Check if each field is required based on asterisk in their respective labels
-    const isTextFieldRequired = isFieldRequired(data.label);
-    const isAutocompleteRequired = isFieldRequired(data.fieldData[0].label);
-    
-    const textFieldEmpty = !textField || textField.trim() === '';
-    const autocompleteEmpty = !autocomplete || autocomplete.trim() === '';
-    
-    // Validate each field separately based on their own requirement
-    const textFieldError = isTextFieldRequired && textFieldEmpty;
-    const autocompleteError = isAutocompleteRequired && autocompleteEmpty;
-    
-    setValidationErrors({
-      textField: textFieldError,
-      autocomplete: autocompleteError
-    });
-    
-    // Return true only if all required fields are valid
-    return !textFieldError && !autocompleteError;
-  };
+  const { textField, autocomplete } = selectedValues.creatableDropdown;
+  
+const isTextFieldRequired = isFieldRequired(data.fieldData[0].InputLabel); // Check InputLabel
+const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel); // Check DropdownLabel
+  
+  const textFieldEmpty = !textField || textField.trim() === '';
+  const autocompleteEmpty = !autocomplete || autocomplete.trim() === '';
+  
+  // Validate each field separately based on their own requirement
+  const textFieldError = isTextFieldRequired && textFieldEmpty;
+  const autocompleteError = isAutocompleteRequired && autocompleteEmpty;
+  
+  setValidationErrors({
+    textField: textFieldError,
+    autocomplete: autocompleteError
+  });
+  
+  // Return true only if all required fields are valid
+  return !textFieldError && !autocompleteError;
+};
 
   const handleSearch = () => {
     // Validate city field
@@ -781,21 +760,21 @@ const FilterComponent = ({
           flexWrap: isMobile ? 'wrap' : 'nowrap'
         }}>
           <div style={{ flex: 1, minWidth: isMobile ? '100%' : 'auto' }}>
-            <CreatableDropdown
-              dropdownLabel={data.label}
-              key={`${selectedValues.creatableDropdown.textField}-${selectedValues.creatableDropdown.autocomplete}`}
-              fieldData={data.fieldData}
-              value={{
-                textField: selectedValues.creatableDropdown.textField,
-                autocomplete: selectedValues.creatableDropdown.autocomplete,
-              }}
-              onChange={handleCityChange}
-              inputFirst={data.inputFirst}
-              dropdownisRequired={isAutocompleteRequired}
-              dropdownError={validationErrors.autocomplete}
-              textfieldisRequired={isTextFieldRequired}
-              textfieldError={validationErrors.textField}
-            />
+           <CreatableDropdown
+            dropdownLabel={data.fieldData[0].InputLabel} // Add this prop
+            key={`${selectedValues.creatableDropdown.textField}-${selectedValues.creatableDropdown.autocomplete}`}
+            fieldData={data.fieldData}
+            value={{
+              textField: selectedValues.creatableDropdown.textField,
+              autocomplete: selectedValues.creatableDropdown.autocomplete,
+            }}
+            onChange={handleCityChange}
+            inputFirst={data.inputFirst}
+            dropdownisRequired={isAutocompleteRequired}
+            dropdownError={validationErrors.autocomplete}
+            textfieldisRequired={isTextFieldRequired}
+            textfieldError={validationErrors.textField}
+          />
           </div>
           
           <div style={{ 

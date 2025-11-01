@@ -4,23 +4,21 @@ import FilterComponent from "../../UIComponents/FilterComponent";
 const FilterSearchPage = () => {
   // Define your data in the page component
   const filterData = {
-    label: "Search Here...*",
-    placeholder: "Search by Property Id, Pincode",
     fieldType: "CreatableDropdown",
     fieldData: [
       {
-        label: "Select City",
+        InputLabel: "Search Here...",
+        placeholder: "Search by Property Id, Pincode",
+        DropdownLabel:'Select City*',
         units: [
           "Bangalore",
-          "Lower Ground",
-          "Ground",
-          "1",
-          "2",
-          "3",
-          "5",
-          "6",
-          "7",
-          "8",
+          "Mumbai",
+          "Delhi",
+          "Chennai",
+          "Hyderabad",
+          "Pune",
+          "Kolkata",
+          "Ahmedabad"
         ],
       },
     ],

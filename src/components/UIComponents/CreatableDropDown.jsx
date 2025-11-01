@@ -28,9 +28,12 @@ const CreatableDropdown = ({
   const [textFieldValue, setTextFieldValue] = useState(value?.textField || '');
   const [autocompleteValue, setAutocompleteValue] = useState(value?.autocomplete || '');
   
-  const label = fieldData?.[0]?.label || 'Select option';
-  const options = fieldData?.[0]?.units || [];
-  const placeholder = fieldData?.[0]?.placeholder;
+  // Get field data from the first item in fieldData array
+  const fieldDataItem = fieldData?.[0] || {};
+  const inputLabel = fieldDataItem?.InputLabel || 'Input';
+  const dropdownLabelText = fieldDataItem?.DropdownLabel || 'Option';
+  const options = fieldDataItem?.units || [];
+  const placeholder = fieldDataItem?.placeholder;
 
   // Debounced onChange callback
   const debouncedOnChange = useCallback(
@@ -95,7 +98,7 @@ const CreatableDropdown = ({
     }
   };
 
-  // Separate border colors for each field
+  // Separate border colors for each field - Validation logic
   const getTextFieldBorderColor = () => {
     return textfieldError ? '1px solid red' : '1px solid transparent';
   };
@@ -110,6 +113,8 @@ const CreatableDropdown = ({
   };
 
   return (
+    <>
+     {fieldData.map((field, index) => (
     <Box sx={{ 
       display: 'flex', 
       width: '100%', 
@@ -119,24 +124,29 @@ const CreatableDropdown = ({
       '&:hover': {
         border: textfieldError || dropdownError ? '1px solid red' : '1px solid black',
       },
-      paddingLeft: '2px',
-      paddingRight: '2px',
       overflow: 'hidden',
+      alignItems: 'center',
     }}>
+     
+
       {/* TextField - Always 80% width */}
       <Box sx={{ 
         width: '80%',
-        padding: '3px',
-        borderRight: textfieldError ? '1px solid red' : '1px solid transparent',
+        padding: '0px 8px',
+        borderRight: inputFirst && (textfieldError || dropdownError) ? '1px solid red' : 
+                    inputFirst ? '1px solid #c4c4c4' : 'none',
+        borderLeft: !inputFirst && (textfieldError || dropdownError) ? '1px solid red' : 
+                   !inputFirst ? '1px solid #c4c4c4' : 'none',
       }}>
         <TextField
           id="creatable-input"
-          label={dropdownLabel}
+          label={inputLabel} 
           placeholder={placeholder}
           variant="standard"
           value={textFieldValue}
           onChange={handleInputChange}
           error={textfieldError}
+          required={textfieldisRequired}
           fullWidth
           size="small"
           sx={{
@@ -149,26 +159,37 @@ const CreatableDropdown = ({
             '& .MuiInput-underline:hover:not(.Mui-disabled):before': {
               borderBottomColor: 'transparent',
             },
+            '& .MuiInputBase-root': {
+              padding: '0px',
+            },
+            '& .MuiInputBase-input': {
+              padding: '8px 0px',
+            },
+            '& .MuiFormLabel-asterisk': {
+              color: 'white',
+            }
           }}
         />
       </Box>
       
-      {/* Conditional Divider */}
-      {!inputFirst && (
-        <Divider orientation="vertical" flexItem sx={{ 
+      {/* Divider - Always visible between fields */}
+      <Divider 
+        orientation="vertical" 
+        flexItem 
+        sx={{ 
           backgroundColor: textfieldError || dropdownError ? 'red' : '#c4c4c4',
+          height: '80%',
+          margin: '4px 0px',
           '&:hover': {
             backgroundColor: textfieldError || dropdownError ? 'red' : 'black',
           },
-          margin: '10px'
-        }} />
-      )}
+        }} 
+      />
       
       {/* Autocomplete - Always 20% width */}
       <Box sx={{ 
         width: '20%', 
-        padding: '3px',
-        borderLeft: dropdownError ? '1px solid red' : '1px solid transparent',
+        padding: '0px 8px',
       }}>
         <Autocomplete         
           freeSolo
@@ -179,27 +200,42 @@ const CreatableDropdown = ({
           renderInput={(params) => (
             <TextField 
               {...params} 
-              label={`${label}`}
+              label={dropdownLabelText} 
               error={dropdownError}
+              required={dropdownisRequired}
               variant="standard"
               size="small"
+              sx={{
+                '& .MuiInput-underline:before': {
+                  borderBottomColor: 'transparent',
+                },
+                '& .MuiInput-underline:after': {
+                  borderBottomColor: 'transparent',
+                },
+                '& .MuiInput-underline:hover:not(.Mui-disabled):before': {
+                  borderBottomColor: 'transparent',
+                },
+                '& .MuiInputBase-root': {
+                  padding: '0px',
+                },
+                '& .MuiInputBase-input': {
+                  padding: '8px 0px',
+                },
+                '& .MuiFormLabel-asterisk': {
+                  color: 'white',
+                }
+              }}
             />
           )}
           fullWidth
         />
       </Box>
-
-      {/* Conditional Divider for when inputFirst is true */}
-      {inputFirst && (
-        <Divider orientation="vertical" flexItem sx={{ 
-          backgroundColor: textfieldError || dropdownError ? 'red' : '#c4c4c4',
-          '&:hover': {
-            backgroundColor: textfieldError || dropdownError ? 'red' : 'black',
-          }
-        }} />
-      )}
+     
     </Box>
+     ))}
+     </>
   );
+  
 };
 
 export default CreatableDropdown;
