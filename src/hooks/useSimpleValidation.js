@@ -3,6 +3,7 @@ import { useState } from 'react';
 
 export const useSimpleValidation = () => {
   const [errors, setErrors] = useState({});
+  const [completedSteps, setCompletedSteps] = useState([]);
 
   // Updated validation for CreatableDropdown - matches FilterComponent logic
   const validateCreatableDropdown = (value, isRequired, fieldData = []) => {
@@ -28,7 +29,6 @@ export const useSimpleValidation = () => {
     return textFieldValid && autocompleteValid;
   };
 
-  // Rest of your validation functions remain exactly the same
   const validateFileUpload = (value, isRequired) => {
     if (!isRequired) return true;
     return value && value.length > 0;
@@ -44,8 +44,45 @@ export const useSimpleValidation = () => {
     return value && value !== '' && !(Array.isArray(value) && value.length === 0);
   };
 
-  // Main step validation function - only change is passing fieldData
-  const validateStep = (stepFields, formData) => {
+  // Check if a specific step is completed
+  const isStepCompleted = (stepIndex, stepFields, formData) => {
+    const stepFieldsValid = stepFields.every(field => {
+      const fieldName = field.label;
+      const isRequired = field.label.includes('*');
+      const value = formData[fieldName];
+
+      if (!isRequired) return true;
+      
+      let fieldValid = true;
+      
+      switch (field.fieldType) {
+        case "CreatableDropdown":
+          fieldValid = validateCreatableDropdown(value, isRequired, field.fieldData);
+          break;
+        case "UploadFile":
+          fieldValid = validateFileUpload(value, isRequired);
+          break;
+        case "Chips":
+        case "RadioButton":
+          fieldValid = validateArrayField(value, isRequired);
+          break;
+        case "InputField":
+        case "TextArea":
+          fieldValid = validateTextField(value, isRequired);
+          break;
+        default:
+          fieldValid = value && value !== '' && !(Array.isArray(value) && value.length === 0);
+          break;
+      }
+      
+      return fieldValid;
+    });
+    
+    return stepFieldsValid;
+  };
+
+  // Main step validation function
+  const validateStep = (stepFields, formData, stepIndex = null) => {
     const newErrors = {};
     let isValid = true;
 
@@ -61,21 +98,17 @@ export const useSimpleValidation = () => {
           case "CreatableDropdown":
             fieldValid = validateCreatableDropdown(value, isRequired, field.fieldData);
             break;
-            
           case "UploadFile":
             fieldValid = validateFileUpload(value, isRequired);
             break;
-            
           case "Chips":
           case "RadioButton":
             fieldValid = validateArrayField(value, isRequired);
             break;
-            
           case "InputField":
           case "TextArea":
             fieldValid = validateTextField(value, isRequired);
             break;
-            
           default:
             fieldValid = value && value !== '' && !(Array.isArray(value) && value.length === 0);
             break;
@@ -89,10 +122,21 @@ export const useSimpleValidation = () => {
     });
 
     setErrors(newErrors);
+    
+    // Update completed steps if this step is valid
+    if (isValid && stepIndex !== null) {
+      setCompletedSteps(prev => {
+        if (!prev.includes(stepIndex)) {
+          return [...prev, stepIndex];
+        }
+        return prev;
+      });
+    }
+    
     return isValid;
   };
 
-  // Validate a single field - only change is passing fieldData
+  // Validate a single field
   const validateField = (fieldName, fieldType, value, isRequired = false, fieldData = []) => {
     const newErrors = { ...errors };
     
@@ -103,21 +147,17 @@ export const useSimpleValidation = () => {
         case "CreatableDropdown":
           fieldValid = validateCreatableDropdown(value, isRequired, fieldData);
           break;
-          
         case "UploadFile":
           fieldValid = validateFileUpload(value, isRequired);
           break;
-          
         case "Chips":
         case "RadioButton":
           fieldValid = validateArrayField(value, isRequired);
           break;
-          
         case "InputField":
         case "TextArea":
           fieldValid = validateTextField(value, isRequired);
           break;
-          
         default:
           fieldValid = value && value !== '' && !(Array.isArray(value) && value.length === 0);
           break;
@@ -136,7 +176,6 @@ export const useSimpleValidation = () => {
     return !newErrors[fieldName];
   };
 
-  // Rest of your functions remain exactly the same
   const clearFieldError = (fieldName) => {
     setErrors(prev => {
       const newErrors = { ...prev };
@@ -153,8 +192,10 @@ export const useSimpleValidation = () => {
 
   return {
     errors,
+    completedSteps,
     validateStep,
     validateField,
+    isStepCompleted,
     clearFieldError,
     clearErrors,
     hasErrors,

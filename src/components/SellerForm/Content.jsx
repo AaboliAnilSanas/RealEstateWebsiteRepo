@@ -10,7 +10,6 @@ const Content = ({ formDetails, formData, updateFormData, errors }) => {
   const handleFieldChange = (fieldName, value) => {
     updateFormData(fieldName, value);
 
-    // Clear error when user selects a value
     if (value && errors[fieldName]) {
       // We'll handle this in the parent component
     }
@@ -21,54 +20,65 @@ const Content = ({ formDetails, formData, updateFormData, errors }) => {
     return fieldLabel && fieldLabel.includes('*');
   };
 
+  // Remove asterisk from label for display
+  const getDisplayLabel = (label) => {
+    return label ? label.replace(/\*$/, '') : label;
+  };
+
   return (
     <div>
-      <div className="mb-3 text-center">
+      <div className="mb-6 px-2">
         <Label
           LabelName={formDetails.label}
-          className="text-[var(--heading-)]+text-[var(--tertiary-color)] font-extrabold uppercase tracking-wide"
+          className="text-2xl  font-black bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent uppercase tracking-wide mb-2"
         />
         {formDetails.subLabel && (
-          <p className="text-[var(--small-text)]+text-[var(--secondary-color)] mt-2 italic">
-            {formDetails.subLabel}
-          </p>
+          <h4 className="text-amber-600 mt-1 text-sm mb-3 italic font-medium bg-amber-50/50 px-3 py-2 rounded-lg border border-amber-200">
+               💡 {formDetails.subLabel}
+          </h4>
         )}
       </div>
 
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-4">
         {formDetails.fields.map((field, idx) => {
           const fieldName = field.label;
           const fieldValue = formData[fieldName] || "";
           const isRequired = field.label.includes("*");
           const error = errors[fieldName];
 
-          // // For CreatableDropdown, check individual field requirements
-          // const isTextFieldRequired = field.fieldData?.[0]?.InputLabel ? 
-          //   isFieldRequired(field.fieldData[0].InputLabel) : false;
-          // const isAutocompleteRequired = field.fieldData?.[0]?.DropdownLabel ? 
-          //   isFieldRequired(field.fieldData[0].DropdownLabel) : false;
-
           return (
             <div
               key={idx}
-              className={`bg-white rounded-xl p-4 mx-4 shadow-sm border transition-all duration-300 ${
-                error ? "border-red-500" : "border-gray-100 hover:shadow-lg"
+              className={`bg-gradient-to-br from-white to-amber-50/30 rounded-2xl p-6 mx-2 shadow-sm border-2 transition-all duration-300 hover:shadow-lg ${
+                error 
+                  ? "border-red-300 bg-red-50/50 shadow-red-100" 
+                  : "border-amber-100 hover:border-amber-200 hover:shadow-amber-100"
               }`}
             >
               {field.label && (
-                <h2 className="font-semibold text-[var(--primary-color),var(--heading-0)] mb-3">
-                  {field.label}
+                <h2 className="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
+                  {getDisplayLabel(field.label)}
+                  {isRequired && (
+                    <span className="text-red-500 text-sm font-semibold">*</span>
+                  )}
                 </h2>
               )}
 
               {field.subLabel && (
-                <h4 className="text-[var(--secondary-color),var(--small-text)] mb-3 italic">
-                  {field.subLabel}
+                <h4 className="text-amber-600 text-sm mb-4 italic font-medium bg-amber-50/50 px-3 py-2 rounded-lg border border-amber-200">
+                  💡 {field.subLabel}
                 </h4>
               )}
 
-              {/* Error Message */}
-              {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
+              {/* Enhanced Error Message */}
+              {error && (
+                <div className="flex items-center gap-2 text-red-600 bg-red-50/80 px-4 py-3 rounded-xl border border-red-200 mb-4">
+                  <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                  </svg>
+                  <span className="text-sm font-medium">{error}</span>
+                </div>
+              )}
 
               {(() => {
                 const commonProps = {
@@ -80,7 +90,7 @@ const Content = ({ formDetails, formData, updateFormData, errors }) => {
                 switch (field.fieldType) {
                   case "InputField":
                     return (
-                      <div style={{ width: "100%" }}>
+                      <div className="w-full">
                         <InputField
                           {...commonProps}
                           InputLabels={field.fieldData || []}
@@ -113,33 +123,31 @@ const Content = ({ formDetails, formData, updateFormData, errors }) => {
                           handleFieldChange(fieldName, e.target.value)
                         }
                         placeholder={field.fieldData?.[0] || ""}
-                        className={`border rounded-lg w-full p-3 text-[var(--body-text)] focus:outline-none transition-all ${
+                        className={`w-full p-4 text-gray-700 rounded-xl border-2 focus:outline-none transition-all duration-300 resize-none ${
                           error
-                            ? "border-red-500 ring-2 ring-red-200"
-                            : "border-gray-300 focus:ring-2 focus:ring-[var(--primary-color-light)]"
+                            ? "border-red-300 bg-red-50/50 focus:ring-2 focus:ring-red-200"
+                            : "border-gray-200 bg-white focus:border-amber-300 focus:ring-2 focus:ring-amber-100"
                         }`}
-                        rows="4"
+                        rows="5"
                       />
                     );
 
                   case "CreatableDropdown":
-                  return (
-                    <div className="grid gap-3">
-                      <CreatableDropdown
-                        dropdownLabel={field.fieldData?.[0]?.InputLabel}
-                        fieldData={field.fieldData}
-                        value={fieldValue}
-                        onChange={(value) => handleFieldChange(fieldName, value)}
-                        inputFirst={field.inputFirst}
-                        // Get individual field requirements
-                        dropdownisRequired={field.fieldData?.[0]?.DropdownLabel?.includes('*') || false}
-                        textfieldisRequired={field.fieldData?.[0]?.InputLabel?.includes('*') || false}
-                        // Pass errors for individual fields
-                        dropdownError={errors[`${fieldName}.autocomplete`]} 
-                        textfieldError={errors[`${fieldName}.textField`]}
-                      />
-                    </div>
-                  );
+                    return (
+                      <div className="grid gap-4">
+                        <CreatableDropdown
+                          dropdownLabel={field.fieldData?.[0]?.InputLabel}
+                          fieldData={field.fieldData}
+                          value={fieldValue}
+                          onChange={(value) => handleFieldChange(fieldName, value)}
+                          inputFirst={field.inputFirst}
+                          dropdownisRequired={field.fieldData?.[0]?.DropdownLabel?.includes('*') || false}
+                          textfieldisRequired={field.fieldData?.[0]?.InputLabel?.includes('*') || false}
+                          dropdownError={errors[`${fieldName}.autocomplete`]} 
+                          textfieldError={errors[`${fieldName}.textField`]}
+                        />
+                      </div>
+                    );
 
                   case "UploadFile":
                     return (
@@ -155,9 +163,11 @@ const Content = ({ formDetails, formData, updateFormData, errors }) => {
 
                   default:
                     return (
-                      <p className="text-gray-400 italic">
-                        Unknown field type: {field.fieldType}
-                      </p>
+                      <div className="text-center py-8">
+                        <p className="text-gray-400 italic text-lg">
+                          🔧 Field type coming soon: {field.fieldType}
+                        </p>
+                      </div>
                     );
                 }
               })()}

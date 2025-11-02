@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import VerticalLinearStepper from "../UIComponents/verticalLinearStepper";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import LeftSideProgress from "./LeftSideProgress";
 
 const SellerForm = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
+  const [formData, setFormData] = useState({});
 
   const formVariants = {
     hidden: { opacity: 0, x: 30 },
@@ -178,10 +179,10 @@ const SellerForm = () => {
       fields: [
         {
           label: 'Upload Videos',
-          fieldType: 'UploadFile'
+          fieldType: 'UploadFile',
         },
         {
-          label: 'Upload Photos',
+          label: 'Upload Photos*',
           subLabel: 'At least one photo is mandatory',
           fieldType: 'UploadFile'
         }
@@ -191,12 +192,20 @@ const SellerForm = () => {
 
   const progressPercentage = ((activeStep + 1) / SellerFormDetailsData.length) * 100;
 
+  const handleStepChange = (step) => {
+    setActiveStep(step);
+  };
+
+  const updateFormData = (fieldData) => {
+    setFormData(prev => ({ ...prev, ...fieldData }));
+  };
+
   return (
     <div className="relative min-h-[92vh] flex bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 overflow-hidden">
 
       {/* Premium Background with Enhanced Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        {/* Enhanced Floating Bubbles
+        {/* Enhanced Floating Bubbles */}
         <motion.div
           className="absolute top-20 left-10 w-24 h-24 bg-gradient-to-br from-amber-300 to-orange-400 rounded-full opacity-70 blur-xl"
           animate={{
@@ -224,59 +233,23 @@ const SellerForm = () => {
             delay: 1
           }}
         />
-        <motion.div
-          className="absolute top-1/2 left-1/4 w-16 h-16 bg-gradient-to-br from-yellow-300 to-amber-400 rounded-full opacity-50 blur-md"
+
+        {/* Hexagon Pattern */}
+        {/* <motion.div 
+          className="absolute top-1/4 left-1/4 w-7 h-7 opacity-80 bg-gradient-to-br from-amber-400 to-orange-500 clip-path-hexagon"
           animate={{
-            y: [0, -25, 0],
-            x: [0, 12, 0],
-            scale: [1, 1.15, 1],
-          }}
-          transition={{
-            duration: 7,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 2
-          }}
-        />
-        <motion.div
-          className="absolute top-1/3 right-1/3 w-14 h-14 bg-gradient-to-br from-orange-300 to-red-400 rounded-full opacity-60 blur-lg"
-          animate={{
-            y: [0, 20, 0],
-            x: [0, -10, 0],
             rotate: [0, 180, 360],
           }}
           transition={{
-            duration: 12,
+            duration: 20,
             repeat: Infinity,
-            ease: "easeInOut",
-            delay: 3
+            ease: "linear"
           }}
         /> */}
 
-        {/* Hexagon Patterns
-        <div className="absolute top-1/4 right-20 w-24 h-24 opacity-20">
-          <div className="w-full h-full bg-gradient-to-br from-amber-400 to-orange-500 clip-path-hexagon"></div>
-        </div>
-        <div className="absolute bottom-1/3 left-16 w-20 h-20 opacity-15">
-          <div className="w-full h-full bg-gradient-to-br from-pink-400 to-rose-500 clip-path-hexagon"></div>
-        </div>
-        <div className="absolute top-3/4 right-40 w-16 h-16 opacity-25">
-          <div className="w-full h-full bg-gradient-to-br from-yellow-400 to-amber-500 clip-path-hexagon"></div>
-        </div> */}
-        {/* <motion.div
-          className="absolute w-5 h-5 bg-gradient-to-br from-amber-400 to-orange-500 clip-path-hexagon rotate-45"
-          animate={{
-            rotate: [45, 90, 135, 180, 225, 270, 315, 360, 45],
-          }}>
-           < div className="w-full h-full bg-gradient-to-br from-amber-400 to-orange-500 clip-path-hexagon"></div>
-          </motion.div> */}
-        <motion.div className="absolute top-1/4 left-97 w-7 h-7 opacity-8 bg-gradient-to-br from-amber-400 to-orange-500 clip-path-hexagon rotate-45"   animate={{
-            rotate: [45, 90, 135, 180, 225, 270, 315, 360, 45],
-          }}>
-        </motion.div>
         {/* Enhanced Geometric Cut Elements */}
         <motion.div
-          className="absolute top-3 right-3 w-18 h-18 border-4 border-amber-400/40 rotate-45"
+          className="absolute top-3 right-3 w-20 h-20 border-4 border-amber-400/40 rotate-45"
           animate={{
             rotate: [45, 90, 135, 180, 225, 270, 315, 360, 45],
           }}
@@ -286,22 +259,10 @@ const SellerForm = () => {
             ease: "linear"
           }}
         />
-        {/* <motion.div
-          className="absolute bottom-0 left-20 w-32 h-32 border-3 border-rose-400/30 rotate-12"
-          animate={{
-            rotate: [12, 60, 120, 180, 240, 300, 360, 12],
-            scale: [1, 1.1, 1.2, 1.1, 1],
-          }}
-          transition={{
-            duration: 15,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        /> */}
         
         {/* Triangle Element */}
         <motion.div
-          className="absolute bottom-16 right-3 w-4 h-4 opacity-30"
+          className="absolute bottom-16 right-3 w-6 h-6 opacity-30"
           animate={{
             rotate: [0, 180, 360],
           }}
@@ -315,7 +276,7 @@ const SellerForm = () => {
         </motion.div>
       </div>
 
-      {/* Add CSS for custom shapes */}
+      {/* Add CSS for custom shapes and scrollbar */}
       <style jsx>{`
         .clip-path-hexagon {
           clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
@@ -323,27 +284,48 @@ const SellerForm = () => {
         .clip-path-triangle {
           clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
         }
+        
+        /* Hide scrollbar but keep functionality */
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        
+        .hide-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
       `}</style>
 
       {/* Left Section - Progress Tracker */}
-      <LeftSideProgress
-        activeStep={activeStep}
-        isSidebarVisible={isSidebarVisible}
-        setIsSidebarVisible={setIsSidebarVisible}
-        SellerFormDetailsData={SellerFormDetailsData}
-        progressPercentage={progressPercentage}
-        setActiveStep={setActiveStep}
-      />
+      <div className="max-h-[92vh] overflow-y-auto overflow-x-hidden hide-scrollbar">
+        <LeftSideProgress
+            activeStep={activeStep}
+            isSidebarVisible={isSidebarVisible}
+            setIsSidebarVisible={setIsSidebarVisible}
+            SellerFormDetailsData={SellerFormDetailsData}
+            progressPercentage={progressPercentage}
+            setActiveStep={setActiveStep}
+            formData={formData}
+          />
+      </div>
 
+      {/* Vertical Slit Divider - Placed after left section */}
+      <div className="relative">
+        <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-64 z-10">
+          <div className="w-full h-full bg-gradient-to-b from-amber-400 via-orange-400 to-rose-400 rounded-full shadow-lg"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-transparent rounded-full"></div>
+        </div>
+      </div>
+       
       {/* Right Section - Expanded Form */}
       <motion.div
         variants={formVariants}
         initial="hidden"
         animate="visible"
-        className="w-full overflow-y-auto"
-        style={{ maxHeight: '100vh' }}
+        className="w-full overflow-y-hidden"
+        style={{ maxHeight: '92vh' }}
       >
-        <div className="w-[100%] overflow-x-hidden overflow-y-hidden py-8 px-9 max-w-8xl relative">
+        <div className="w-[100%] overflow-x-hidden overflow-y-hidden py-9 px-9 max-w-8xl relative">
           {/* Background Bubble Effect */}
           <div className="absolute -top-8 -right-2 w-40 h-40 bg-gradient-to-br from-amber-200 to-orange-300 rounded-full opacity-40 blur-2xl"></div>
           <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-gradient-to-br from-rose-200 to-pink-300 rounded-full opacity-40 blur-2xl"></div>
@@ -370,11 +352,13 @@ const SellerForm = () => {
             </div>
 
             {/* Form Content - Now with more space */}
-            <div className="max-h-[68vh] overflow-y-auto">
+            <div className="max-h-[66vh] overflow-y-auto hide-scrollbar">
               <VerticalLinearStepper 
                 SellerFormDetails={SellerFormDetailsData}
                 activeStep={activeStep}
-                onStepChange={setActiveStep}
+                onStepChange={handleStepChange}
+                formData={formData}
+                updateFormData={updateFormData}
               />
             </div>
 
@@ -400,7 +384,6 @@ const SellerForm = () => {
           </div>
         </div>
       </motion.div>
-
     </div>
   );
 };
