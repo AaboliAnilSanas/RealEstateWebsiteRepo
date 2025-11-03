@@ -38,48 +38,48 @@ export default function OtpForm({
         }
     };
 
-    const handleVerifyOtp = async (otpCode) => {
-        if (!otpCode || otpCode.length !== 6) return;
+    // const handleVerifyOtp = async (otpCode) => {
+    //     if (!otpCode || otpCode.length !== 6) return;
 
-        setLoading(true);
-        setError('');
+    //     setLoading(true);
+    //     setError('');
 
-        try {
-            const payload = email ? { email, otp: otpCode } : { phoneNumber, otp: otpCode };
+    //     try {
+    //         const payload = email ? { email, otp: otpCode } : { phoneNumber, otp: otpCode };
             
-            const response = await axiosInstance.post('/auth/verify-otp', payload);
+    //         const response = await axiosInstance.post('/auth/verify-otp', payload);
 
-            if (response.data.status === 'success') {
-                // Store token if provided
-                if (response.data.token) {
-                    localStorage.setItem('authToken', response.data.token);
-                }
+    //         if (response.data.status === 'success') {
+    //             // Store token if provided
+    //             if (response.data.token) {
+    //                 localStorage.setItem('authToken', response.data.token);
+    //             }
                 
-                onVerify({
-                    success: true,
-                    token: response.data.token,
-                    user: response.data.user,
-                    message: response.data.message
-                });
-            } else {
-                setError(response.data.message || 'OTP verification failed');
-            }
-        } catch (error) {
-            console.error('OTP verification error:', error);
+    //             onVerify({
+    //                 success: true,
+    //                 token: response.data.token,
+    //                 user: response.data.user,
+    //                 message: response.data.message
+    //             });
+    //         } else {
+    //             setError(response.data.message || 'OTP verification failed');
+    //         }
+    //     } catch (error) {
+    //         console.error('OTP verification error:', error);
             
-            if (error.response?.data?.message) {
-                setError(error.response.data.message);
-            } else if (error.response?.status === 400) {
-                setError('Invalid OTP. Please try again.');
-            } else if (error.response?.status === 404) {
-                setError('OTP expired or not found. Please request a new one.');
-            } else {
-                setError('Network error. Please check your connection.');
-            }
-        } finally {
-            setLoading(false);
-        }
-    };
+    //         if (error.response?.data?.message) {
+    //             setError(error.response.data.message);
+    //         } else if (error.response?.status === 400) {
+    //             setError('Invalid OTP. Please try again.');
+    //         } else if (error.response?.status === 404) {
+    //             setError('OTP expired or not found. Please request a new one.');
+    //         } else {
+    //             setError('Network error. Please check your connection.');
+    //         }
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
 
     const handleManualVerify = (e) => {
         e.preventDefault();
