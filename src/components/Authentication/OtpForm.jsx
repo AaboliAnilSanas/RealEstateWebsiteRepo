@@ -47,7 +47,7 @@ export default function OtpForm({
         try {
             const payload = email ? { email, otp: otpCode } : { phoneNumber, otp: otpCode };
             
-            const response = await axiosInstance.post('/api/auth/verify-otp', payload);
+            const response = await axiosInstance.post('/auth/verify-otp', payload);
 
             if (response.data.status === 'success') {
                 // Store token if provided
@@ -89,24 +89,54 @@ export default function OtpForm({
         }
     };
 
-    const handleResendOtp = async () => {
-        try {
-            setLoading(true);
-            setError('');
+    const handleVerifyOtp = async (otpCode) => {
+    if (!otpCode || otpCode.length !== 6) return;
+
+    setLoading(true);
+    setError('');
+
+    try {
+        // Send only email in the payload
+        const payload = { 
+            email: email,  // Always send email
+            otp: otpCode 
+        };
+        
+        console.log('Sending payload:', payload); // Debug log
+        
+        const response = await axiosInstance.post('/auth/verify-otp', payload);
+
+        if (response.data.status === 'success') {
+            // Store token if provided
+            if (response.data.token) {
+                localStorage.setItem('authToken', response.data.token);
+            }
             
-            const payload = email ? { email } : { phoneNumber };
-            await axiosInstance.post('/api/auth/send-otp', payload);
-            
-            setOtp(['', '', '', '', '', '']);
-            setTimeout(() => inputRefs.current[0]?.focus(), 100);
-            
-            alert('New OTP sent successfully!');
-        } catch (error) {
-            setError('Failed to resend OTP. Please try again.');
-        } finally {
-            setLoading(false);
+            onVerify({
+                success: true,
+                token: response.data.token,
+                user: response.data.user,
+                message: response.data.message
+            });
+        } else {
+            setError(response.data.message || 'OTP verification failed');
         }
-    };
+    } catch (error) {
+        console.error('OTP verification error:', error);
+        
+        if (error.response?.data?.message) {
+            setError(error.response.data.message);
+        } else if (error.response?.status === 400) {
+            setError('Invalid OTP. Please try again.');
+        } else if (error.response?.status === 404) {
+            setError('OTP expired or not found. Please request a new one.');
+        } else {
+            setError('Network error. Please check your connection.');
+        }
+    } finally {
+        setLoading(false);
+    }
+};
 
     const inputFocus = (e) => {
         e.target.style.borderColor = getCssVar('--primary-color', '#d2a63f');
