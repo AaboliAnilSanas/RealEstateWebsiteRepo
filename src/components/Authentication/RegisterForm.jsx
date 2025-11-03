@@ -27,7 +27,7 @@ export default function RegisterForm({
       const response = await axiosInstance.post('/auth/send-otp', {
         email: email
       });
-
+      console.log('.....',response);
       if (response.status === 200) {
         // Store email for later use in OTP verification
         localStorage.setItem('userEmail', email);
