@@ -63,9 +63,11 @@ const Chips = ({ ChipLabel, value, onChange, isRequired }) => {
           onClick={() => handleChipClick(chip)}
           className={`px-4 py-2 rounded-full border transition-all ${
             value === chip 
-              ? 'bg-[var(--primary-color)] text-white border-[var(--primary-color)]' 
-              : 'bg-white text-gray-700 border-gray-300 hover:border-[var(--primary-color)]'
-          } ${chip === "+" ? 'border-dashed border-2' : ''}`}
+              ? 'bg-[#d2a63f] text-white border-[#d2a63f] shadow-md' 
+              : chip === "+" 
+                ? 'bg-white text-[#d2a63f] border-[#d2a63f] border-dashed border-2 hover:bg-[#fef9c3]'
+                : 'bg-white text-gray-700 border-gray-300 hover:border-[#d2a63f] hover:text-[#d2a63f]'
+          }`}
         >
           {chip}
         </button>
@@ -79,13 +81,13 @@ const Chips = ({ ChipLabel, value, onChange, isRequired }) => {
             onChange={(e) => setCustomValue(e.target.value)}
             onKeyDown={handleKeyPress}
             placeholder="Enter value..."
-            className="w-32 px-3 py-2 border border-[var(--primary-color)] rounded-full focus:outline-none focus:ring-2 focus:ring-[var(--primary-color-light)] text-sm"
+            className="w-32 px-3 py-2 border border-[#d2a63f] rounded-full focus:outline-none focus:ring-2 focus:ring-[#fef9c3] text-sm"
             autoFocus
           />
           <button
             type="button"
             onClick={handleAddCustomValue}
-            className="px-3 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors text-sm"
+            className="px-3 py-2 bg-[#d2a63f] text-white rounded-full hover:bg-[#b8860b] transition-colors text-sm shadow-sm"
           >
             Add
           </button>

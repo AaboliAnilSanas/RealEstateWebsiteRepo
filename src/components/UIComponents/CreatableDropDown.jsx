@@ -36,35 +36,51 @@ const CreatableDropdown = ({
     fieldData?.forEach((field, index) => {
       const fieldKey = field.InputLabel || `field_${index}`;
       initialValues[fieldKey] = {
-        textField: value?.[fieldKey]?.textField || '',
-        autocomplete: value?.[fieldKey]?.autocomplete || ''
+        textField: value?.textField || '',
+        autocomplete: value?.autocomplete || ''
       };
     });
     return initialValues;
   });
 
-  // Debounced onChange callback
+  // Local error state to handle field-specific errors
+  const [localErrors, setLocalErrors] = useState({
+    textField: false,
+    autocomplete: false
+  });
+
+  // Update local errors when props change
+  useEffect(() => {
+    setLocalErrors({
+      textField: textfieldError,
+      autocomplete: dropdownError
+    });
+  }, [textfieldError, dropdownError]);
+
+  // Sync with external value changes
+  useEffect(() => {
+    if (value) {
+      const newFieldValues = {};
+      fieldData?.forEach((field, index) => {
+        const fieldKey = field.InputLabel || `field_${index}`;
+        newFieldValues[fieldKey] = {
+          textField: value.textField || '',
+          autocomplete: value.autocomplete || ''
+        };
+      });
+      setFieldValues(newFieldValues);
+    }
+  }, [value, fieldData]);
+
+  // Debounced onChange callback for text field
   const debouncedOnChange = useCallback(
     debounce((newValue) => {
       if (onChange) {
         onChange(newValue);
       }
-    }, 1200),
+    }, 300),
     [onChange]
   );
-
-  // Sync with external value changes
-  useEffect(() => {
-    const newFieldValues = {};
-    fieldData?.forEach((field, index) => {
-      const fieldKey = field.InputLabel || `field_${index}`;
-      newFieldValues[fieldKey] = {
-        textField: value?.[fieldKey]?.textField || '',
-        autocomplete: value?.[fieldKey]?.autocomplete || ''
-      };
-    });
-    setFieldValues(newFieldValues);
-  }, [value, fieldData]);
 
   // Cleanup debounce on unmount
   useEffect(() => {
@@ -76,6 +92,14 @@ const CreatableDropdown = ({
   const handleInputChange = (fieldKey, event) => {
     const newValue = event.target.value;
     
+    // Clear text field error when user starts typing
+    if (localErrors.textField) {
+      setLocalErrors(prev => ({
+        ...prev,
+        textField: false
+      }));
+    }
+    
     setFieldValues(prev => {
       const updatedValues = {
         ...prev,
@@ -85,8 +109,12 @@ const CreatableDropdown = ({
         }
       };
       
+      // Get the first field value (since there's typically only one field)
+      const firstFieldKey = Object.keys(updatedValues)[0];
+      const firstFieldValue = updatedValues[firstFieldKey];
+      
       // Use debounced function to update parent
-      debouncedOnChange(updatedValues);
+      debouncedOnChange(firstFieldValue);
       
       return updatedValues;
     });
@@ -94,6 +122,14 @@ const CreatableDropdown = ({
 
   const handleAutocompleteChange = (fieldKey, event, newValue) => {
     const stringValue = newValue || '';
+    
+    // Clear autocomplete error when user selects an option
+    if (localErrors.autocomplete) {
+      setLocalErrors(prev => ({
+        ...prev,
+        autocomplete: false
+      }));
+    }
     
     setFieldValues(prev => {
       const updatedValues = {
@@ -104,9 +140,13 @@ const CreatableDropdown = ({
         }
       };
       
+      // Get the first field value (since there's typically only one field)
+      const firstFieldKey = Object.keys(updatedValues)[0];
+      const firstFieldValue = updatedValues[firstFieldKey];
+      
       // Update parent immediately for autocomplete changes
       if (onChange) {
-        onChange(updatedValues);
+        onChange(firstFieldValue);
       }
       
       return updatedValues;
@@ -118,6 +158,14 @@ const CreatableDropdown = ({
     if (event && event.type === 'change') {
       const stringValue = newValue || '';
       
+      // Clear autocomplete error when user starts typing
+      if (localErrors.autocomplete) {
+        setLocalErrors(prev => ({
+          ...prev,
+          autocomplete: false
+        }));
+      }
+      
       setFieldValues(prev => {
         const updatedValues = {
           ...prev,
@@ -127,9 +175,13 @@ const CreatableDropdown = ({
           }
         };
         
+        // Get the first field value (since there's typically only one field)
+        const firstFieldKey = Object.keys(updatedValues)[0];
+        const firstFieldValue = updatedValues[firstFieldKey];
+        
         // Also update parent immediately for autocomplete text input
         if (onChange) {
-          onChange(updatedValues);
+          onChange(firstFieldValue);
         }
         
         return updatedValues;
@@ -138,9 +190,36 @@ const CreatableDropdown = ({
   };
 
   // Separate border colors for each field - Validation logic
-  const getOverallBorderColor = (textfieldError, dropdownError) => {
-    if (textfieldError || dropdownError) return '1px solid red';
-    return '1px solid #c4c4c4';
+  const getOverallBorderColor = () => {
+    if (localErrors.textField || localErrors.autocomplete) return '1px solid #ef4444';
+    return '1px solid var(--location-gray-300)';
+  };
+
+  // Get field-specific error state and helper text
+  const getTextFieldErrorProps = (field) => {
+    const isRequired = field?.InputLabel?.includes('*') || false;
+    const fieldKey = field.InputLabel || `field_${0}`;
+    const currentValue = fieldValues[fieldKey] || { textField: '', autocomplete: '' };
+    
+    return {
+      error: localErrors.textField && isRequired && (!currentValue.textField || currentValue.textField.trim() === ''),
+      // helperText: localErrors.textField && isRequired && (!currentValue.textField || currentValue.textField.trim() === '') 
+      //   ? `${getDisplayLabel(field.InputLabel)} is required` 
+      //   : ''
+    };
+  };
+
+  const getAutocompleteErrorProps = (field) => {
+    const isRequired = field?.DropdownLabel?.includes('*') || false;
+    const fieldKey = field.InputLabel || `field_${0}`;
+    const currentValue = fieldValues[fieldKey] || { textField: '', autocomplete: '' };
+    
+    return {
+      error: localErrors.autocomplete && isRequired && (!currentValue.autocomplete || currentValue.autocomplete.trim() === ''),
+      // helperText: localErrors.autocomplete && isRequired && (!currentValue.autocomplete || currentValue.autocomplete.trim() === '') 
+      //   ? `${getDisplayLabel(field.DropdownLabel)} is required` 
+      //   : ''
+    };
   };
 
   return (
@@ -157,6 +236,9 @@ const CreatableDropdown = ({
         const isDropdownRequired = field?.DropdownLabel?.includes('*') || false;
         
         const currentValue = fieldValues[fieldKey] || { textField: '', autocomplete: '' };
+        
+        const textFieldErrorProps = getTextFieldErrorProps(field);
+        const autocompleteErrorProps = getAutocompleteErrorProps(field);
 
         return (
           <Box 
@@ -164,11 +246,15 @@ const CreatableDropdown = ({
             sx={{ 
               display: 'flex', 
               width: '100%', 
+              scrollPaddingLeft:'2px',
               flexDirection: inputFirst ? 'row' : 'row-reverse',
-              border: getOverallBorderColor(false, false), // You can pass specific errors per field if needed
-              borderRadius: '4px',
+              border: getOverallBorderColor(),
+              borderRadius: '6px',
+              marginLeft:'2px',
               '&:hover': {
-                border: '1px solid black',
+                border: localErrors.textField || localErrors.autocomplete 
+                  ? '1px solid #ef4444' 
+                  : '1px solid var(--gold-base)',
               },
               overflow: 'hidden',
               alignItems: 'center',
@@ -178,8 +264,8 @@ const CreatableDropdown = ({
             <Box sx={{ 
               width: '80%',
               padding: '0px 8px',
-              borderRight: inputFirst ? '1px solid #c4c4c4' : 'none',
-              borderLeft: !inputFirst ? '1px solid #c4c4c4' : 'none',
+              borderRight: inputFirst ? '1px solid var(--location-gray-300)' : 'none',
+              borderLeft: !inputFirst ? '1px solid var(--location-gray-300)' : 'none',
             }}>
               <TextField
                 id={`creatable-input-${fieldKey}`}
@@ -188,7 +274,8 @@ const CreatableDropdown = ({
                 variant="standard"
                 value={currentValue.textField}
                 onChange={(event) => handleInputChange(fieldKey, event)}
-                error={false} // You can pass specific errors per field
+                error={textFieldErrorProps.error}
+                helperText={textFieldErrorProps.helperText}
                 required={isTextFieldRequired}
                 fullWidth
                 size="small"
@@ -207,9 +294,20 @@ const CreatableDropdown = ({
                   },
                   '& .MuiInputBase-input': {
                     padding: '8px 0px',
+                    color: 'var(--location-blue-800)',
                   },
                   '& .MuiFormLabel-asterisk': {
-                    color: 'red',
+                    color: '#ef4444',
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: textFieldErrorProps.error ? '#ef4444' : 'var(--location-gray-600)',
+                    '&.Mui-focused': {
+                      color: textFieldErrorProps.error ? '#ef4444' : 'var(--gold-base)',
+                    },
+                  },
+                  '& .MuiFormHelperText-root': {
+                    marginLeft: 0,
+                    marginRight: 0,
                   }
                 }}
               />
@@ -220,11 +318,15 @@ const CreatableDropdown = ({
               orientation="vertical" 
               flexItem 
               sx={{ 
-                backgroundColor: '#c4c4c4',
+                backgroundColor: localErrors.textField || localErrors.autocomplete 
+                  ? '#ef4444' 
+                  : 'var(--location-gray-300)',
                 height: '80%',
                 margin: '4px 0px',
                 '&:hover': {
-                  backgroundColor: 'black',
+                  backgroundColor: localErrors.textField || localErrors.autocomplete 
+                    ? '#ef4444' 
+                    : 'var(--gold-base)',
                 },
               }} 
             />
@@ -233,6 +335,7 @@ const CreatableDropdown = ({
             <Box sx={{ 
               width: '20%', 
               padding: '0px 8px',
+              marginTop: autocompleteErrorProps.error ? '0px' : '-10px'
             }}>
               <Autocomplete         
                 freeSolo
@@ -244,7 +347,8 @@ const CreatableDropdown = ({
                   <TextField 
                     {...params} 
                     label={getDisplayLabel(dropdownLabelText)} 
-                    error={false} // You can pass specific errors per field
+                    error={autocompleteErrorProps.error}
+                    helperText={autocompleteErrorProps.helperText}
                     required={isDropdownRequired}
                     variant="standard"
                     size="small"
@@ -263,14 +367,34 @@ const CreatableDropdown = ({
                       },
                       '& .MuiInputBase-input': {
                         padding: '8px 0px',
+                        color: 'var(--location-blue-800)',
                       },
                       '& .MuiFormLabel-asterisk': {
-                        color: 'red',
+                        color: '#ef4444',
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: autocompleteErrorProps.error ? '#ef4444' : 'var(--location-gray-600)',
+                        '&.Mui-focused': {
+                          color: autocompleteErrorProps.error ? '#ef4444' : 'var(--gold-base)',
+                        },
+                      },
+                      '& .MuiFormHelperText-root': {
+                        marginLeft: 0,
+                        marginRight: 0,
+                        whiteSpace: 'nowrap'
                       }
                     }}
                   />
                 )}
                 fullWidth
+                sx={{
+                  '& .MuiAutocomplete-popupIndicator': {
+                    color: autocompleteErrorProps.error ? '#ef4444' : 'var(--gold-base)',
+                  },
+                  '& .MuiAutocomplete-clearIndicator': {
+                    color: autocompleteErrorProps.error ? '#ef4444' : 'var(--gold-base)',
+                  },
+                }}
               />
             </Box>
           </Box>

@@ -294,7 +294,7 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
   const isTextFieldRequired = isFieldRequired(data.label);
   const isAutocompleteRequired = isFieldRequired(data.fieldData[0].label);
 
-  // Hexagon SVG Component with Animation - Only Right Top and Left Bottom
+  // Hexagon SVG Component with Animation - Using CSS variables
   const HexagonBackground = () => (
     <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
       {/* Right Top Corner - 3 Hexagons */}
@@ -312,15 +312,15 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
         >
           <defs>
             <linearGradient id="hexagonGradient1" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#d2a63f" />
-              <stop offset="100%" stopColor="#d2a63fb5" />
+              <stop offset="0%" stopColor="var(--gold-base)" />
+              <stop offset="100%" stopColor="var(--gold-base)" style={{ stopOpacity: 0.7 }} />
             </linearGradient>
           </defs>
           <polygon
             points="50,15 85,30 85,70 50,85 15,70 15,30"
             fill="url(#hexagonGradient1)"
             strokeWidth="1"
-            stroke="#d2a63f"
+            stroke="var(--gold-base)"
           />
         </svg>
 
@@ -337,15 +337,16 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
         >
           <defs>
             <linearGradient id="hexagonGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#d2a63f" />
-              <stop offset="100%" stopColor="#d2a63f80" />
+              <stop offset="0%" stopColor="var(--gold-base)" />
+              <stop offset="100%" stopColor="var(--gold-base)" style={{ stopOpacity: 0.5 }} />
             </linearGradient>
           </defs>
           <polygon
             points="50,15 85,30 85,70 50,85 15,70 15,30"
             fill="url(#hexagonGradient2)"
             strokeWidth="1"
-            stroke="#d2a63f60"
+            stroke="var(--gold-base)"
+            style={{ opacity: 0.6 }}
           />
         </svg>
 
@@ -362,15 +363,16 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
         >
           <defs>
             <linearGradient id="hexagonGradient3" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#d2a63f80" />
-              <stop offset="100%" stopColor="#d2a63f" />
+              <stop offset="0%" stopColor="var(--gold-base)" style={{ stopOpacity: 0.5 }} />
+              <stop offset="100%" stopColor="var(--gold-base)" />
             </linearGradient>
           </defs>
           <polygon
             points="50,15 85,30 85,70 50,85 15,70 15,30"
             fill="url(#hexagonGradient3)"
             strokeWidth="1"
-            stroke="#d2a63f40"
+            stroke="var(--gold-base)"
+            style={{ opacity: 0.4 }}
           />
         </svg>
       </div>
@@ -390,15 +392,16 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
         >
           <defs>
             <linearGradient id="hexagonGradient5" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#d2a63fb5" />
-              <stop offset="100%" stopColor="#d2a63f80" />
+              <stop offset="0%" stopColor="var(--gold-base)" style={{ stopOpacity: 0.7 }} />
+              <stop offset="100%" stopColor="var(--gold-base)" style={{ stopOpacity: 0.5 }} />
             </linearGradient>
           </defs>
           <polygon
             points="50,15 85,30 85,70 50,85 15,70 15,30"
             fill="url(#hexagonGradient5)"
             strokeWidth="1"
-            stroke="#d2a63f60"
+            stroke="var(--gold-base)"
+            style={{ opacity: 0.6 }}
           />
         </svg>
 
@@ -415,15 +418,16 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
         >
           <defs>
             <linearGradient id="hexagonGradient5" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#d2a63fb5" />
-              <stop offset="100%" stopColor="#d2a63f80" />
+              <stop offset="0%" stopColor="var(--gold-base)" style={{ stopOpacity: 0.7 }} />
+              <stop offset="100%" stopColor="var(--gold-base)" style={{ stopOpacity: 0.5 }} />
             </linearGradient>
           </defs>
           <polygon
             points="50,15 85,30 85,70 50,85 15,70 15,30"
             fill="url(#hexagonGradient5)"
             strokeWidth="1"
-            stroke="#d2a63f60"
+            stroke="var(--gold-base)"
+            style={{ opacity: 0.6 }}
           />
         </svg>
 
@@ -440,15 +444,16 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
         >
           <defs>
             <linearGradient id="hexagonGradient6" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#d2a63f80" />
-              <stop offset="100%" stopColor="#d2a63f40" />
+              <stop offset="0%" stopColor="var(--gold-base)" style={{ stopOpacity: 0.5 }} />
+              <stop offset="100%" stopColor="var(--gold-base)" style={{ stopOpacity: 0.3 }} />
             </linearGradient>
           </defs>
           <polygon
             points="50,15 85,30 85,70 50,85 15,70 15,30"
             fill="url(#hexagonGradient6)"
             strokeWidth="1"
-            stroke="#d2a63f40"
+            stroke="var(--gold-base)"
+            style={{ opacity: 0.4 }}
           />
         </svg>
 
@@ -465,15 +470,16 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
         >
           <defs>
             <linearGradient id="hexagonGradient7" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#d2a63f60" />
-              <stop offset="100%" stopColor="#d2a63f20" />
+              <stop offset="0%" stopColor="var(--gold-base)" style={{ stopOpacity: 0.4 }} />
+              <stop offset="100%" stopColor="var(--gold-base)" style={{ stopOpacity: 0.1 }} />
             </linearGradient>
           </defs>
           <polygon
             points="50,15 85,30 85,70 50,85 15,70 15,30"
             fill="url(#hexagonGradient7)"
             strokeWidth="0.5"
-            stroke="#d2a63f30"
+            stroke="var(--gold-base)"
+            style={{ opacity: 0.3 }}
           />
         </svg>
       </div>
@@ -565,17 +571,17 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
               fullWidth={isMobile}
               sx={{
                 "&.MuiButton-contained": {
-                  backgroundColor: "#d2a63f",
+                  backgroundColor: "var(--gold-base)",
                   "&:hover": {
-                    backgroundColor: "#d2a63fb5",
+                    backgroundColor: "var(--gold-dark)",
                   },
                 },
                 "&.MuiButton-outlined": {
-                  borderColor: "#d2a63f",
-                  color: "#d2a63f",
+                  borderColor: "var(--gold-base)",
+                  color: "var(--gold-base)",
                   "&:hover": {
-                    borderColor: "#d2a63fb5",
-                    backgroundColor: "rgba(210, 166, 63, 0.04)",
+                    borderColor: "var(--gold-dark)",
+                    backgroundColor: "var(--gold-light)",
                   },
                 },
                 fontSize: '14px',
@@ -592,17 +598,17 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
               fullWidth={isMobile}
               sx={{
                 "&.MuiButton-contained": {
-                  backgroundColor: "#d2a63f",
+                  backgroundColor: "var(--gold-base)",
                   "&:hover": {
-                    backgroundColor: "#d2a63fb5",
+                    backgroundColor: "var(--gold-dark)",
                   },
                 },
                 "&.MuiButton-outlined": {
-                  borderColor: "#d2a63f",
-                  color: "#d2a63f",
+                  borderColor: "var(--gold-base)",
+                  color: "var(--gold-base)",
                   "&:hover": {
-                    borderColor: "#d2a63fb5",
-                    backgroundColor: "rgba(210, 166, 63, 0.04)",
+                    borderColor: "var(--gold-dark)",
+                    backgroundColor: "var(--gold-light)",
                   },
                 },
                 fontSize: '14px',
@@ -622,8 +628,8 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
             gap: '24px',
             padding: '8px 12px',
             borderRadius: '8px',
-            backgroundColor: 'rgba(210, 166, 63, 0.05)',
-            border: '1px solid #e5e5e5',
+            backgroundColor: "var(--gold-light)",
+            border: '1px solid var(--gold-base)',
             minWidth: isMobile ? '100%' : '300px',
             boxShadow: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.05)'
           }}>
@@ -637,14 +643,14 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
             }}>
               <span style={{ 
                 fontWeight: 600, 
-                color: '#374151',
+                color: 'var(--location-blue-800)',
                 fontSize: '14px',
               }}>
                 {transactionType === "buy" ? "Buy Price:" : "Monthly Rent:"}
               </span>
               <span style={{ 
                 fontWeight: 'bold', 
-                color: '#d2a63f',
+                color: 'var(--gold-base)',
                 fontSize: '14px'
               }}>
                 {getRangeText()}
@@ -668,18 +674,18 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
                 max={sliderConfig.max}
                 step={sliderConfig.step}
                 sx={{
-                  color: "#d2a63f",
+                  color: "var(--gold-base)",
                   "& .MuiSlider-thumb": {
-                    backgroundColor: "#d2a63f",
+                    backgroundColor: "var(--gold-base)",
                     width: 14,
                     height: 14,
                   },
                   "& .MuiSlider-track": {
-                    backgroundColor: "#d2a63f",
+                    backgroundColor: "var(--gold-base)",
                     height: 3,
                   },
                   "& .MuiSlider-rail": {
-                    backgroundColor: "#e5e5e5",
+                    backgroundColor: "var(--location-gray-300)",
                     height: 3,
                   },
                 }}
@@ -788,7 +794,7 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
               sx={{
                 minWidth: '120px',
                 height: "53px",
-                background: "linear-gradient(135deg, #d2a63f, #d2a63fb5) !important",
+                background: "linear-gradient(135deg, var(--gold-base), var(--gold-dark)) !important",
                 color: "white !important",
                 border: "none !important",
                 borderRadius: "12px !important",
@@ -797,11 +803,9 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
                 boxShadow: "0 2px 4px -1px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.06) !important",
                 transition: "all 0.3s ease !important",
                 "&:hover": {
-                  background: "linear-gradient(135deg, #d2a63fb5, #d2a63f) !important",
-                  // transform: "scale(1.03)",
-                  // boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.05) !important",
-                   transform: "translateY(-2px) translateZ(0) !important",
-                  boxShadow:" 0 8px 20px rgba(94, 43, 109, 0.3) !important"
+                  background: "linear-gradient(135deg, var(--gold-dark), var(--gold-base)) !important",
+                  transform: "translateY(-2px) translateZ(0) !important",
+                  boxShadow:" 0 8px 20px rgba(0, 0, 0, 0.2) !important"
                 },
               }}
             >
@@ -814,16 +818,16 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
               sx={{
                 minWidth: '120px',
                 height: "53px",
-                borderColor: "#d2a63f",
-                color: "#d2a63f",
+                borderColor: "var(--gold-base)",
+                color: "var(--gold-base)",
                 borderRadius: "12px",
                 fontWeight: "600",
                 fontSize: "14px",
                 "&:hover": {
-                  borderColor: "#d2a63fb5",
-                  backgroundColor: "rgba(210, 166, 63, 0.04)",
+                  borderColor: "var(--gold-dark)",
+                  backgroundColor: "var(--gold-light)",
                   transform: "translateY(-2px) translateZ(0)",
-                  boxShadow:" 0 8px 20px rgba(94, 43, 109, 0.3)"
+                  boxShadow:" 0 8px 20px rgba(0, 0, 0, 0.1)"
                 },
               }}
             >
@@ -861,15 +865,15 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
             >
               <defs>
                 <linearGradient id="mobileHexagon" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#d2a63f" />
-                  <stop offset="100%" stopColor="#d2a63fb5" />
+                  <stop offset="0%" stopColor="var(--gold-base)" />
+                  <stop offset="100%" stopColor="var(--gold-dark)" />
                 </linearGradient>
               </defs>
               <polygon
                 points="50,15 85,30 85,70 50,85 15,70 15,30"
                 fill="url(#mobileHexagon)"
                 strokeWidth="1"
-                stroke="#d2a63f"
+                stroke="var(--gold-base)"
               />
             </svg>
           </div>
@@ -882,11 +886,11 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
               fullWidth
               size="medium"
               sx={{
-                borderColor: "#d2a63f",
-                color: "#d2a63f",
+                borderColor: "var(--gold-base)",
+                color: "var(--gold-base)",
                 "&:hover": {
-                  borderColor: "#d2a63fb5",
-                  backgroundColor: "rgba(210, 166, 63, 0.04)",
+                  borderColor: "var(--gold-dark)",
+                  backgroundColor: "var(--gold-light)",
                 },
                 fontSize: '14px',
                 padding: '8px 16px',
@@ -898,7 +902,7 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
                 selectedValues.bathroom.length > 0) && (
                 <span style={{
                   marginLeft: '6px',
-                  backgroundColor: '#ef4444',
+                  backgroundColor: 'var(--location-blue-600)',
                   color: 'white',
                   borderRadius: '50%',
                   width: '20px',
@@ -941,7 +945,7 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
             width: "100vw",
             maxWidth: "380px",
             backgroundColor: "white",
-            color: "#333333",
+            color: "var(--location-blue-800)",
             position: 'relative',
             overflow: 'hidden',
             boxShadow: 'inset 0 1px 1px 0 rgba(0, 0, 0, 0.05)'
@@ -962,15 +966,15 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
           >
             <defs>
               <linearGradient id="drawerHexagon" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#d2a63f" />
-                <stop offset="100%" stopColor="#d2a63fb5" />
+                <stop offset="0%" stopColor="var(--gold-base)" />
+                <stop offset="100%" stopColor="var(--gold-dark)" />
               </linearGradient>
             </defs>
             <polygon
               points="50,15 85,30 85,70 50,85 15,70 15,30"
               fill="url(#drawerHexagon)"
               strokeWidth="1"
-              stroke="#d2a63f"
+              stroke="var(--gold-base)"
             />
           </svg>
         </div>
@@ -981,7 +985,7 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
             justifyContent: "space-between",
             alignItems: "center",
             padding: "12px",
-            borderBottom: "1px solid #e5e5e5",
+            borderBottom: "1px solid var(--location-gray-300)",
             position: 'relative',
             zIndex: 1,
             backgroundColor: 'white'
@@ -990,13 +994,14 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
           <h2 style={{ 
             fontSize: "18px",
             fontWeight: "bold",
-            margin: 0
+            margin: 0,
+            color: "var(--location-blue-800)"
           }}>
             Filters
           </h2>
           <IconButton
             onClick={handleMobileClose}
-            sx={{ color: "#333333" }}
+            sx={{ color: "var(--location-blue-800)" }}
           >
             <CloseIcon />
           </IconButton>

@@ -11,26 +11,28 @@ import Content from "../SellerForm/Content";
 import { useSimpleValidation } from "../../hooks/useSimpleValidation";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
-// Create a custom theme with orange/amber colors for radio buttons
+// Create a custom theme with golden as primary color
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#f59e0b', // amber-500
+      main: '#d2a63f', // Gold as primary color
+      light: '#fbf1d4', // Light gold
+      dark: '#b8860b', // Dark gold
     },
     secondary: {
-      main: '#ea580c', // orange-600
+      main: '#2563EB', // Blue as secondary color
     },
   },
   components: {
     MuiRadio: {
       styleOverrides: {
         root: {
-          color: '#d97706', // amber-600
+          color: '#93C5FD', // Light blue
           '&.Mui-checked': {
-            color: '#f59e0b', // amber-500
+            color: '#d2a63f', // Gold - primary color
           },
           '&:hover': {
-            backgroundColor: 'rgba(245, 158, 11, 0.08)',
+            backgroundColor: '#fef9c3', // Light gold - was var(--gold-100)
           },
         },
       },
@@ -38,12 +40,24 @@ const theme = createTheme({
     MuiCheckbox: {
       styleOverrides: {
         root: {
-          color: '#d97706', // amber-600
+          color: '#93C5FD', // Light blue
           '&.Mui-checked': {
-            color: '#f59e0b', // amber-500
+            color: '#d2a63f', // Gold - primary color
           },
           '&:hover': {
-            backgroundColor: 'rgba(245, 158, 11, 0.08)',
+            backgroundColor: '#fef9c3', // Light gold
+          },
+        },
+      },
+    },
+    MuiStepIcon: {
+      styleOverrides: {
+        root: {
+          '&.Mui-completed': {
+            color: '#d2a63f', // Gold for completed steps
+          },
+          '&.Mui-active': {
+            color: '#d2a63f', // Gold for active steps
           },
         },
       },
@@ -165,11 +179,11 @@ function VerticalLinearStepper({ SellerFormDetails, activeStep, onStepChange, fo
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: 'rgba(0, 0, 0, 0.38)',
+            color: '#9CA3AF', // Gray
             cursor: 'pointer',
             borderRadius: '4px',
             '&:hover': {
-              backgroundColor: 'rgba(0, 0, 0, 0.04)',
+              backgroundColor: '#fef9c3', // Light gold
             }
           }}
         >
@@ -186,7 +200,7 @@ function VerticalLinearStepper({ SellerFormDetails, activeStep, onStepChange, fo
               top: '-45px',
               left: '-110%',
               transform: 'translateX(-50%)',
-              background: '#1f2937',
+              background: '#854d0e', // Dark gold - was var(--gold-800)
               color: 'white',
               padding: '6px 12px',
               borderRadius: '6px',
@@ -203,7 +217,7 @@ function VerticalLinearStepper({ SellerFormDetails, activeStep, onStepChange, fo
                 transform: 'translateX(-50%)',
                 width: '8px',
                 height: '8px',
-                background: '#1f2937',
+                background: '#854d0e', // Dark gold
                 rotate: '45deg'
               }
             }}
@@ -234,10 +248,10 @@ function VerticalLinearStepper({ SellerFormDetails, activeStep, onStepChange, fo
                       fontWeight: "bold",
                       opacity: isStepAccessible ? 1 : 0.6,
                       "& .MuiStepIcon-root": { 
-                        color: isCompleted ? "#f59e0b" : "#d97706" 
+                        color: isCompleted ? "#d2a63f" : "#93C5FD" // Gold : Light blue
                       },
-                      "&.Mui-active .MuiStepIcon-root": { color: "#ea580c" },
-                      "&.Mui-completed .MuiStepIcon-root": { color: "#f59e0b" },
+                      "&.Mui-active .MuiStepIcon-root": { color: "#d2a63f" }, // Gold for active steps
+                      "&.Mui-completed .MuiStepIcon-root": { color: "#d2a63f" }, // Gold for completed steps
                       "&:hover": {
                         opacity: isStepAccessible ? 1 : 0.6,
                       }
@@ -263,7 +277,12 @@ function VerticalLinearStepper({ SellerFormDetails, activeStep, onStepChange, fo
                 <StepContent>
                   <Box
                     className="w-full bg-white/80 backdrop-blur-sm rounded-2xl shadow-md"
-                    sx={{ border: "1px solid rgba(245, 158, 11, 0.3)", mb: 3, p:3 }}
+                    sx={{ 
+                      border: "1px solid #BFDBFE", // Light blue border
+                      mb: 3, 
+                      p: 3,
+                      background: "linear-gradient(135deg, #EFF6FF, white)" // Light blue to white
+                    }}
                   >
                     <Content 
                       formDetails={step}
@@ -278,11 +297,11 @@ function VerticalLinearStepper({ SellerFormDetails, activeStep, onStepChange, fo
                         onClick={handleBack}
                         sx={{
                           mt: 1, mr: 1,
-                          color: "#d97706",
-                          border: "1px solid #d97706",
+                          color: "#d2a63f", // Gold
+                          border: "1px solid #fde047", // Light gold - was var(--gold-300)
                           "&:hover": { 
-                            backgroundColor: "rgba(245, 158, 11, 0.08)",
-                            border: "1px solid #f59e0b"
+                            backgroundColor: "#fef9c3", // Light gold
+                            border: "1px solid #d2a63f" // Gold
                           },
                         }}
                       >
@@ -294,15 +313,15 @@ function VerticalLinearStepper({ SellerFormDetails, activeStep, onStepChange, fo
                         disabled={!isStepCompleted(index, step.fields, formData)}
                         sx={{
                           mt: 1, mr: 1,
-                          background: "linear-gradient(90deg, #ea580c, #f59e0b)",
+                          background: "linear-gradient(90deg, #d2a63f, #b8860b)", // Gold gradient
                           color: "white",
                           "&:hover": { 
-                            background: "linear-gradient(90deg, #f59e0b, #ea580c)",
-                            boxShadow: "0 4px 12px rgba(245, 158, 11, 0.4)"
+                            background: "linear-gradient(90deg, #b8860b, #d2a63f)", // Gold gradient reversed
+                            boxShadow: "0 4px 12px rgba(210, 166, 63, 0.3)" // Gold shadow
                           },
                           "&:disabled": {
-                            background: "rgba(0,0,0,0.12)",
-                            color: "rgba(0,0,0,0.26)",
+                            background: "#D1D5DB", // Gray
+                            color: "#4B5563", // Dark gray
                             boxShadow: "none"
                           }
                         }}
@@ -321,21 +340,26 @@ function VerticalLinearStepper({ SellerFormDetails, activeStep, onStepChange, fo
           <Paper square elevation={0} sx={{ 
             p: "var(--padding-y)", 
             textAlign: "center", 
-            background: "linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(245, 158, 11, 0.1))", 
+            background: "linear-gradient(135deg, #fef9c3, #fbf1d4)", // Light gold gradient
             borderRadius: "var(--radius-lg)",
-            border: "1px solid rgba(245, 158, 11, 0.2)"
+            border: "1px solid #fde047" // Light gold border
           }}>
-            <Typography sx={{ mb: "var(--gap)", color: "#d97706", fontWeight: "bold" }}>
+            <Typography sx={{ 
+              mb: "var(--gap)", 
+              color: "#b8860b", // Dark gold
+              fontWeight: "bold",
+              fontSize: "1.1rem"
+            }}>
               🎉 All steps completed — you're finished!
             </Typography>
             <Button 
               onClick={handleReset} 
               sx={{ 
-                background: "linear-gradient(90deg, #f59e0b, #ea580c)", 
+                background: "linear-gradient(90deg, #d2a63f, #b8860b)", // Gold gradient
                 color: "white", 
                 "&:hover": { 
-                  background: "linear-gradient(90deg, #ea580c, #f59e0b)",
-                  boxShadow: "0 4px 12px rgba(245, 158, 11, 0.4)"
+                  background: "linear-gradient(90deg, #b8860b, #d2a63f)", // Gold gradient reversed
+                  boxShadow: "0 4px 12px rgba(210, 166, 63, 0.3)" // Gold shadow
                 } 
               }}
             >

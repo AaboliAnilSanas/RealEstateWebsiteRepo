@@ -8,32 +8,54 @@
 
 :root {
   /* Colors */
+  --primary-color: #2d59d0;       /* Navy blue */
+  --primary-color-light: #3B82F6;  /* Bright blue */
+  --primary-color-dark: #1E293B;  /* Dark navy */
+  --secondary-color: #d2a63f;     /* Gold - Updated from bronze */
+  --secondary-color-light: #FEF3C7; /* Light gold */
+  --tertiary-color: #374151;      /* Charcoal */
 
-  --primary-color: #A87CA0;
-  --primary-color-light: #5E2B6D;
-  --secondary-color: #E6E6FA;
-  --tertiary-color: #420452;
-  --secondary-color-light: #a26e98;
-  --gold-accent: rgba(210, 166, 63, 0.3);
-  
-  /* Primary Colors - Main brand colors */
-  --primary-color: #F59E0B; /* Amber-500 - from your yellow-400 */
-  --primary-color-light: #FBBF24; /* Amber-400 - lighter yellow */
-  --primary-color-dark: #D97706; /* Amber-600 - darker orange */
-  
-  /* Secondary Colors - Supporting colors */
-  --secondary-color: #EA580C; /* Orange-600 - from your orange-500 */
-  --secondary-color-light: #FDBA74; /* Orange-300 - lighter orange */
-  --secondary-color-dark: #C2410C; /* Orange-700 - darker orange */
-  
-  /* Tertiary Colors - Backgrounds and accents */
-  --tertiary-color: #7DD3FC; /* Sky-300 - from your blue-cyan gradients */
-  --tertiary-color-light: #E0F2FE; /* Sky-100 - very light blue */
-  --tertiary-color-dark: #0EA5E9; /* Sky-500 - darker blue */
-  
-  /* Gold Accent - For special effects */
-  --gold-accent: rgba(245, 158, 11, 0.3); /* Based on your primary */
-  --gold-accent-light: rgba(251, 191, 36, 0.2);
+  /* Location Section Colors */
+  --location-blue-50: #EFF6FF;
+  --location-blue-100: #DBEAFE;
+  --location-blue-200: #BFDBFE;
+  --location-blue-300: #93C5FD;    /* Light blue for hover borders */
+  --location-blue-400: #60A5FA;
+  --location-blue-500: #3B82F6;
+  --location-blue-600: #2563EB;    /* Bright blue */
+  --location-blue-700: #1D4ED8;
+  --location-blue-800: #1E3A8A;    /* Navy blue */
+  --location-blue-900: #1E3A8A;
+
+  /* Gold color variants */
+  --gold-base: #d2a63f;
+  --gold-light: #fbf1d4;
+  --gold-dark: #b8860b;
+  --gold-50: #fefce8;
+  --gold-100: #fef9c3;
+  --gold-200: #fef08a;
+  --gold-300: #fde047;
+  --gold-400: #facc15;
+  --gold-500: #eab308;
+  --gold-600: #ca8a04;
+  --gold-700: #a16207;
+  --gold-800: #854d0e;
+  --gold-900: #713f12;
+
+  /* Additional colors from your component */
+  --location-cyan-100: #CFFAFE;
+  --location-white: #FFFFFF;
+  --location-gray-300: #D1D5DB;
+  --location-gray-400: #9CA3AF;
+  --location-gray-600: #4B5563;
+  --location-black: #000000;
+
+  /* Opacity variants */
+  --location-blue-800-80: rgba(30, 58, 138, 0.8);
+  --location-blue-800-20: rgba(30, 58, 138, 0.2);
+  --location-black-20: rgba(0, 0, 0, 0.2);
+  --gold-base-20: rgba(210, 166, 63, 0.2);
+  --gold-base-50: rgba(210, 166, 63, 0.5);
 
   /* 3 Headings */
   --heading-1: 2rem;      /* 32px */
@@ -86,6 +108,94 @@ body {
   background: transparent;
   margin: 0;
   padding: 0;
+}
+
+/* Location Section Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% -200%;
+  }
+  100% {
+    background-position: 200% 200%;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Utility classes for Location Section */
+.carousel-item {
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+.location-card-hover {
+  transition: all 0.3s ease;
+}
+
+.location-card-hover:hover {
+  transform: translateY(-1rem);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.location-border-hover:hover {
+  border-bottom-color: var(--location-blue-300);
+  border-bottom-width: 8px;
+}
+
+.location-overlay-hover:hover {
+  background-color: var(--location-black-20);
+}
+
+.location-shimmer {
+  background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%);
+  background-size: 200% 200%;
+  animation: shimmer 1.5s ease-in-out;
+}
+
+.location-glow-hover:hover {
+  background: linear-gradient(to top, var(--location-blue-800-20), var(--location-blue-800-20));
+}
+
+.location-gradient-overlay {
+  background: linear-gradient(to top, var(--location-blue-800-80), transparent);
+}
+
+.location-section-bg {
+  background: linear-gradient(135deg, var(--location-blue-50), var(--location-white));
+}
+
+.location-cursor-glow {
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.6) 0%, rgba(30, 58, 138, 0.3) 30%, transparent 70%);
+  filter: blur(10px);
+}
+
+.location-dot-active {
+  background: linear-gradient(to right, var(--location-blue-600), var(--location-blue-800));
+}
+
+.location-dot-inactive {
+  background-color: var(--location-blue-300);
+}
+
+.location-dot-inactive:hover {
+  background-color: var(--location-blue-400);
 }
 
 /* Navbar Styles */
@@ -478,4 +588,3 @@ body {
     gap: 0;
   }
 }
-

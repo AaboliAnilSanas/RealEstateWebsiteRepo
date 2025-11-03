@@ -5,28 +5,46 @@ export const useSimpleValidation = () => {
   const [errors, setErrors] = useState({});
   const [completedSteps, setCompletedSteps] = useState([]);
 
-  // Updated validation for CreatableDropdown - matches FilterComponent logic
+  // Enhanced validation for CreatableDropdown - checks individual field requirements
   const validateCreatableDropdown = (value, isRequired, fieldData = []) => {
     if (!isRequired) return true;
     
     // If no value at all
-    if (!value) return false;
+    if (!value || typeof value !== 'object') return false;
     
-    // Extract field requirements from fieldData (same as FilterComponent)
-    const isTextFieldRequired = fieldData[0]?.InputLabel ? 
-      fieldData[0].InputLabel.includes('*') : false;
-    const isAutocompleteRequired = fieldData[0]?.DropdownLabel ? 
-      fieldData[0].DropdownLabel.includes('*') : false;
+    let allRequiredFieldsValid = true;
     
-    const textFieldValue = value.textField || '';
-    const autocompleteValue = value.autocomplete || '';
+    // Check each field in fieldData for its specific requirements
+    fieldData.forEach((field, index) => {
+      const fieldKey = field.InputLabel || `field_${index}`;
+      
+      // Check if this specific field is required
+      const isTextFieldRequired = field?.InputLabel?.includes('*') || false;
+      const isDropdownRequired = field?.DropdownLabel?.includes('*') || false;
+      
+      // For CreatableDropdown, the value structure is { textField: '', autocomplete: '' }
+      // not nested under fieldKey
+      const textFieldValue = value.textField || '';
+      const dropdownValue = value.autocomplete || '';
+      
+      // Validate text field if required
+      if (isTextFieldRequired) {
+        const textFieldValid = textFieldValue && textFieldValue.trim() !== '';
+        if (!textFieldValid) {
+          allRequiredFieldsValid = false;
+        }
+      }
+      
+      // Validate dropdown field if required
+      if (isDropdownRequired) {
+        const dropdownValid = dropdownValue && dropdownValue.trim() !== '';
+        if (!dropdownValid) {
+          allRequiredFieldsValid = false;
+        }
+      }
+    });
     
-    // Validate each field separately based on their own requirement
-    const textFieldValid = !isTextFieldRequired || (textFieldValue && textFieldValue.trim() !== '');
-    const autocompleteValid = !isAutocompleteRequired || (autocompleteValue && autocompleteValue.trim() !== '');
-    
-    // Return true only if all required fields are valid
-    return textFieldValid && autocompleteValid;
+    return allRequiredFieldsValid;
   };
 
   const validateFileUpload = (value, isRequired) => {
@@ -97,25 +115,39 @@ export const useSimpleValidation = () => {
         switch (field.fieldType) {
           case "CreatableDropdown":
             fieldValid = validateCreatableDropdown(value, isRequired, field.fieldData);
+            if (!fieldValid) {
+              newErrors[fieldName] = `${getDisplayLabel(fieldName)} is required`;
+            }
             break;
           case "UploadFile":
             fieldValid = validateFileUpload(value, isRequired);
+            if (!fieldValid) {
+              newErrors[fieldName] = `${getDisplayLabel(fieldName)} is required`;
+            }
             break;
           case "Chips":
           case "RadioButton":
             fieldValid = validateArrayField(value, isRequired);
+            if (!fieldValid) {
+              newErrors[fieldName] = `${getDisplayLabel(fieldName)} is required`;
+            }
             break;
           case "InputField":
           case "TextArea":
             fieldValid = validateTextField(value, isRequired);
+            if (!fieldValid) {
+              newErrors[fieldName] = `${getDisplayLabel(fieldName)} is required`;
+            }
             break;
           default:
             fieldValid = value && value !== '' && !(Array.isArray(value) && value.length === 0);
+            if (!fieldValid) {
+              newErrors[fieldName] = `${getDisplayLabel(fieldName)} is required`;
+            }
             break;
         }
         
         if (!fieldValid) {
-          newErrors[fieldName] = `${fieldName} is required`;
           isValid = false;
         }
       }
@@ -164,7 +196,7 @@ export const useSimpleValidation = () => {
       }
       
       if (!fieldValid) {
-        newErrors[fieldName] = `${fieldName} is required`;
+        newErrors[fieldName] = `${getDisplayLabel(fieldName)} is required`;
       } else {
         delete newErrors[fieldName];
       }
@@ -189,6 +221,11 @@ export const useSimpleValidation = () => {
   const hasErrors = () => Object.keys(errors).length > 0;
 
   const getFieldError = (fieldName) => errors[fieldName];
+
+  // Helper function to remove asterisk from labels
+  const getDisplayLabel = (label) => {
+    return label ? label.replace(/\*$/, '') : label;
+  };
 
   return {
     errors,

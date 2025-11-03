@@ -41,12 +41,27 @@ const CustomAutocomplete = ({
       disableCloseOnSelect={multiple}
       getOptionLabel={getOptionLabel}
       renderOption={(props, option, { selected }) => (
-        <li {...props}>
+        <li 
+          {...props} 
+          style={{
+            backgroundColor: selected ? 'var(--gold-light)' : 'white',
+            color: 'var(--location-blue-800)',
+            '&:hover': {
+              backgroundColor: 'var(--gold-light)',
+            }
+          }}
+        >
           <Checkbox
             icon={icon}
             checkedIcon={checkedIcon}
             style={{ marginRight: 8 }}
             checked={selected}
+            sx={{
+              color: 'var(--gold-base)',
+              '&.Mui-checked': {
+                color: 'var(--gold-base)',
+              },
+            }}
           />
           {getOptionLabel(option)}
         </li>
@@ -62,7 +77,6 @@ const CustomAutocomplete = ({
         <TextField 
           {...params} 
           label={label}
-          // Show selected values permanently
           inputProps={{
             ...params.inputProps,
             value: getDisplayText(),
@@ -71,22 +85,73 @@ const CustomAutocomplete = ({
               cursor: 'pointer',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap'
+              whiteSpace: 'nowrap',
+              color: 'var(--location-blue-800)',
+              fontSize: '14px'
             }
           }}
-          // Custom placeholder that shows when no selection
           placeholder={getDisplayText() || label}
-          
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              borderRadius: '8px',
+              backgroundColor: 'white',
+              '&:hover': {
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'var(--gold-base)',
+                }
+              },
+              '&.Mui-focused': {
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'var(--gold-base)',
+                  borderWidth: '1px',
+                }
+              }
+            },
+            '& .MuiInputLabel-root': {
+              color: 'var(--location-gray-600)',
+              fontSize: '14px',
+              '&.Mui-focused': {
+                color: 'var(--gold-base)',
+              }
+            },
+            '& .MuiAutocomplete-popupIndicator': {
+              color: 'var(--gold-base)',
+            },
+            '& .MuiAutocomplete-clearIndicator': {
+              color: 'var(--gold-base)',
+            },
+          }}
         />
       )}
-      // Prevent chips from showing
       renderTags={() => null}
-      // Clear input value when dropdown closes to show selected values
       onClose={() => setInputValue('')}
-      // Force dropdown below
       componentsProps={{
         popper: {
           placement: 'bottom-start',
+          sx: {
+            '& .MuiAutocomplete-paper': {
+              backgroundColor: 'white',
+              border: '1px solid var(--location-gray-300)',
+              borderRadius: '8px',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+            }
+          }
+        },
+      }}
+      sx={{
+        '& .MuiAutocomplete-listbox': {
+          padding: '4px',
+        },
+        '& .MuiAutocomplete-option': {
+          fontSize: '14px',
+          borderRadius: '4px',
+          margin: '2px 0',
+          '&[aria-selected="true"]': {
+            backgroundColor: 'var(--gold-light)',
+          },
+          '&.Mui-focused': {
+            backgroundColor: 'var(--gold-light)',
+          },
         },
       }}
       {...props}

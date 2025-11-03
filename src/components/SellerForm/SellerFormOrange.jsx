@@ -23,7 +23,7 @@ const SellerForm = () => {
       label: 'Fill out Basic Details',
       icon: '🏠',
       description: 'Start with the fundamental information about your property listing',
-      gradient: 'from-[var(--location-blue-400)] to-[var(--location-blue-600)]',
+      gradient: 'from-amber-400 to-orange-400',
       fields: [
         {
           label: "I'm looking to*",
@@ -54,7 +54,7 @@ const SellerForm = () => {
       subLabel: 'An accurate location helps you connect with the right buyers',
       icon: '📍',
       description: 'Help buyers find your property with precise location details',
-      gradient: 'from-[var(--location-blue-500)] to-[var(--location-blue-700)]',
+      gradient: 'from-orange-400 to-amber-500',
       fields: [
         {
           label: 'City*',
@@ -88,7 +88,7 @@ const SellerForm = () => {
       label: 'Tell us about your property',
       icon: '📊',
       description: 'Showcase your property features and unique selling points',
-      gradient: 'from-[var(--location-blue-600)] to-[var(--location-blue-800)]',
+      gradient: 'from-amber-500 to-orange-500',
       fields: [
         {
           label: 'No. of Bedrooms*',
@@ -175,7 +175,7 @@ const SellerForm = () => {
       subLabel: 'Property with photos and videos get higher page views. Make sure you follow video guidelines.',
       icon: '📷',
       description: 'Visual content increases engagement and trust with potential buyers',
-      gradient: 'from-[var(--location-blue-700)] to-[var(--location-blue-900)]',
+      gradient: 'from-orange-500 to-amber-600',
       fields: [
         {
           label: 'Upload Videos',
@@ -201,13 +201,13 @@ const SellerForm = () => {
   };
 
   return (
-    <div className="relative min-h-[92vh] flex bg-gradient-to-br from-[var(--location-blue-50)] via-[var(--location-blue-100)] to-[var(--location-cyan-100)] overflow-hidden">
+    <div className="relative min-h-[92vh] flex bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 overflow-hidden">
 
       {/* Premium Background with Enhanced Elements */}
       <div className="absolute inset-0 overflow-hidden">
         {/* Enhanced Floating Bubbles */}
         <motion.div
-          className="absolute top-20 left-10 w-24 h-24 bg-gradient-to-br from-[var(--location-blue-300)] to-[var(--location-blue-500)] rounded-full opacity-70 blur-xl"
+          className="absolute top-20 left-10 w-24 h-24 bg-gradient-to-br from-amber-300 to-orange-400 rounded-full opacity-70 blur-xl"
           animate={{
             y: [0, -30, 0],
             x: [0, 15, 0],
@@ -220,7 +220,7 @@ const SellerForm = () => {
           }}
         />
         <motion.div
-          className="absolute bottom-40 right-32 w-20 h-20 bg-gradient-to-br from-[var(--gold-light)] to-[var(--gold-base)] rounded-full opacity-60 blur-lg"
+          className="absolute bottom-40 right-32 w-20 h-20 bg-gradient-to-br from-pink-300 to-rose-400 rounded-full opacity-60 blur-lg"
           animate={{
             y: [0, 40, 0],
             x: [0, -20, 0],
@@ -234,9 +234,22 @@ const SellerForm = () => {
           }}
         />
 
+        {/* Hexagon Pattern */}
+        {/* <motion.div 
+          className="absolute top-1/4 left-1/4 w-7 h-7 opacity-80 bg-gradient-to-br from-amber-400 to-orange-500 clip-path-hexagon"
+          animate={{
+            rotate: [0, 180, 360],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+        /> */}
+
         {/* Enhanced Geometric Cut Elements */}
         <motion.div
-          className="absolute top-3 right-3 w-20 h-20 border-4 border-[var(--location-blue-400)]/40 rotate-45"
+          className="absolute top-3 right-3 w-20 h-20 border-4 border-amber-400/40 rotate-45"
           animate={{
             rotate: [45, 90, 135, 180, 225, 270, 315, 360, 45],
           }}
@@ -259,7 +272,7 @@ const SellerForm = () => {
             ease: "linear"
           }}
         >
-          <div className="w-full h-full bg-gradient-to-br from-[var(--location-blue-400)] to-[var(--location-blue-600)] clip-path-triangle"></div>
+          <div className="w-full h-full bg-gradient-to-br from-orange-400 to-amber-500 clip-path-triangle"></div>
         </motion.div>
       </div>
 
@@ -299,7 +312,7 @@ const SellerForm = () => {
       {/* Vertical Slit Divider - Placed after left section */}
       <div className="relative">
         <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-64 z-10">
-          <div className="w-full h-full bg-gradient-to-b from-[var(--location-blue-400)] via-[var(--location-blue-600)] to-[var(--location-blue-800)] rounded-full shadow-lg"></div>
+          <div className="w-full h-full bg-gradient-to-b from-amber-400 via-orange-400 to-rose-400 rounded-full shadow-lg"></div>
           <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-transparent rounded-full"></div>
         </div>
       </div>
@@ -314,26 +327,26 @@ const SellerForm = () => {
       >
         <div className="w-[100%] overflow-x-hidden overflow-y-hidden py-9 px-9 max-w-8xl relative">
           {/* Background Bubble Effect */}
-          <div className="absolute -top-8 -right-2 w-40 h-40 bg-gradient-to-br from-[var(--location-blue-200)] to-[var(--location-blue-400)] rounded-full opacity-40 blur-2xl"></div>
-          <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-gradient-to-br from-[var(--gold-light)] to-[var(--gold-base)] rounded-full opacity-40 blur-2xl"></div>
+          <div className="absolute -top-8 -right-2 w-40 h-40 bg-gradient-to-br from-amber-200 to-orange-300 rounded-full opacity-40 blur-2xl"></div>
+          <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-gradient-to-br from-rose-200 to-pink-300 rounded-full opacity-40 blur-2xl"></div>
 
           {/* Main Form Container */}
           <div className="relative bg-white/80 backdrop-blur-xl rounded-2xl border-2 border-white shadow-2xl overflow-hidden">
             
             {/* Form Header with Funky Cut */}
-            <div className="relative p-6 bg-gradient-to-r from-white to-[var(--location-blue-50)] border-b border-[var(--location-blue-200)]">
-              <div className="absolute top-0 left-0 w-3 h-full bg-gradient-to-b from-[var(--location-blue-400)] to-[var(--location-blue-600)]"></div>
+            <div className="relative p-6 bg-gradient-to-r from-white to-amber-50 border-b border-amber-100">
+              <div className="absolute top-0 left-0 w-3 h-full bg-gradient-to-b from-amber-400 to-orange-400"></div>
               <div className="flex items-center space-x-3 ml-1">
-                <div className="w-12 h-12 bg-gradient-to-br from-[var(--location-blue-400)] to-[var(--location-blue-600)] rounded-xl flex items-center justify-center shadow-lg">
+                <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
                   <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                   </svg>
                 </div>
                 <div>
-                  <h2 className="text-2xl font-black bg-gradient-to-r from-[var(--location-blue-800)] to-[var(--primary-color-dark)] bg-clip-text text-transparent">
+                  <h2 className="text-2xl font-black bg-gradient-to-r from-slate-800 to-slate-900 bg-clip-text text-transparent">
                     Property Details
                   </h2>
-                  <p className="text-[var(--location-gray-600)] text-sm font-medium">Complete all sections for maximum visibility</p>
+                  <p className="text-slate-500 text-sm font-medium">Complete all sections for maximum visibility</p>
                 </div>
               </div>
             </div>
@@ -350,17 +363,17 @@ const SellerForm = () => {
             </div>
 
             {/* Form Footer */}
-            <div className="px-6 py-4 bg-gradient-to-r from-[var(--location-blue-50)] to-[var(--location-blue-100)] border-t border-[var(--location-blue-200)]">
+            <div className="px-6 py-4 bg-gradient-to-r from-amber-50 to-orange-50 border-t border-amber-100">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <div className="w-1.5 h-1.5 bg-gradient-to-r from-[var(--location-blue-400)] to-[var(--location-blue-600)] rounded-full animate-pulse"></div>
-                  <span className="text-[var(--location-gray-600)] text-xs font-medium">Auto-save enabled • Secure premium listing</span>
+                  <div className="w-1.5 h-1.5 bg-gradient-to-r from-amber-400 to-orange-400 rounded-full animate-pulse"></div>
+                  <span className="text-slate-600 text-xs font-medium">Auto-save enabled • Secure premium listing</span>
                 </div>
                 <div className="flex space-x-1">
                   {[1, 2, 3].map((dot) => (
                     <motion.div
                       key={dot}
-                      className="w-1.5 h-1.5 bg-gradient-to-r from-[var(--location-blue-400)] to-[var(--location-blue-600)] rounded-full"
+                      className="w-1.5 h-1.5 bg-gradient-to-r from-amber-400 to-orange-400 rounded-full"
                       animate={{ scale: [1, 1.2, 1] }}
                       transition={{ duration: 1.5, repeat: Infinity, delay: dot * 0.2 }}
                     />

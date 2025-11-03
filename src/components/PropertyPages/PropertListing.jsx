@@ -276,6 +276,42 @@ const PropertyListing = () => {
     possession_status: ["Ready To Move", "Under Construction"]
   };
 
+  // Color scheme
+  const colors = {
+    blue: {
+      50: '#EFF6FF',
+      100: '#DBEAFE',
+      200: '#BFDBFE',
+      300: '#93C5FD',
+      400: '#60A5FA',
+      500: '#3B82F6',
+      600: '#2563EB',
+      700: '#1D4ED8',
+      800: '#1E3A8A',
+      900: '#1E3A8A'
+    },
+    gold: {
+      50: '#fefce8',
+      100: '#fef9c3',
+      200: '#fef08a',
+      300: '#fde047',
+      400: '#facc15',
+      500: '#eab308',
+      600: '#ca8a04',
+      700: '#a16207',
+      800: '#854d0e',
+      900: '#713f12',
+      base: '#d2a63f',
+      light: '#fbf1d4',
+      dark: '#b8860b'
+    },
+    gray: {
+      300: '#D1D5DB',
+      400: '#9CA3AF',
+      600: '#4B5563'
+    }
+  };
+
   // Format price for display
   const formatPrice = (price, type = "buy") => {
     if (type === "rent") {
@@ -593,7 +629,7 @@ const PropertyListing = () => {
 
   const FilterSection = ({ title, options, filterType, type = "checkbox" }) => (
     <Box sx={{ mb: 1 }}>
-      <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold", fontSize: "1rem" }}>
+      <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold", fontSize: "1rem", color: colors.blue[800] }}>
         {title}
       </Typography>
       {type === "checkbox" ? (
@@ -606,9 +642,24 @@ const PropertyListing = () => {
                   size="small"
                   checked={filters.filters[filterType].includes(option)}
                   onChange={() => handleCheckboxChange(filterType, option, true)}
+                  sx={{
+                    color: colors.blue[400],
+                    '&.Mui-checked': {
+                      color: colors.gold.base, // Gold for checked state
+                    },
+                    '&:hover': {
+                      backgroundColor: colors.gold[100], // Light gold on hover
+                    },
+                  }}
                 />
               }
               label={option}
+              sx={{
+                '& .MuiFormControlLabel-label': {
+                  fontSize: '14px',
+                  color: colors.gray[600],
+                }
+              }}
             />
           ))}
         </FormGroup>
@@ -617,6 +668,17 @@ const PropertyListing = () => {
           <Select
             value={filters.filters[filterType]}
             onChange={(e) => handleFilterChange(filterType, e.target.value, true)}
+            sx={{
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: colors.gray[300],
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: colors.gold.base, // Gold on hover
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: colors.gold.base, // Gold when focused
+              },
+            }}
           >
             <MenuItem value="">All</MenuItem>
             {options.map(option => (
@@ -640,8 +702,8 @@ const PropertyListing = () => {
         flexDirection: 'column',
         gap: 2
       }}>
-        <CircularProgress size={40} />
-        <Typography variant="h6" color="text.secondary">
+        <CircularProgress size={40} sx={{ color: colors.gold.base }} />
+        <Typography variant="h6" sx={{ color: colors.gray[600] }}>
           Loading properties...
         </Typography>
       </Box>
@@ -651,20 +713,20 @@ const PropertyListing = () => {
   const currentPriceRange = getCurrentPriceRange();
 
   return (
-    <Box sx={{ padding: { xs: 1, sm: 2 }, width: '100%',  }} className="-mt-1">
+    <Box sx={{ padding: { xs: 1, sm: 2 }, width: '100%' }} className="-mt-1">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <Typography variant="h5" component="h1" gutterBottom sx={{ fontWeight: "bold", mb: 3 }}>
-          Property Listings: <span>{filteredProperties.length} properties found</span> 
+        <Typography variant="h5" component="h1" gutterBottom sx={{ fontWeight: "bold", mb: 3, color: colors.blue[800] }}>
+          Property Listings: <span style={{ color: colors.gold.base }}>{filteredProperties.length} properties found</span> 
         </Typography>
       </motion.div>
 
-      <Grid container spacing={2}  className="-mt-2" >
+      <Grid container spacing={2} className="-mt-2">
         {/* Filters Sidebar - Responsive width */}
-        <Grid item xs={12} md={4} lg={2.4} sx={{width: '20%',}}>
+        <Grid item xs={12} md={4} lg={2.4} sx={{ width: '20%' }}>
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -674,35 +736,48 @@ const PropertyListing = () => {
               p: 3, 
               position: 'sticky', 
               top: 10, 
-              maxHeight: '83vh', 
+              height: '83vh', 
               overflowY: 'auto',
-              overflowX: 'hidden', // Prevent horizontal scroll
+              overflowX: 'hidden',
+              backgroundColor: 'white',
               '&::-webkit-scrollbar': {
-                width: '6px',
+                width: '3px',
               },
               '&::-webkit-scrollbar-track': {
-                background: '#f1f1f1',
+                background: colors.blue[50],
               },
               '&::-webkit-scrollbar-thumb': {
-                background: '#c1c1c1',
+                background: colors.gold.base, // Gold scrollbar
                 borderRadius: '3px',
               },
               '&::-webkit-scrollbar-thumb:hover': {
-                background: '#a1a1a1',
+                background: colors.gold.dark,
               }
             }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                <Typography variant="h6" sx={{ fontWeight: "bold", color: colors.blue[800] }}>
                   Filters
                 </Typography>
-                <Button onClick={resetFilters} size="small" variant="outlined">
+                <Button 
+                  onClick={resetFilters} 
+                  size="small" 
+                  variant="outlined"
+                  sx={{
+                    borderColor: colors.gold.base,
+                    color: colors.gold.base,
+                    '&:hover': {
+                      borderColor: colors.gold.dark,
+                      backgroundColor: colors.gold[100],
+                    }
+                  }}
+                >
                   Reset All
                 </Button>
               </Box>
 
               {/* Price Range */}
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold", fontSize: "1rem" }}>
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold", fontSize: "1rem", color: colors.blue[800] }}>
                   Price Range ({filters.transaction_type === "buy" ? "Buy" : "Rent"})
                 </Typography>
                 <Slider
@@ -716,26 +791,58 @@ const PropertyListing = () => {
                   min={currentPriceRange.min}
                   max={currentPriceRange.max}
                   step={currentPriceRange.step}
+                  sx={{
+                    color: colors.gold.base, // Gold slider
+                    marginTop:'0px',
+                    paddingBottom:'1px',
+                    paddingLeft:'2px',
+                    '& .MuiSlider-thumb': {
+                      backgroundColor: colors.gold.base,
+                      height:'10px',
+                      width:'10px',
+                      '&:hover': {
+                        backgroundColor: colors.gold.dark,
+                      }
+                    },
+                    '& .MuiSlider-track': {
+                      backgroundColor: colors.gold.base,
+                      height:'3px'
+                    },
+                    '& .MuiSlider-rail': {
+                      backgroundColor: colors.gray[300],
+                    },
+                  }}
                 />
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
-                  <Typography variant="body2">
+                  <Typography variant="body2" sx={{ color: colors.gray[600] }}>
                     {formatPrice(filters.filters.budget_range.min, filters.transaction_type)}
                   </Typography>
-                  <Typography variant="body2">
+                  <Typography variant="body2" sx={{ color: colors.gray[600] }}>
                     {formatPrice(filters.filters.budget_range.max, filters.transaction_type)}
                   </Typography>
                 </Box>
               </Box>
 
               {/* Transaction Type */}
-              <Box sx={{ mb: 3, }}>
-                <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold", fontSize: "1rem" }}>
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold", fontSize: "1rem", color: colors.blue[800] }}>
                   Transaction Type
                 </Typography>
                 <FormControl fullWidth size="small">
                   <Select
                     value={filters.transaction_type}
                     onChange={(e) => handleFilterChange('transaction_type', e.target.value)}
+                    sx={{
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: colors.gray[300],
+                      },
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: colors.gold.base,
+                      },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: colors.gold.base,
+                      },
+                    }}
                   >
                     {filterOptions.transaction_type.map(option => (
                       <MenuItem key={option} value={option}>
@@ -748,13 +855,24 @@ const PropertyListing = () => {
 
               {/* City Dropdown */}
               <Box sx={{ mb: 3 }}>
-                <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold", fontSize: "1rem" }}>
+                <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold", fontSize: "1rem", color: colors.blue[800] }}>
                   City
                 </Typography>
                 <FormControl fullWidth size="small">
                   <Select
                     value={filters.filters.city}
                     onChange={(e) => handleFilterChange('city', e.target.value, true)}
+                    sx={{
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: colors.gray[300],
+                      },
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: colors.gold.base,
+                      },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: colors.gold.base,
+                      },
+                    }}
                   >
                     <MenuItem value="">All Cities</MenuItem>
                     {filterOptions.city.map(option => (
@@ -803,8 +921,8 @@ const PropertyListing = () => {
 
               {filterLoading && (
                 <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 2, py: 1 }}>
-                  <CircularProgress size={16} />
-                  <Typography variant="body2" sx={{ ml: 1 }}>
+                  <CircularProgress size={16} sx={{ color: colors.gold.base }} />
+                  <Typography variant="body2" sx={{ ml: 1, color: colors.gray[600] }}>
                     Updating results...
                   </Typography>
                 </Box>
@@ -829,8 +947,8 @@ const PropertyListing = () => {
                 flexDirection: 'column',
                 gap: 2
               }}>
-                <CircularProgress />
-                <Typography variant="body1" color="text.secondary">
+                <CircularProgress sx={{ color: colors.gold.base }} />
+                <Typography variant="body1" sx={{ color: colors.gray[600] }}>
                   Updating results...
                 </Typography>
               </Box>
@@ -842,10 +960,10 @@ const PropertyListing = () => {
               transition={{ duration: 0.3 }}
             >
               <Box sx={{ textAlign: "center", mt: 8, py: 4 }}>
-                <Typography variant="h6" color="text.secondary" gutterBottom>
+                <Typography variant="h6" sx={{ color: colors.gray[600] }} gutterBottom>
                   No properties found
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{ color: colors.gray[600] }}>
                   Try adjusting your search criteria or reset filters
                 </Typography>
               </Box>
@@ -879,14 +997,14 @@ const PropertyListing = () => {
 
               {/* Pagination Section */}
               <Box sx={{ 
-                position: 'sticky' , 
+                position: 'sticky', 
                 bottom: 0, 
-                backgroundColor: 'background.paper', 
+                backgroundColor: 'white', 
                 py: 2, 
                 borderTop: 1, 
-                borderColor: 'divider',
+                borderColor: colors.gray[300],
                 mt: 'auto',
-                px:2
+                px: 2
               }}>
                 <Box sx={{ 
                   display: 'flex', 
@@ -894,10 +1012,9 @@ const PropertyListing = () => {
                   justifyContent: 'space-between', 
                   alignItems: { xs: 'flex-start', sm: 'center' },
                   gap: 2, 
-                  
                 }}>
                   {/* Page info */}
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={{ color: colors.gray[600] }}>
                     Showing {indexOfFirstProperty + 1}-{Math.min(indexOfLastProperty, filteredProperties.length)} of {filteredProperties.length} properties
                   </Typography>
                   
@@ -916,7 +1033,6 @@ const PropertyListing = () => {
                         size={window.innerWidth < 600 ? "small" : "medium"}
                         showFirstButton 
                         showLastButton
-                        
                         sx={{
                           '& .MuiPaginationItem-root': {
                             borderRadius: '8px',
@@ -924,17 +1040,21 @@ const PropertyListing = () => {
                             fontWeight: 'bold',
                           },
                           '& .MuiPaginationItem-page.Mui-selected': {
-                            backgroundColor: 'primary.main',
+                            backgroundColor: colors.gold.base, // Gold for selected page
                             color: 'white',
                             '&:hover': {
-                              backgroundColor: 'primary.dark',
+                              backgroundColor: colors.gold.dark,
                             }
                           },
                           '& .MuiPaginationItem-page': {
+                            color: colors.blue[800], // Blue for page numbers
                             '&:hover': {
-                              backgroundColor: 'primary.light',
-                              color: 'white',
+                              backgroundColor: colors.blue[50],
+                              color: colors.blue[600],
                             }
+                          },
+                          '& .MuiPaginationItem-ellipsis': {
+                            color: colors.blue[600],
                           }
                         }}
                       />

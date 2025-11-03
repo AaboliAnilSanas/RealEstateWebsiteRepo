@@ -4,7 +4,7 @@ const LocationCard = ({ image, location }) => {
   return (
     <div className="flex flex-col items-center text-center group cursor-pointer relative">
       {/* Square Card Container with Rounded Image - Updated hover effect */}
-      <div className="relative mb-4 rounded-2xl overflow-hidden border-4 border-white shadow-2xl group-hover:shadow-2xl transition-all duration-300 w-48 h-48 sm:w-56 sm:h-56 lg:w-64 lg:h-64 xl:w-80 xl:h-80 group-hover:-translate-y-4 group-hover:border-b-8 group-hover:border-b-[#FDBA74]">
+      <div className="relative mb-4 rounded-2xl overflow-hidden border-4 border-white shadow-2xl group-hover:shadow-2xl transition-all duration-300 w-48 h-48 sm:w-56 sm:h-56 lg:w-64 lg:h-64 xl:w-80 xl:h-80 group-hover:-translate-y-4 group-hover:border-b-8 group-hover:border-b-[var(--gold-base)]">
         <img 
           src={image} 
           alt={location}
@@ -12,29 +12,24 @@ const LocationCard = ({ image, location }) => {
         />
         
         {/* Overlay effect on hover */}
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300"></div>
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-[var(--location-black-20)] transition-all duration-300"></div>
         
         {/* Shimmer effect on hover */}
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-             style={{
-               background: 'linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%)',
-               backgroundSize: '200% 200%',
-               animation: 'shimmer 1.5s ease-in-out'
-             }}>
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 location-shimmer">
         </div>
 
         {/* Background Glow Effect - Comes from bottom on hover */}
-        <div className="absolute bottom-0 left-0 right-0 h-0 group-hover:h-100 bg-gradient-to-t from-black/20 to-black/20 transition-all duration-500 ease-out rounded-2xl"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-0 group-hover:h-100 bg-gradient-to-t from-[var(--gold-base-20)] to-[var(--gold-base-20)] transition-all duration-500 ease-out rounded-2xl"></div>
 
         {/* Arrow Icon - Comes from top on hover */}
-        <div className="absolute top-35 right-35 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transform -translate-y-40 group-hover:translate-y-0 transition-all duration-500 ease-out shadow-lg">
-          <svg className="w-5 h-5 text-gray-800 transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="absolute top-35 right-35 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transform -translate-y-40 group-hover:translate-y-0 transition-all duration-500 ease-out shadow-lg border border-[var(--gold-light)]">
+          <svg className="w-5 h-5 text-[var(--gold-base)] transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
           </svg>
         </div>
 
         {/* Location Name Inside Card - Bottom Overlay */}
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 pt-8 transform translate-y-0 group-hover:translate-y-0 transition-transform duration-300">
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[var(--location-blue-800-80)] to-transparent p-4 pt-8 transform translate-y-0 group-hover:translate-y-0 transition-transform duration-300">
           <h3 className="text-white font-bold text-lg sm:text-xl lg:text-2xl transition-all duration-300 group-hover:text-white group-hover:scale-105">
             {location}
           </h3>
@@ -165,7 +160,7 @@ const LocationSection = () => {
   };
 
   return (
-    <div className="relative pt-60 pb-40 px-4  -mt-55 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-white overflow-hidden">
+    <div className="relative pt-60 pb-40 px-4 -mt-60 sm:px-6 lg:px-8 location-section-bg overflow-hidden">
       <style>{`
         @keyframes fadeIn {
           from {
@@ -192,24 +187,6 @@ const LocationSection = () => {
         }
       `}</style>
 
-      {/* Top-left PNG Image */}
-      {/* <div className="absolute top-0 left-0 z-10 ">
-        <img 
-          src="/svgLinePng.png" 
-          alt="Zaceler Data Protector" 
-          className="h-[200px] w-[1000px] opacity-90 hover:opacity-100 transition-opacity duration-300"
-        />
-      </div> */}
-
-      {/* Bottom-right PNG Image */}
-      {/* <div className="absolute bottom-0 right-0 z-10 -rotate-180">
-        <img 
-          src="/svgLinePng.png" 
-          alt="Zaceler Data Protector" 
-          className="h-[200px] w-[1000px] opacity-90 hover:opacity-100 transition-opacity duration-300"
-        />
-      </div> */}
-
       {/* Custom Cursor Glow Effect */}
       <div 
         className="fixed pointer-events-none z-50 transition-all duration-100 ease-out opacity-20"
@@ -219,26 +196,26 @@ const LocationSection = () => {
           transform: 'translate(-50%, -50%)',
           width: '80px',
           height: '80px',
-          background: 'radial-gradient(circle, rgba(255,215,0,0.6) 0%, rgba(255,140,0,0.3) 30%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(210, 166, 63, 0.6) 0%, rgba(184, 134, 11, 0.3) 30%, transparent 70%)',
           filter: 'blur(10px)',
         }}
       />
 
       {/* Enhanced Background Gradients */}
-      {/* <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-gradient-to-r from-yellow-200 to-orange-200 opacity-25 blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-40 -right-40 w-96 h-96 rounded-full bg-gradient-to-r from-purple-200 to-pink-200 opacity-25 blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full bg-gradient-to-r from-blue-100 to-cyan-100 opacity-20 blur-3xl"></div>
-      </div> */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-gradient-to-r from-[var(--location-blue-50)] to-[var(--gold-light)] opacity-25 blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-40 -right-40 w-96 h-96 rounded-full bg-gradient-to-r from-[var(--gold-light)] to-[var(--location-blue-100)] opacity-25 blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full bg-gradient-to-r from-[var(--location-blue-100)] to-[var(--gold-light)] opacity-20 blur-3xl"></div>
+      </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto ">
+      <div className="relative z-10 max-w-7xl mx-auto">
         {/* Section Header - Centered without arrows */}
         <div className="text-center mb-20">
-          <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-            Explore Prime Locations
+          <h2 className="text-4xl lg:text-5xl font-bold text-[var(--location-blue-800)] mb-6">
+            Explore Prime <span className="text-[var(--gold-base)]">Locations</span>
           </h2>
-          <div className="w-32 h-1.5 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full mx-auto shadow-lg"></div>
-          <p className="text-gray-600 text-lg lg:text-xl mt-6 max-w-2xl mx-auto">
+          <div className="w-32 h-1.5 bg-gradient-to-r from-[var(--gold-base)] to-[var(--location-blue-400)] rounded-full mx-auto shadow-lg"></div>
+          <p className="text-[var(--location-gray-600)] text-lg lg:text-xl mt-6 max-w-2xl mx-auto">
             Discover amazing destinations with our premium locations
           </p>
         </div>
@@ -274,8 +251,8 @@ const LocationSection = () => {
               onClick={() => setCurrentIndex(index)}
               className={`transition-all duration-500 ease-out ${
                 index === currentIndex 
-                  ? 'w-10 h-3 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full shadow-lg transform scale-110' 
-                  : 'w-3 h-3 bg-gray-300 hover:bg-gray-400 rounded-full hover:scale-110'
+                  ? 'w-10 h-3 bg-gradient-to-r from-[var(--gold-base)] to-[var(--gold-dark)] rounded-full shadow-lg transform scale-110' 
+                  : 'w-3 h-3 bg-[var(--gold-light)] hover:bg-[var(--gold-base)] rounded-full hover:scale-110'
               }`}
               aria-label={`Go to slide ${index + 1}`}
             />

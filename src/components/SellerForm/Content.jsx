@@ -30,10 +30,10 @@ const Content = ({ formDetails, formData, updateFormData, errors }) => {
       <div className="mb-6 px-2">
         <Label
           LabelName={formDetails.label}
-          className="text-2xl  font-black bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent uppercase tracking-wide mb-2"
+          className="text-2xl font-black bg-gradient-to-r from-[var(--location-blue-600)] to-[var(--location-blue-800)] bg-clip-text text-transparent uppercase tracking-wide mb-2"
         />
         {formDetails.subLabel && (
-          <h4 className="text-amber-600 mt-1 text-sm mb-3 italic font-medium bg-amber-50/50 px-3 py-2 rounded-lg border border-amber-200">
+          <h4 className="text-[var(--location-blue-600)] mt-1 text-sm mb-3 italic font-medium bg-[var(--location-blue-50)] px-3 py-2 rounded-lg border border-[var(--location-blue-200)]">
                💡 {formDetails.subLabel}
           </h4>
         )}
@@ -49,14 +49,14 @@ const Content = ({ formDetails, formData, updateFormData, errors }) => {
           return (
             <div
               key={idx}
-              className={`bg-gradient-to-br from-white to-amber-50/30 rounded-2xl p-6 mx-2 shadow-sm border-2 transition-all duration-300 hover:shadow-lg ${
+              className={`bg-gradient-to-br from-white to-[var(--location-blue-50)] rounded-2xl p-6 mx-2 shadow-sm border-2 transition-all duration-300 hover:shadow-lg ${
                 error 
                   ? "border-red-300 bg-red-50/50 shadow-red-100" 
-                  : "border-amber-100 hover:border-amber-200 hover:shadow-amber-100"
+                  : "border-[var(--location-blue-100)] hover:border-[var(--location-blue-200)] hover:shadow-[var(--location-blue-100)]"
               }`}
             >
               {field.label && (
-                <h2 className="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
+                <h2 className="font-bold text-lg text-[var(--location-blue-800)] mb-4 flex items-center gap-2">
                   {getDisplayLabel(field.label)}
                   {isRequired && (
                     <span className="text-red-500 text-sm font-semibold">*</span>
@@ -65,7 +65,7 @@ const Content = ({ formDetails, formData, updateFormData, errors }) => {
               )}
 
               {field.subLabel && (
-                <h4 className="text-amber-600 text-sm mb-4 italic font-medium bg-amber-50/50 px-3 py-2 rounded-lg border border-amber-200">
+                <h4 className="text-[var(--gold-base)] text-sm mb-4 italic font-medium bg-[var(--gold-light)] px-3 py-2 rounded-lg border border-[var(--gold-base)]/30">
                   💡 {field.subLabel}
                 </h4>
               )}
@@ -123,10 +123,10 @@ const Content = ({ formDetails, formData, updateFormData, errors }) => {
                           handleFieldChange(fieldName, e.target.value)
                         }
                         placeholder={field.fieldData?.[0] || ""}
-                        className={`w-full p-4 text-gray-700 rounded-xl border-2 focus:outline-none transition-all duration-300 resize-none ${
+                        className={`w-full p-4 text-[var(--location-blue-800)] rounded-xl border-2 focus:outline-none transition-all duration-300 resize-none ${
                           error
                             ? "border-red-300 bg-red-50/50 focus:ring-2 focus:ring-red-200"
-                            : "border-gray-200 bg-white focus:border-amber-300 focus:ring-2 focus:ring-amber-100"
+                            : "border-[var(--location-gray-300)] bg-white focus:border-[var(--location-blue-400)] focus:ring-2 focus:ring-[var(--location-blue-100)]"
                         }`}
                         rows="5"
                       />
@@ -164,7 +164,7 @@ const Content = ({ formDetails, formData, updateFormData, errors }) => {
                   default:
                     return (
                       <div className="text-center py-8">
-                        <p className="text-gray-400 italic text-lg">
+                        <p className="text-[var(--location-gray-400)] italic text-lg">
                           🔧 Field type coming soon: {field.fieldType}
                         </p>
                       </div>
