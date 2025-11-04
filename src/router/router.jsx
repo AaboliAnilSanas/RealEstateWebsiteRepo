@@ -11,7 +11,7 @@ import HomePage from '../components/Homepage/homepage.jsx';
 import Layout from '../components/Layout/layout.jsx';
 import RegisterForm from '../components/Authentication/RegisterForm.jsx';
 import AuthFlowModal from '../components/Authentication/AuthFlowModal.jsx'; // Import the new flow controller
-
+import PropertyDetails from '../components/PropertyPages/PropertyDetails/PropertyDetails.jsx';
 // Create router configuration
 const router = createBrowserRouter([
   {
@@ -25,6 +25,10 @@ const router = createBrowserRouter([
       {
         path: 'properties',
         element: <PropertyListing />,
+      },
+      {
+        path: 'properties/:propertyId', // Dynamic parameter for property ID
+        element: <PropertyDetails />,
       },
       {
         path: 'sell',

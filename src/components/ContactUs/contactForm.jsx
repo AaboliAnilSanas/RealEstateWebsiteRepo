@@ -1,47 +1,101 @@
 import React, { useState } from "react";
-import { Mail, Send, User, Phone, Briefcase, Home, Key } from "lucide-react";
+import { Mail, Send, User, Phone, Briefcase, Home, Key, CheckCircle2 } from "lucide-react";
 
-// Reusable Toggle Button
-const ThemedToggleButton = ({ icon: Icon, label, value, current, onChange, colorVar, iconColorVar }) => {
+// Premium Toggle Button
+const ThemedToggleButton = ({ icon: Icon, label, value, current, onChange, colorType }) => {
   const isActive = current === value;
-  const activeStyle = { backgroundColor: `var(${colorVar})`, color: "white" };
-  const inactiveStyle = { backgroundColor: "#f3f4f6", color: `var(${iconColorVar})` };
+  
+  const getActiveStyle = () => {
+    if (colorType === 'blue') {
+      return {
+        background: 'linear-gradient(135deg, var(--primary-color), var(--primary-color-light))',
+        color: 'white',
+        boxShadow: '0 4px 12px rgba(45, 89, 208, 0.3)'
+      };
+    }
+    return {
+      background: 'linear-gradient(135deg, var(--gold-600), var(--gold-400))',
+      color: 'white',
+      boxShadow: '0 4px 12px rgba(210, 166, 63, 0.3)'
+    };
+  };
+
+  const activeStyle = getActiveStyle();
+  const inactiveStyle = { 
+    backgroundColor: "white", 
+    color: colorType === 'blue' ? 'var(--primary-color)' : 'var(--gold-600)',
+    border: '2px solid #e5e7eb'
+  };
 
   return (
     <button
       type="button"
       onClick={() => onChange(label, value)}
-      className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 shadow-sm ${
-        isActive ? "shadow-md scale-[1.02]" : "hover:bg-gray-200"
+      className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl transition-all duration-300 ${
+        isActive ? "scale-[1.02]" : "hover:bg-gray-50 hover:border-gray-300"
       }`}
       style={isActive ? activeStyle : inactiveStyle}
     >
-      <Icon className="w-5 h-5" style={{ color: isActive ? "white" : `var(${iconColorVar})` }} />
+      <Icon 
+        className="w-4 h-4" 
+        style={{ color: isActive ? "white" : (colorType === 'blue' ? 'var(--primary-color)' : 'var(--gold-600)') }} 
+      />
       <span className="hidden sm:inline">{value}</span>
     </button>
   );
 };
 
-// Input Field with icon
-const InputField = ({ label, name, value, onChange, type = "text", placeholder, required = false, icon: Icon }) => (
-  <div className="relative">
-    <label className="block text-sm font-medium mb-1" style={{ color: "var(--primary-color)" }}>
-      {label}
-    </label>
-    <div className="flex items-center border rounded-xl" style={{ borderColor: "var(--secondary-color)" }}>
-      <Icon className="w-5 h-5 ml-3" style={{ color: "var(--tertiary-color)" }} />
-      <input
-        type={type}
-        name={name}
-        value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-        required={required}
-        className="w-full px-3 py-2 text-base rounded-r-xl focus:ring-2 focus:ring-[var(--primary-color-light)] focus:border-transparent outline-none placeholder:text-gray-400"
-      />
+// Premium Input Field with floating label
+const InputField = ({ label, name, value, onChange, type = "text", required = false, icon: Icon }) => {
+  const [isFocused, setIsFocused] = useState(false);
+  const hasValue = value && value.length > 0;
+
+  return (
+    <div className="relative">
+      <label 
+        className={`absolute transition-all duration-200 pointer-events-none font-medium z-10 ${
+          isFocused || hasValue 
+            ? '-top-2 left-3 text-xs bg-white px-1.5' 
+            : 'left-10 top-1/2 -translate-y-1/2 text-sm'
+        }`}
+        style={{ 
+          color: isFocused || hasValue ? 'var(--primary-color-light)' : '#9ca3af'
+        }}
+      >
+        {label}
+      </label>
+      
+      <div 
+        className={`flex items-center border-2 rounded-xl transition-all duration-200 bg-white ${
+          isFocused ? 'shadow-md' : 'shadow-sm'
+        }`}
+        style={{ 
+          borderColor: isFocused ? 'var(--primary-color-light)' : '#e5e7eb'
+        }}
+      >
+        <div 
+          className="flex items-center justify-center px-3 transition-colors duration-200"
+          style={{ 
+            color: isFocused ? 'var(--primary-color-light)' : 'var(--gold-500)'
+          }}
+        >
+          <Icon className="w-4 h-4" />
+        </div>
+        <input
+          type={type}
+          name={name}
+          value={value}
+          onChange={onChange}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          required={required}
+          className="w-full pr-3 py-2.5 text-sm rounded-r-xl focus:outline-none bg-transparent"
+          style={{ color: '#1f2937' }}
+        />
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default function ContactForm() {
   const [formData, setFormData] = useState({
@@ -53,6 +107,7 @@ export default function ContactForm() {
     intent: "Buy",
   });
   const [submitted, setSubmitted] = useState(false);
+  const [messageFocused, setMessageFocused] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -64,17 +119,45 @@ export default function ContactForm() {
   const handleToggleChange = (field, value) => setFormData({ ...formData, [field]: value });
 
   return (
-    <div className="w-[100%] h-full bg-white rounded-xl shadow-2xl  p-6 font-inter">
-      {!submitted ? (
-        <>
-          <h2 className="text-2xl font-bold mb-4 text-center" style={{ color: "var(--primary-color)" }}>
-            Contact Us
-          </h2>
+    <div 
+      className="w-full max-w-md mx-auto rounded-2xl shadow-2xl p-6 font-inter relative overflow-hidden"
+      style={{
+        background: 'linear-gradient(135deg, #fafafa 0%, #ffffff 50%, #fafafa 100%)'
+      }}
+    >
+      {/* Decorative Elements */}
+      <div 
+        className="absolute top-0 right-0 w-40 h-40 rounded-full blur-3xl opacity-10"
+        style={{ background: 'var(--primary-color)' }}
+      />
+      <div 
+        className="absolute bottom-0 left-0 w-40 h-40 rounded-full blur-3xl opacity-10"
+        style={{ background: 'var(--gold-500)' }}
+      />
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+      {!submitted ? (
+        <div className="relative z-10">
+          <div className="text-center mb-4">
+            <h2 
+              className="text-2xl font-bold mb-1"
+              style={{ 
+                background: 'linear-gradient(135deg, var(--primary-color), var(--primary-color-light), var(--gold-500))',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }}
+            >
+              Get In Touch
+            </h2>
+            <p className="text-sm" style={{ color: 'var(--tertiary-color)' }}>
+              Let's discuss your property needs
+            </p>
+          </div>
+
+          <div className="space-y-3.5">
             {/* Owner/Agent Toggle */}
             <div>
-              <label className="block text-sm font-medium mb-1" style={{ color: "var(--primary-color)" }}>
+              <label className="block text-xs font-semibold mb-1.5" style={{ color: "var(--primary-color)" }}>
                 I am:
               </label>
               <div className="flex gap-2">
@@ -84,8 +167,7 @@ export default function ContactForm() {
                   value="Owner"
                   current={formData.userType}
                   onChange={handleToggleChange}
-                  colorVar="--primary-color"
-                  iconColorVar="--tertiary-color"
+                  colorType="blue"
                 />
                 <ThemedToggleButton
                   icon={Briefcase}
@@ -93,15 +175,14 @@ export default function ContactForm() {
                   value="Agent"
                   current={formData.userType}
                   onChange={handleToggleChange}
-                  colorVar="--primary-color"
-                  iconColorVar="--tertiary-color"
+                  colorType="blue"
                 />
               </div>
             </div>
 
             {/* Buy/Lease Toggle */}
             <div>
-              <label className="block text-sm font-medium mb-1" style={{ color: "var(--primary-color)" }}>
+              <label className="block text-xs font-semibold mb-1.5" style={{ color: "var(--primary-color)" }}>
                 I'm interested in:
               </label>
               <div className="flex gap-2">
@@ -111,8 +192,7 @@ export default function ContactForm() {
                   value="Buy"
                   current={formData.intent}
                   onChange={handleToggleChange}
-                  colorVar="--tertiary-color"
-                  iconColorVar="--primary-color"
+                  colorType="gold"
                 />
                 <ThemedToggleButton
                   icon={Key}
@@ -120,55 +200,122 @@ export default function ContactForm() {
                   value="Lease"
                   current={formData.intent}
                   onChange={handleToggleChange}
-                  colorVar="--tertiary-color"
-                  iconColorVar="--primary-color"
+                  colorType="gold"
                 />
               </div>
             </div>
 
-            <InputField label="Name" name="name" value={formData.name} onChange={handleChange} icon={User} required placeholder="Your name" />
-            <InputField label="Email" name="email" value={formData.email} onChange={handleChange} type="email" icon={Mail} required placeholder="you@email.com" />
-            <InputField label="Phone" name="phone" value={formData.phone} onChange={handleChange} type="tel" icon={Phone} required placeholder="+1 555-123-4567" />
+            <InputField 
+              label="Name" 
+              name="name" 
+              value={formData.name} 
+              onChange={handleChange} 
+              icon={User} 
+              required 
+            />
+            <InputField 
+              label="Email" 
+              name="email" 
+              value={formData.email} 
+              onChange={handleChange} 
+              type="email" 
+              icon={Mail} 
+              required 
+            />
+            <InputField 
+              label="Phone" 
+              name="phone" 
+              value={formData.phone} 
+              onChange={handleChange} 
+              type="tel" 
+              icon={Phone} 
+              required 
+            />
 
-            <div>
-              <label className="block text-sm font-medium mb-1" style={{ color: "var(--primary-color)" }}>
+            {/* Message Field */}
+            <div className="relative">
+              <label 
+                className={`absolute transition-all duration-200 pointer-events-none font-medium z-10 ${
+                  messageFocused || formData.message 
+                    ? '-top-2 left-3 text-xs bg-white px-1.5' 
+                    : 'left-4 top-3 text-sm'
+                }`}
+                style={{ 
+                  color: messageFocused || formData.message ? 'var(--primary-color-light)' : '#9ca3af'
+                }}
+              >
                 Message
               </label>
-              <textarea
-                name="message"
-                value={formData.message}
-                onChange={handleChange}
-                rows="3"
-                className="w-full px-3 py-2 text-sm border rounded-xl focus:ring-2 focus:ring-[var(--primary-color-light)] outline-none placeholder:text-gray-400 resize-none"
-                placeholder="Your inquiry details..."
-                style={{ borderColor: "var(--secondary-color)" }}
-              />
+              
+              <div 
+                className={`relative border-2 rounded-xl transition-all duration-200 bg-white ${
+                  messageFocused ? 'shadow-md' : 'shadow-sm'
+                }`}
+                style={{ 
+                  borderColor: messageFocused ? 'var(--primary-color-light)' : '#e5e7eb'
+                }}
+              >
+                <textarea
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  onFocus={() => setMessageFocused(true)}
+                  onBlur={() => setMessageFocused(false)}
+                  rows="2"
+                  className="w-full px-4 py-2.5 text-sm rounded-xl focus:outline-none resize-none bg-transparent"
+                  style={{ color: '#1f2937' }}
+                />
+              </div>
             </div>
 
             <button
-              type="submit"
-              className="w-full py-2.5 rounded-xl font-semibold text-white text-base transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:scale-[1.02]"
-              style={{ backgroundColor: "var(--primary-color)", boxShadow: "0 4px 6px -1px var(--tertiary-color)" }}
+              onClick={handleSubmit}
+              className="w-full py-2.5 rounded-xl font-bold text-white text-sm transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:scale-[1.02] mt-3 relative overflow-hidden group"
+              style={{ 
+                background: 'linear-gradient(135deg, var(--primary-color), var(--primary-color-light))',
+              }}
             >
-              <Send className="w-5 h-5" />
-              Send Inquiry
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-20 transition-opacity duration-500" 
+                   style={{ transform: 'translateX(-100%)', animation: 'shimmer 2s infinite' }} />
+              <Send className="w-4 h-4" />
+              <span>Send Inquiry</span>
             </button>
-          </form>
-        </>
-      ) : (
-        <div className="text-center py-12">
-          <div
-            className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4"
-            style={{ backgroundColor: "var(--tertiary-color)", opacity: 0.2 }}
-          >
-            <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: "var(--tertiary-color)" }}>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-            </svg>
           </div>
-          <h3 className="text-xl font-bold" style={{ color: "var(--primary-color)" }}>
-            Message Sent!
+
+          <style>{`
+            @keyframes shimmer {
+              0% { transform: translateX(-100%); }
+              100% { transform: translateX(100%); }
+            }
+          `}</style>
+        </div>
+      ) : (
+        <div className="text-center py-12 relative z-10">
+          <div
+            className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+            style={{ 
+              background: 'linear-gradient(135deg, var(--primary-color-light), var(--gold-400))'
+            }}
+          >
+            <CheckCircle2 className="w-8 h-8 text-white animate-bounce" strokeWidth={2.5} />
+          </div>
+          <h3 
+            className="text-2xl font-bold mb-2"
+            style={{ 
+              background: 'linear-gradient(135deg, var(--primary-color), var(--gold-600))',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }}
+          >
+            Thank You!
           </h3>
-          <p className="text-gray-600">We'll get back to you soon.</p>
+          <p className="text-sm mb-2" style={{ color: 'var(--tertiary-color)' }}>
+            Your message has been sent successfully
+          </p>
+          <p className="text-xs" style={{ color: '#9ca3af' }}>
+            We'll get back to you within 24 hours
+          </p>
         </div>
       )}
     </div>

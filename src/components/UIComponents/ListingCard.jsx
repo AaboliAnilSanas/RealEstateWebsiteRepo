@@ -11,6 +11,7 @@ import BathtubIcon from '@mui/icons-material/Bathtub';
 import HotelIcon from '@mui/icons-material/Hotel';
 import SquareFootIcon from '@mui/icons-material/SquareFoot';
 import BalconyIcon from '@mui/icons-material/OutdoorGrill';
+import { Link } from 'react-router-dom'; // 👈 NEW IMPORT
 
 const ListingCard = ({ propertyData }) => {
   if (!propertyData) {
@@ -178,13 +179,17 @@ const ListingCard = ({ propertyData }) => {
         {/* Bottom Section - Action Buttons */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 'auto' }}>
           <Box sx={{ display: 'flex', gap: 1 }}>
-            <Button 
-              size="small" 
-              variant="outlined"
-              sx={{ fontSize: '0.875rem', minWidth: 'auto', px: 1.5 }}
-            >
-              View Details
-            </Button>
+            {/* 👈 LINK WRAPPER */}
+            <Link to={`/properties/${propertyData.id}`} style={{ textDecoration: 'none' }}>
+              <Button 
+                size="small" 
+                variant="outlined"
+                sx={{ fontSize: '0.875rem', minWidth: 'auto', px: 1.5 }}
+              >
+                View Details
+              </Button>
+            </Link>
+            {/* 👈 END LINK WRAPPER */}
             <Button 
               size="small" 
               variant="contained"

@@ -1,22 +1,20 @@
 import React, { useState } from 'react';
-import axiosInstance from '../../services/axios'; // Adjust path as needed
+import { Mail, ArrowRight } from 'lucide-react';
 
-export default function RegisterForm({ 
+export default function ModernRegisterForm({ 
   onContinue = () => {}
 }) {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
-  const getCssVar = (varName, fallback) => `var(${varName}, ${fallback})`;
+  const [isFocused, setIsFocused] = useState(false);
 
   const handleContinue = async (e) => {
     e.preventDefault();
     
-    // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      alert("Please enter a valid email address.");
+      setError("Please enter a valid email address.");
       return;
     }
 
@@ -24,129 +22,131 @@ export default function RegisterForm({
     setError('');
 
     try {
-      const response = await axiosInstance.post('/auth/send-otp', {
-        email: email
-      });
-      console.log('.....',response);
-      if (response.status === 200) {
-        // Store email for later use in OTP verification
-        localStorage.setItem('userEmail', email);
-        
-        // Call the parent callback to proceed to OTP step
-        onContinue(email);
-      } else {
-        setError('Failed to send OTP. Please try again.');
-      }
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      onContinue(email);
     } catch (error) {
-      console.error('Error sending OTP:', error);
-      
-      if (error.response?.data?.message) {
-        setError(error.response.data.message);
-      } else if (error.response?.status === 400) {
-        setError('Invalid email address.');
-      } else if (error.response?.status === 429) {
-        setError('Too many attempts. Please try again later.');
-      } else {
-        setError('Network error. Please check your connection.');
-      }
+      setError('Network error. Please check your connection.');
     } finally {
       setLoading(false);
     }
   };
 
-  const inputStyle = {
-    borderColor: getCssVar('--secondary-color', 'rgb(138, 136, 136)'),
-    color: getCssVar('--tertiary-color', 'black'),
-    boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.05)',
-  };
-
-  const inputFocus = (e) => {
-    e.target.style.borderColor = getCssVar('--primary-color', '#d2a63f');
-    e.target.style.boxShadow = `0 0 0 2px ${getCssVar('--primary-color-light', '#d2a63fb5')}`;
-  };
-  
-  const inputBlur = (e) => {
-    e.target.style.borderColor = getCssVar('--secondary-color', 'rgb(138, 136, 136)');
-    e.target.style.boxShadow = 'inset 0 1px 2px rgba(0,0,0,0.05)';
-  };
-
   return (
-    <div className="pt-6 px-6 pb-8 sm:pt-8 sm:px-8 sm:pb-10">
-      <form onSubmit={handleContinue} className="space-y-6">
-        {/* Removed the email/phone toggle */}
-        
-        <div>
-          <label className="block font-medium mb-2 text-sm text-gray-700" htmlFor="email-input">
-            Email Address
-          </label>
-          <input
-            id="email-input"
-            type="email"
-            placeholder="Enter your email address"
-            value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              setError(''); // Clear error when user types
-            }}
-            className="w-full border rounded-lg py-2.5 px-3.5 focus:outline-none transition placeholder-gray-400 text-sm bg-white"
-            style={inputStyle}
-            onFocus={inputFocus}
-            onBlur={inputBlur}
-            disabled={loading}
-            required
-          />
+    <div className="relative bg-gradient-to-br from-blue-50 via-white to-blue-50 rounded-2xl shadow-2xl overflow-hidden max-w-md mx-auto">
+      {/* Decorative Elements */}
+      <div className="absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"
+           style={{ background: 'radial-gradient(circle, rgba(59, 130, 246, 0.15), rgba(210, 166, 63, 0.15))' }} />
+      <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"
+           style={{ background: 'radial-gradient(circle, rgba(210, 166, 63, 0.15), rgba(59, 130, 246, 0.15))' }} />
+      
+      {/* Content */}
+      <div className="relative z-10 p-8 sm:p-10">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold mb-2"
+              style={{ 
+                background: 'linear-gradient(135deg, var(--primary-color-light), var(--location-blue-600), var(--secondary-color))',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }}>
+            Get Started
+          </h2>
+          <p className="text-gray-600 text-sm">
+            Enter your email to receive a verification code
+          </p>
         </div>
 
-        {/* Error Message */}
-        {error && (
-          <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
-            {error}
+        <div className="space-y-6">
+          {/* Email Input with Modern Design */}
+          <div className="relative">
+            <label 
+              htmlFor="email-input" 
+              className={`absolute left-12 transition-all duration-200 pointer-events-none z-10 ${
+                isFocused || email 
+                  ? '-top-2.5 left-4 text-xs bg-white px-2 font-medium' 
+                  : 'top-4 text-gray-400'
+              }`}
+              style={isFocused || email ? { color: 'var(--primary-color-light)' } : {}}
+            >
+              {isFocused || email ? 'Email' : 'Email Address'}
+            </label>
+            <div className="relative">
+              <Mail className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors duration-200 ${
+                isFocused ? '' : 'text-gray-400'
+              }`}
+              style={isFocused ? { color: 'var(--primary-color-light)' } : {}} />
+              <input
+                id="email-input"
+                type="email"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setError('');
+                }}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
+                className={`w-full pl-12 pr-4 py-4 bg-white border-2 rounded-xl focus:outline-none transition-all duration-200 ${
+                  error 
+                    ? 'border-red-400 focus:border-red-500' 
+                    : isFocused 
+                    ? 'shadow-lg' 
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+                style={isFocused && !error ? {
+                  borderColor: 'var(--primary-color-light)',
+                  boxShadow: '0 4px 12px rgba(59, 130, 246, 0.25)'
+                } : {}}
+                disabled={loading}
+              />
+            </div>
           </div>
-        )}
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full text-white font-medium text-base py-3 rounded-lg transition-all duration-200 mt-2 relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed"
-          style={{ 
-            background: loading 
-              ? '#ccc' 
-              : 'linear-gradient(135deg, #d2a63f 0%, #c09935 50%, #d2a63f 100%)',
-            boxShadow: loading 
-              ? 'none' 
-              : '0 2px 8px rgba(210,166,63,0.25)'
-          }}
-          onMouseEnter={(e) => {
-            if (!loading) {
-              e.target.style.transform = 'translateY(-1px)';
-              e.target.style.boxShadow = '0 4px 12px rgba(210,166,63,0.3)';
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (!loading) {
-              e.target.style.transform = 'translateY(0)';
-              e.target.style.boxShadow = '0 2px 8px rgba(210,166,63,0.25)';
-            }
-          }}
-          onMouseDown={(e) => {
-            if (!loading) {
-              e.target.style.transform = 'scale(0.98)';
-            }
-          }}
-          onMouseUp={(e) => {
-            if (!loading) {
-              e.target.style.transform = 'translateY(-1px)';
-            }
-          }}
-        >
-          {loading ? 'Sending OTP...' : 'Continue'}
-        </button>
+          {/* Error Message */}
+          {error && (
+            <div className="flex items-start gap-2 p-4 bg-red-50 border border-red-200 rounded-xl">
+              <div className="flex-shrink-0 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center mt-0.5">
+                <span className="text-white text-xs font-bold">!</span>
+              </div>
+              <p className="text-sm text-red-700 font-medium">{error}</p>
+            </div>
+          )}
 
-        {/* Optional: Info message */}
-        <p className="text-xs text-gray-500 text-center">
-          We'll send a verification code to your email address
-        </p>
-      </form>
+          {/* Submit Button */}
+          <button
+            onClick={handleContinue}
+            disabled={loading}
+            className="group relative w-full text-white font-semibold py-4 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden shadow-lg hover:shadow-xl disabled:shadow-none"
+            style={{
+              background: 'linear-gradient(135deg, var(--primary-color-light), var(--location-blue-600), var(--secondary-color))',
+              boxShadow: '0 4px 12px rgba(59, 130, 246, 0.35)',
+            }}
+          >
+            {/* Shimmer Effect */}
+            {!loading && (
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+            )}
+            
+            <span className="relative flex items-center justify-center gap-2">
+              {loading ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Sending Code...
+                </>
+              ) : (
+                <>
+                  Continue
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </>
+              )}
+            </span>
+          </button>
+        </div>
+      </div>
+
+      {/* Bottom Wave Decoration */}
+      <div className="absolute bottom-0 left-0 right-0 h-1"
+           style={{ background: 'linear-gradient(to right, var(--primary-color-light), var(--secondary-color), var(--primary-color-light))' }} />
     </div>
   );
 }

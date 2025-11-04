@@ -1,14 +1,13 @@
 import React from 'react';
 import { Facebook, Instagram, Linkedin, Phone, Mail, MapPin, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom'; // 👈 ADDED: Import Link for routing
 
 const Footer = () => {
   const quickLinks = [
-    { name: 'Home', href: '#' },
-    { name: 'About Us', href: '#' },
-    { name: 'Services', href: '#' },
-    { name: 'Property Listing', href: '#' },
-    { name: 'Locations', href: '#' },
-    { name: 'Blog', href: '#' }
+    { name: 'Home', to: '/' },
+    { name: 'Buy Property', to: '/properties' },
+    { name: 'Post Property', to: '/sell' },
+    { name: 'Contact', to: '/contact' }
   ];
 
   const locations = [
@@ -20,6 +19,11 @@ const Footer = () => {
     'Lonavala',
     'Andheri West'
   ];
+
+  const handleHomeClick = () => {
+    // Forces a smooth scroll to the very top of the viewport
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <footer className="bg-gradient-to-b from-[var(--location-blue-50)] to-white text-[var(--location-blue-800)] text-sm mt-auto">
@@ -79,12 +83,13 @@ const Footer = () => {
               <ul className="space-y-2">
                 {quickLinks.map((link) => (
                   <li key={link.name}>
-                    <a
+                    <Link // 👈 USED LINK COMPONENT
                       className="text-sm text-[var(--location-gray-600)] hover:text-[var(--gold-base)] hover:translate-x-1 inline-block transition-all"
-                      href={link.href}
+                      to={link.to} // 👈 USED 'to' PROP
+                      onClick={link.name === 'Home' ? handleHomeClick : undefined}
                     >
                       {link.name}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -119,7 +124,7 @@ const Footer = () => {
               </p>
               
               <a
-                href="#"
+                href="/properties"
                 className="group inline-flex items-center justify-center w-full gap-2 bg-gradient-to-r from-[var(--gold-base)] to-[var(--gold-dark)] text-white text-sm font-medium py-2.5 px-4 rounded-lg hover:shadow-md transition-all"
               >
                 Get Started
