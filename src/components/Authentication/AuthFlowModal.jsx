@@ -1,3 +1,4 @@
+// Authentication/AuthFlowModal.jsx
 import React, { useState } from 'react';
 import { X, ArrowLeft } from 'lucide-react';
 // Import the refactored content-only components
@@ -29,8 +30,10 @@ export default function AuthFlowModal({
   const [email, setEmail] = useState('');
   const [authToken, setAuthToken] = useState('');
   const [userEmail, setUserEmail] = useState('');
+  // ADDED: Internal state for forcing closure on user's request
+  const [isClosedInternally, setIsClosedInternally] = useState(false);
 
-  if (!isOpen) return null;
+  if (!isOpen || isClosedInternally) return null; // MODIFIED: Check local state
 
   // --- Flow Handlers ---
 
@@ -98,9 +101,9 @@ export default function AuthFlowModal({
     <div 
       className="fixed inset-0 flex items-center justify-center p-4 z-50 font-sans"
       style={{
-        // MODIFIED: Set to high opacity black to dim the background and hide the underlying gray browser background, ensuring the modal is prominent.
-        backgroundColor: 'rgba(0, 0, 0, 0.7)', 
-        // Removed backdrop-filter
+        backdropFilter: "blur(1px)",        // ✅ Blur
+        WebkitBackdropFilter: "blur(1px)",  // ✅ Safari support
+        backgroundColor: "rgba(0, 0, 0, 0.45)", // ✅ Soft fade on top of blur
       }}
     >
       
@@ -129,7 +132,10 @@ export default function AuthFlowModal({
           </div>
 
           <button
-            onClick={onClose}
+            onClick={() => {
+              onClose();
+              setIsClosedInternally(true); // ADDED: Force modal to close internally
+            }}
             className="text-gray-500 hover:text-gray-700 p-1 rounded-full transition"
             aria-label="Close Modal"
           >

@@ -15,7 +15,8 @@ const StickyNav = ({ activeSection, setActiveSection }) => {
   };
 
   return (
-    <div className="overflow-hidden bg-white rounded-2xl shadow-xl border border-[var(--location-blue-100)] p-2">
+    // GLASSMORPHISM APPLIED HERE
+    <div className="overflow-hidden bg-white/80 backdrop-blur-lg rounded-2xl shadow-2xl border border-[var(--location-blue-100)] p-2">
       <style>{`
         @keyframes slide-in {
           from { transform: translateX(-10px); opacity: 0; }

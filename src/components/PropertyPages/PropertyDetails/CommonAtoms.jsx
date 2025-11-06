@@ -1,47 +1,14 @@
-import React, { useState } from 'react';
-import { BedDouble, Bath, Maximize2, Layers, Heart, Share2, Sparkles } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { 
+  BedDouble, Bath, Maximize2, Layers, Share2, // Existing key specs
+  Ruler, Key, Sofa, Gauge, Home, ParkingCircle, Clock, // New icons for features
+  TrendingUp, Briefcase, CheckCircle, Building2, Gavel, 
+  Sparkles, ChevronRight,
+} from 'lucide-react';
+import FloatingContactButton from '../../UIComponents/FloatingContactButton';
 
-// --- ATOM 1: SpecItem - ENHANCED WITH MORE ANIMATIONS ---
 export const SpecItem = ({ icon: Icon, label, value }) => (
   <div className="spec-item group relative overflow-hidden rounded-2xl bg-white p-5 shadow-lg transition-all duration-500 hover:shadow-2xl hover:scale-[1.05] border border-[var(--location-blue-100)]">
-    <style>{`
-      .spec-item::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
-        opacity: 0;
-        transition: opacity 0.5s ease;
-      }
-      .spec-item:hover::before {
-        opacity: 1;
-      }
-      .spec-icon-float {
-        animation: float-subtle 3s ease-in-out infinite;
-      }
-      @keyframes float-subtle {
-        0%, 100% { transform: translateY(0px) rotate(0deg); }
-        50% { transform: translateY(-5px) rotate(5deg); }
-      }
-      .spec-value-pop {
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      }
-      .group:hover .spec-value-pop {
-        transform: scale(1.1);
-      }
-    `}</style>
-    
-    {/* Animated gradient background on hover */}
-    <div className="absolute inset-0 bg-gradient-to-br from-[var(--gold-50)]/40 via-transparent to-[var(--location-blue-50)]/40 opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div>
-    
-    {/* Sparkle effect on hover */}
-    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
-      <Sparkles className="w-4 h-4 text-[var(--gold-base)] animate-pulse" />
-    </div>
-    
     <div className="relative z-10 flex items-center gap-4">
       <div className="spec-icon-float flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--location-blue-600)] to-[var(--location-blue-800)] shadow-lg transition-all duration-500 group-hover:shadow-2xl group-hover:scale-110">
         <Icon className="h-7 w-7 text-white" />
@@ -55,86 +22,166 @@ export const SpecItem = ({ icon: Icon, label, value }) => (
         </p>
       </div>
     </div>
-    
-    {/* Bottom accent line */}
-    <div className="absolute bottom-0 left-0 h-1 w-0 bg-gradient-to-r from-[var(--gold-base)] to-[var(--location-blue-600)] transition-all duration-500 group-hover:w-full"></div>
   </div>
 );
 
-// --- ATOM 2: FloatingActions - ENHANCED WITH VISIBILITY CONTROL ---
 export const FloatingActions = () => {
-  const [showTooltip, setShowTooltip] = useState(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
-  // Detect when user reaches bottom of page
-  React.useEffect(() => {
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY + window.innerHeight;
-      const threshold = document.documentElement.scrollHeight - 200; // 200px before bottom
-      setShowScrollTop(scrollPosition >= threshold);
-    };
+  useEffect(() => {
+    const handleScroll = () => setShowScrollTop(window.scrollY > 400);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: 'Property Details',
+        text: 'Check out this amazing property!',
+        url: window.location.href,
+      }).catch((err) => console.log('Error sharing:', err));
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      alert('Link copied to clipboard!');
+    }
+  };
+
   return (
-    <div className="fixed bottom-8 right-8 z-40 flex flex-col gap-4">
+    <>
       <style>{`
-        .floating-btn {
-          position: relative;
-          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .tooltip {
-          animation: tooltip-slide 0.3s ease;
-        }
-        @keyframes tooltip-slide {
-          from { opacity: 0; transform: translateX(10px); }
-          to { opacity: 1; transform: translateX(0); }
+        .floating-actions-container {
+          position: fixed;
+          right: 32px;
+          bottom: 32px;
+          z-index: 50;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          gap: 12px;
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* SHARE BUTTON ANIMATION */
-        .share-btn {
-          border: 3px solid var(--location-blue-600);
-          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        .floating-actions-container.with-scroll {
+          transform: translateY(-80px);
         }
-        .share-btn:hover {
-          transform: scale(1.15) rotate(15deg);
-          box-shadow: 0 0 15px rgba(30, 136, 229, 0.3);
+
+        .floating-btn {
+          width: 56px;
+          height: 56px;
+          border-radius: 50%;
+          background: white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+          transition: all 0.3s ease;
+          cursor: pointer;
+          border: none;
+          position: relative;
+        }
+
+        .floating-btn:hover {
+          transform: scale(1.1);
+          box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+        }
+
+        /* Share button */
+        .floating-btn.share-btn {
+          background: white;
+          border: 3px solid var(--location-blue-600);
+        }
+
+        .share-icon {
+          color: var(--location-blue-600);
+        }
+
+        /* Tooltip */
+        .tooltip {
+          position: absolute;
+          right: 65px;
+          top: 50%;
+          transform: translateY(-50%);
+          background: var(--location-blue-700);
+          color: white;
+          padding: 6px 12px;
+          border-radius: 8px;
+          font-size: 13px;
+          font-weight: 500;
+          opacity: 0;
+          pointer-events: none;
+          transition: all 0.3s ease;
+          white-space: nowrap;
+        }
+
+        .floating-btn.share-btn:hover .tooltip {
+          opacity: 1;
+          transform: translateY(-50%) translateX(-5px);
+        }
+
+        /* Arrow for tooltip */
+        .tooltip::after {
+          content: '';
+          position: absolute;
+          top: 50%;
+          right: -6px;
+          transform: translateY(-50%) rotate(45deg);
+          width: 10px;
+          height: 10px;
+          background: var(--location-blue-700);
+        }
+
+        /* Scroll top button */
+        .floating-btn.scroll-top-btn {
+          background: linear-gradient(135deg, #d0ae02ff 0%, #d0ae02ff 100%);
+          animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
       `}</style>
 
-      {/* Share Button */}
-      <div className="relative">
-        <button 
-          className="share-btn group flex h-14 w-14 items-center justify-center rounded-full bg-white shadow-xl"
-          onMouseEnter={() => setShowTooltip('share')}
-          onMouseLeave={() => setShowTooltip(null)}
-        >
-          <Share2 className="h-6 w-6 text-[var(--location-blue-600)] transition-transform duration-300 group-hover:rotate-12" />
+      <div className={`floating-actions-container ${showScrollTop ? 'with-scroll' : ''}`}>
+        {/* Contact Button */}
+        <FloatingContactButton />
+
+        {/* Share Button with Tooltip */}
+        <button className="floating-btn share-btn" onClick={handleShare}>
+          <Share2 className="w-6 h-6 share-icon" />
+          <span className="tooltip">Share this property</span>
         </button>
-        {showTooltip === 'share' && (
-          <div className="tooltip absolute right-full mr-3 top-1/2 -translate-y-1/2 whitespace-nowrap bg-[var(--location-blue-800)] text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-xl">
-            Share property
-          </div>
+
+        {/* Scroll Top Button */}
+        {showScrollTop && (
+          <button
+            className="floating-btn scroll-top-btn"
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            title="Back to top"
+          >
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
+            </svg>
+          </button>
         )}
       </div>
-
-      {/* Scroll to Top Button (visible only near bottom) */}
-      {showScrollTop && (
-        <button 
-          className="floating-btn group flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[var(--gold-base)] to-[var(--gold-dark)] shadow-2xl transition-all duration-300"
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        >
-          <svg className="w-6 h-6 text-white transition-transform duration-300 group-hover:-translate-y-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-          </svg>
-        </button>
-      )}
-    </div>
+    </>
   );
 };
 
+export { FloatingContactButton };
 
-
-// Exporting required icons for PropertyBodySections
-export const PropertyIcons = { BedDouble, Bath, Maximize2, Layers };
+// EXPORT ALL RELEVANT ICONS HERE
+export const PropertyIcons = { 
+  BedDouble, Bath, Maximize2, Layers, 
+  Ruler, Key, Sofa, Gauge, Home, ParkingCircle, 
+  Clock, TrendingUp, Briefcase, CheckCircle, 
+  Building2, Gavel, Sparkles, ChevronRight,
+};
