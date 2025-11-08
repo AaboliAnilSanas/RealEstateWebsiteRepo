@@ -172,7 +172,7 @@ const PropertyDetails = () => {
         /* Slide in from Left (for StickyNav) */
         @keyframes slide-in-left {
           from { opacity: 0; transform: translateX(-100px); }
-          to { opacity: 1; transform: translateX(0); }
+          to { transform: translateX(0); opacity: 1; }
         }
         .slide-in-left-on-scroll {
           opacity: 0; /* Default hidden state */
@@ -185,7 +185,7 @@ const PropertyDetails = () => {
         /* Slide in from Right (for Body Content & Location) */
         @keyframes slide-in-right {
           from { opacity: 0; transform: translateX(100px); }
-          to { opacity: 1; transform: translateX(0); }
+          to { transform: translateX(0); opacity: 1; }
         }
         .slide-in-right-on-scroll {
           opacity: 0; /* Default hidden state */
@@ -244,17 +244,20 @@ const PropertyDetails = () => {
         className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-10 pb-20"
       >
         {/* Sticky Nav and Body Sections Container - Scroll Triggered */}
+        {/* Default: flex-col (stacked) on mobile/tablet, lg:flex-row (side-by-side) on large screens */}
         <div 
           ref={bodyRef}
           className="flex flex-col lg:flex-row gap-8"
         >
           {/* Sticky Navigation Sidebar - SLIDE IN FROM LEFT */}
-          <div className={`lg:sticky lg:top-20 lg:w-1/4 lg:self-start slide-in-left-on-scroll ${isBodyInView ? 'in-view' : ''}`}>
+          {/* Default: full width, not sticky. lg:sticky, lg:w-1/4 on large screens */}
+          <div className={`w-full mb-6 lg:mb-0 lg:sticky lg:top-20 lg:w-1/4 lg:self-start slide-in-left-on-scroll ${isBodyInView ? 'in-view' : ''}`}>
             <StickyNav activeSection={activeSection} setActiveSection={setActiveSection} />
           </div>
           
           {/* Main Body Content - SLIDE IN FROM RIGHT */}
-          <div className={`lg:w-3/4 slide-in-right-on-scroll ${isBodyInView ? 'in-view' : ''}`}>
+          {/* Default: full width. lg:w-3/4 on large screens */}
+          <div className={`w-full lg:w-3/4 slide-in-right-on-scroll ${isBodyInView ? 'in-view' : ''}`}>
             <PropertyBodySections 
               property={property} 
               activeSection={activeSection}
@@ -290,7 +293,7 @@ const PropertyDetails = () => {
                 {property.apartmentSociety} Locality
               </h3>
               
-              <div className="relative w-full h-[400px] overflow-hidden rounded-2xl shadow-2xl border-4 border-blue-100">
+              <div className="relative w-full h-[300px] sm:h-[400px] overflow-hidden rounded-2xl shadow-2xl border-4 border-blue-100">
                 {/* Map Embed */}
                 <iframe
                   title="Property Location Map"

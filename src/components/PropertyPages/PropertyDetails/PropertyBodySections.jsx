@@ -168,7 +168,8 @@ const PropertyBodySections = ({ property, activeSection }) => {
         activeSection={activeSection}
         icon={Briefcase}
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Adjusted grid for responsiveness: 2 columns on small/mobile, 4 columns on large */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
           <SpecItem icon={BedDouble} label="Bedrooms" value={property.bedrooms} />
           <SpecItem icon={Bath} label="Bathrooms" value={property.bathrooms} />
           <SpecItem icon={Maximize2} label="Carpet Area" value={property.carpetArea} />
@@ -193,6 +194,7 @@ const PropertyBodySections = ({ property, activeSection }) => {
           </div>
           
           {/* Key Highlights Cards */}
+          {/* Adjusted grid for responsiveness: 1 column on mobile, 3 columns on medium/large */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-2xl border-2 border-blue-200 shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300">
               <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center mb-4 shadow-lg">
@@ -228,7 +230,8 @@ const PropertyBodySections = ({ property, activeSection }) => {
         activeSection={activeSection}
         icon={CheckCircle}
       >
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        {/* Adjusted grid for responsiveness: 1 column on small/mobile, 2 columns on medium/large */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {detailedFeatures.map((item, index) => (
             <div 
               key={index}
@@ -257,7 +260,8 @@ const PropertyBodySections = ({ property, activeSection }) => {
         activeSection={activeSection}
         icon={Sparkles}
       >
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        {/* Adjusted grid for responsiveness: 1 column on small/mobile, 2 on medium, 3 on large */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {property.amenities.map((amenity, index) => (
             <div
               key={index}

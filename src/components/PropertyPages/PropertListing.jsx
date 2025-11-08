@@ -1,3 +1,4 @@
+// src/components/PropertyPages/PropertListing.jsx
 import React, { useState, useEffect, useCallback } from "react";
 import ListingCard from "../UIComponents/ListingCard.jsx";
 import Box from "@mui/material/Box";
@@ -17,6 +18,7 @@ import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import debounce from "lodash/debounce";
 import { motion, AnimatePresence } from "framer-motion";
+import Loader from "../UIComponents/PageLoader.jsx";
 
 const PropertyListing = () => {
   const [properties, setProperties] = useState([]);
@@ -694,19 +696,9 @@ const PropertyListing = () => {
 
   if (loading) {
     return (
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '60vh',
-        flexDirection: 'column',
-        gap: 2
-      }}>
-        <CircularProgress size={40} sx={{ color: colors.gold.base }} />
-        <Typography variant="h6" sx={{ color: colors.gray[600] }}>
-          Loading properties...
-        </Typography>
-      </Box>
+      // <--- UPDATED LOADER IMPLEMENTATION HERE:
+      <Loader loading={loading} fullScreen={false} theme="gold" />
+      // END UPDATED LOADER IMPLEMENTATION --->
     );
   }
 

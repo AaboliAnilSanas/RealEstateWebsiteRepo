@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { User, Phone, Users, ArrowRight, Home, Briefcase } from 'lucide-react';
+import axiosInstance from '../../services/axios'; // <-- ADDED IMPORT
 
 export default function DetailsForm({ 
   onCreateAccount = (details) => { console.log('Create Account clicked:', details); },
@@ -22,7 +23,7 @@ export default function DetailsForm({
       return;
     }
 
-    if (!authToken) {
+    if (!authToken && !localStorage.getItem('authToken')) {
       setError("Authentication token missing. Please login again.");
       return;
     }
@@ -31,19 +32,31 @@ export default function DetailsForm({
     setError('');
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // ** API CALL: Register User (Replaces dummy promise) **
+      // The authorization token (set in localStorage in the previous step) is automatically 
+      // sent via the axios interceptor and contains the user's email.
+      const response = await axiosInstance.post('auth/register', {
+        fullName: name,
+        phone: phone,
+        role: role.toUpperCase() // Ensure role is uppercase "BUYER" or "SELLER"
+      });
       
+      const data = response.data;
+      
+      // Update the token to the final, long-lived token from the response
+      localStorage.setItem('authToken', data.token);
+
       onCreateAccount({
         success: true,
-        user: { name, phone, role },
-        message: 'Account created successfully!',
+        user: data.data, // The new User entity
+        message: data.message,
         name,
         phone,
         role
       });
     } catch (error) {
-      console.error('Registration error:', error);
-      setError('Network error. Please try again.');
+      console.error('Registration error:', error.response?.data || error.message);
+      setError(error.response?.data?.message || 'Account creation failed. Please try again.');
     } finally {
       setLoading(false);
     }

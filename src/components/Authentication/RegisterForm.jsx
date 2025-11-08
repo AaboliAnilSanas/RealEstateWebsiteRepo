@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Mail, ArrowRight } from 'lucide-react';
+import axiosInstance from '../../services/axios'; // <-- ADDED IMPORT
 
 export default function ModernRegisterForm({ 
   onContinue = () => {}
@@ -22,10 +23,15 @@ export default function ModernRegisterForm({
     setError('');
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // ** API CALL: Send OTP (Replaces dummy promise) **
+      await axiosInstance.post('auth/send-otp', {
+        email: email
+      });
+      // If successful, proceed to OTP step
       onContinue(email);
     } catch (error) {
-      setError('Network error. Please check your connection.');
+      console.error('Error sending OTP:', error.response?.data || error.message);
+      setError(error.response?.data?.message || 'Failed to send OTP. Please check your network.');
     } finally {
       setLoading(false);
     }

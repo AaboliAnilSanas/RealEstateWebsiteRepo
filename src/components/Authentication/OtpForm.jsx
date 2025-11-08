@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, RefreshCw } from 'lucide-react';
+import axiosInstance from '../../services/axios'; // <-- ADDED IMPORT
 
 export default function ModernOtpForm({ 
     phoneNumber = '', 
@@ -12,10 +13,50 @@ export default function ModernOtpForm({
     const [resending, setResending] = useState(false);
     const [loading, setLoading] = useState(false);
     const inputRefs = useRef([]);
+    
+    const isOtpComplete = otp.every(digit => digit.length === 1);
 
     useEffect(() => {
         setTimeout(() => inputRefs.current[0]?.focus(), 100);
     }, []);
+
+    // ** ADDED API CALL FUNCTION: Verify OTP **
+    const handleVerify = async () => {
+        if (!isOtpComplete || loading) return; // Prevent double submission
+        
+        setLoading(true);
+        setError('');
+        const otpCode = otp.join('');
+
+        try {
+            const response = await axiosInstance.post('auth/verify-otp', {
+                email: email,
+                otp: otpCode
+            });
+            
+            const data = response.data;
+            
+            // Store token in localStorage for subsequent API calls (like registration)
+            if (data.token) {
+                localStorage.setItem('authToken', data.token);
+            }
+            
+            // Pass the crucial status and token back to AuthFlowModal
+            onVerify({
+                success: true, // Always true if API call succeeds and we get a token/message
+                token: data.token,
+                status: data.status, // "login_successful" or "proceed_to_registration"
+                message: data.message
+            });
+            
+        } catch (error) {
+            console.error('OTP verification failed:', error.response?.data || error.message);
+            setError(error.response?.data?.message || 'Invalid or expired OTP. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
+    // ** END API CALL FUNCTION **
 
     const handleInputChange = (e, index) => {
         const value = e.target.value.replace(/[^0-9]/g, '').slice(-1);
@@ -30,11 +71,8 @@ export default function ModernOtpForm({
         }
         
         if (newOtp.every(digit => digit.length === 1)) {
-            onVerify({
-                success: true,
-                token: 'dummy-token-123',
-                message: 'Verification successful!'
-            });
+            // ** MODIFIED: Call API function when OTP is complete **
+            setTimeout(handleVerify, 100); 
         }
     };
 
@@ -73,29 +111,25 @@ export default function ModernOtpForm({
         } else {
             inputRefs.current[5]?.focus();
             if (newOtp.every(digit => digit)) {
-                onVerify({
-                    success: true,
-                    token: 'dummy-token-123',
-                    message: 'Verification successful!'
-                });
+                // ** MODIFIED: Call API function when OTP is complete after paste **
+                 setTimeout(handleVerify, 100);
             }
         }
     };
 
-    const handleManualVerify = () => {
-        onVerify({
-            success: true,
-            token: 'dev-bypass-token-12345', 
-            message: 'Bypass verification successful!'
-        });
-    };
+    // ** MODIFIED: Use the actual handleVerify function for manual click **
+    const handleManualVerify = handleVerify;
 
     const handleResendOtp = async () => {
         try {
             setResending(true);
             setError('');
             
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            // ** API CALL: Resend OTP (Replaces dummy promise) **
+            await axiosInstance.post('auth/send-otp', {
+                email: email
+            });
+            // ** END API CALL **
             
             setOtp(['', '', '', '', '', '']);
             setTimeout(() => inputRefs.current[0]?.focus(), 100);
@@ -105,8 +139,6 @@ export default function ModernOtpForm({
             setResending(false);
         }
     };
-
-    const isOtpComplete = otp.every(digit => digit.length === 1);
 
     return (
         <div className="relative bg-gradient-to-br from-blue-50 via-white to-blue-50 rounded-2xl shadow-2xl overflow-hidden max-w-md mx-auto">
