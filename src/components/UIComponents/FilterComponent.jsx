@@ -36,7 +36,8 @@ const FilterComponent = ({
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  // isMobile is true for screens below 'md' (768px by default)
+  const isMobile = useMediaQuery(theme.breakpoints.down("md")); 
 
   // Different slider ranges for Buy vs Rent
   const [buySliderValue, setBuySliderValue] = useState([0, 100]);
@@ -295,18 +296,21 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
   const isAutocompleteRequired = isFieldRequired(data.fieldData[0].label);
 
   // Hexagon SVG Component with Animation - Using CSS variables
+  // NOTE: Reduced opacity and size of hexagons for mobile drawer (Drawer section)
   const HexagonBackground = () => (
     <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
       {/* Right Top Corner - 3 Hexagons */}
       <div className="absolute top-0 right-0">
         {/* Hexagon 1 - Top Right */}
         <svg 
-          className="absolute -top-4 right-10 opacity-20"
-          width="80"
-          height="80"
+          className="absolute -top-4 right-10"
+          // Conditional size and opacity reduction for mobile
+          width={isMobile ? "50" : "80"}
+          height={isMobile ? "50" : "80"}
           viewBox="0 0 100 100"
           xmlns="http://www.w3.org/2000/svg"
           style={{
+            opacity: isMobile ? 0.10 : 0.20, // Reduced opacity on mobile
             animation: 'floatHexagon1 8s ease-in-out infinite'
           }}
         >
@@ -326,12 +330,14 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
 
         {/* Hexagon 2 - Middle Right */}
         <svg 
-          className="absolute top-10 right-3 opacity-15"
-          width="60"
-          height="60"
+          className="absolute top-10 right-3"
+          // Conditional size and opacity reduction for mobile
+          width={isMobile ? "40" : "60"}
+          height={isMobile ? "40" : "60"}
           viewBox="0 0 100 100"
           xmlns="http://www.w3.org/2000/svg"
           style={{
+            opacity: isMobile ? 0.08 : 0.15, // Reduced opacity on mobile
             animation: 'floatHexagon2 6s ease-in-out infinite 1s'
           }}
         >
@@ -352,12 +358,14 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
 
         {/* Hexagon 3 - Bottom Right */}
         <svg 
-          className="absolute top-1 right-1 opacity-10"
-          width="50"
-          height="50"
+          className="absolute top-1 right-1"
+          // Conditional size and opacity reduction for mobile
+          width={isMobile ? "30" : "50"}
+          height={isMobile ? "30" : "50"}
           viewBox="0 0 100 100"
           xmlns="http://www.w3.org/2000/svg"
           style={{
+            opacity: isMobile ? 0.05 : 0.10, // Reduced opacity on mobile
             animation: 'floatHexagon3 7s ease-in-out infinite 0.5s'
           }}
         >
@@ -377,112 +385,114 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
         </svg>
       </div>
 
-      {/* Left Bottom Corner - 4 Hexagons */}
-      <div className="absolute bottom-0 left-0">
-        {/* Hexagon 4 - Bottom Left Large */}
-         <svg 
-          className="absolute bottom-11 left-2 opacity-20"
-          width="75"
-          height="70"
-          viewBox="0 0 100 100"
-          xmlns="http://www.w3.org/2000/svg"
-          style={{
-            animation: 'floatHexagon5 7s ease-in-out infinite 1.2s'
-          }}
-        >
-          <defs>
-            <linearGradient id="hexagonGradient5" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="var(--gold-base)" style={{ stopOpacity: 0.7 }} />
-              <stop offset="100%" stopColor="var(--gold-base)" style={{ stopOpacity: 0.5 }} />
-            </linearGradient>
-          </defs>
-          <polygon
-            points="50,15 85,30 85,70 50,85 15,70 15,30"
-            fill="url(#hexagonGradient5)"
-            strokeWidth="1"
-            stroke="var(--gold-base)"
-            style={{ opacity: 0.6 }}
-          />
-        </svg>
+      {/* Left Bottom Corner - 4 Hexagons (Hidden for max compactness on mobile) */}
+      {!isMobile && (
+        <div className="absolute bottom-0 left-0">
+          {/* Hexagon 4 - Bottom Left Large */}
+          <svg 
+            className="absolute bottom-11 left-2 opacity-20"
+            width="75"
+            height="70"
+            viewBox="0 0 100 100"
+            xmlns="http://www.w3.org/2000/svg"
+            style={{
+              animation: 'floatHexagon5 7s ease-in-out infinite 1.2s'
+            }}
+          >
+            <defs>
+              <linearGradient id="hexagonGradient5" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="var(--gold-base)" style={{ stopOpacity: 0.7 }} />
+                <stop offset="100%" stopColor="var(--gold-base)" style={{ stopOpacity: 0.5 }} />
+              </linearGradient>
+            </defs>
+            <polygon
+              points="50,15 85,30 85,70 50,85 15,70 15,30"
+              fill="url(#hexagonGradient5)"
+              strokeWidth="1"
+              stroke="var(--gold-base)"
+              style={{ opacity: 0.6 }}
+            />
+          </svg>
 
-        {/* Hexagon 5 - Middle Left Medium */}
-        <svg 
-          className="absolute -bottom-1 -left-2 opacity-25"
-          width="70"
-          height="70"
-          viewBox="0 0 100 100"
-          xmlns="http://www.w3.org/2000/svg"
-          style={{
-            animation: 'floatHexagon5 7s ease-in-out infinite 1.2s'
-          }}
-        >
-          <defs>
-            <linearGradient id="hexagonGradient5" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="var(--gold-base)" style={{ stopOpacity: 0.7 }} />
-              <stop offset="100%" stopColor="var(--gold-base)" style={{ stopOpacity: 0.5 }} />
-            </linearGradient>
-          </defs>
-          <polygon
-            points="50,15 85,30 85,70 50,85 15,70 15,30"
-            fill="url(#hexagonGradient5)"
-            strokeWidth="1"
-            stroke="var(--gold-base)"
-            style={{ opacity: 0.6 }}
-          />
-        </svg>
+          {/* Hexagon 5 - Middle Left Medium */}
+          <svg 
+            className="absolute -bottom-1 -left-2 opacity-25"
+            width="70"
+            height="70"
+            viewBox="0 0 100 100"
+            xmlns="http://www.w3.org/2000/svg"
+            style={{
+              animation: 'floatHexagon5 7s ease-in-out infinite 1.2s'
+            }}
+          >
+            <defs>
+              <linearGradient id="hexagonGradient5-b" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="var(--gold-base)" style={{ stopOpacity: 0.7 }} />
+                <stop offset="100%" stopColor="var(--gold-base)" style={{ stopOpacity: 0.5 }} />
+              </linearGradient>
+            </defs>
+            <polygon
+              points="50,15 85,30 85,70 50,85 15,70 15,30"
+              fill="url(#hexagonGradient5-b)"
+              strokeWidth="1"
+              stroke="var(--gold-base)"
+              style={{ opacity: 0.6 }}
+            />
+          </svg>
 
-        {/* Hexagon 6 - Top Left Small */}
-        <svg 
-          className="absolute bottom-6 left-14 opacity-25"
-          width="45"
-          height="45"
-          viewBox="0 0 100 100"
-          xmlns="http://www.w3.org/2000/svg"
-          style={{
-            animation: 'floatHexagon6 8s ease-in-out infinite 0.8s'
-          }}
-        >
-          <defs>
-            <linearGradient id="hexagonGradient6" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="var(--gold-base)" style={{ stopOpacity: 0.5 }} />
-              <stop offset="100%" stopColor="var(--gold-base)" style={{ stopOpacity: 0.3 }} />
-            </linearGradient>
-          </defs>
-          <polygon
-            points="50,15 85,30 85,70 50,85 15,70 15,30"
-            fill="url(#hexagonGradient6)"
-            strokeWidth="1"
-            stroke="var(--gold-base)"
-            style={{ opacity: 0.4 }}
-          />
-        </svg>
+          {/* Hexagon 6 - Top Left Small */}
+          <svg 
+            className="absolute bottom-6 left-14 opacity-25"
+            width="45"
+            height="45"
+            viewBox="0 0 100 100"
+            xmlns="http://www.w3.org/2000/svg"
+            style={{
+              animation: 'floatHexagon6 8s ease-in-out infinite 0.8s'
+            }}
+          >
+            <defs>
+              <linearGradient id="hexagonGradient6" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="var(--gold-base)" style={{ stopOpacity: 0.5 }} />
+                <stop offset="100%" stopColor="var(--gold-base)" style={{ stopOpacity: 0.3 }} />
+              </linearGradient>
+            </defs>
+            <polygon
+              points="50,15 85,30 85,70 50,85 15,70 15,30"
+              fill="url(#hexagonGradient6)"
+              strokeWidth="1"
+              stroke="var(--gold-base)"
+              style={{ opacity: 0.4 }}
+            />
+          </svg>
 
-        {/* Hexagon 7 - Center Left Tiny */}
-        <svg 
-          className="absolute bottom-12 left-8 opacity-10"
-          width="30"
-          height="30"
-          viewBox="0 0 100 100"
-          xmlns="http://www.w3.org/2000/svg"
-          style={{
-            animation: 'floatHexagon7 6s ease-in-out infinite 1.5s'
-          }}
-        >
-          <defs>
-            <linearGradient id="hexagonGradient7" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="var(--gold-base)" style={{ stopOpacity: 0.4 }} />
-              <stop offset="100%" stopColor="var(--gold-base)" style={{ stopOpacity: 0.1 }} />
-            </linearGradient>
-          </defs>
-          <polygon
-            points="50,15 85,30 85,70 50,85 15,70 15,30"
-            fill="url(#hexagonGradient7)"
-            strokeWidth="0.5"
-            stroke="var(--gold-base)"
-            style={{ opacity: 0.3 }}
-          />
-        </svg>
-      </div>
+          {/* Hexagon 7 - Center Left Tiny */}
+          <svg 
+            className="absolute bottom-12 left-8 opacity-10"
+            width="30"
+            height="30"
+            viewBox="0 0 100 100"
+            xmlns="http://www.w3.org/2000/svg"
+            style={{
+              animation: 'floatHexagon7 6s ease-in-out infinite 1.5s'
+            }}
+          >
+            <defs>
+              <linearGradient id="hexagonGradient7" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="var(--gold-base)" style={{ stopOpacity: 0.4 }} />
+                <stop offset="100%" stopColor="var(--gold-base)" style={{ stopOpacity: 0.1 }} />
+              </linearGradient>
+            </defs>
+            <polygon
+              points="50,15 85,30 85,70 50,85 15,70 15,30"
+              fill="url(#hexagonGradient7)"
+              strokeWidth="0.5"
+              stroke="var(--gold-base)"
+              style={{ opacity: 0.3 }}
+            />
+          </svg>
+        </div>
+      )}
 
       <style jsx>{`
         @keyframes floatHexagon1 {
@@ -540,7 +550,8 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
   // Filter content component with uniform spacing
   const FilterContent = () => (
     <div style={{ 
-      padding: '8px',
+      // 🚀 REDUCED PADDING ON MOBILE
+      padding: isMobile ? '12px' : '8px', 
       borderRadius: '16px',
       position: 'relative',
       overflow: 'hidden'
@@ -554,20 +565,24 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
         <div style={{ 
           display: 'flex', 
           alignItems: 'center',
-          gap: '16px',
-          marginBottom: '16px',
+          // 🚀 REDUCED GAP ON MOBILE
+          gap: isMobile ? '8px' : '16px', 
+          // 🚀 REDUCED MARGIN BOTTOM ON MOBILE
+          marginBottom: isMobile ? '12px' : '16px', 
           flexWrap: isMobile ? 'wrap' : 'nowrap'
         }}>
           {/* Buy/Rent Toggle Buttons */}
           <div style={{ 
             display: 'flex', 
-            gap: '4px',
+            // 🚀 REDUCED GAP ON MOBILE
+            gap: isMobile ? '2px' : '4px',
             flex: isMobile ? '1 1 100%' : 'none'
           }}>
             <Button
               variant={transactionType === "buy" ? "contained" : "outlined"}
               onClick={() => setTransactionType("buy")}
-              size="medium"
+              // 🚀 REDUCED SIZE TO SMALLER FOR MOBILE
+              size={isMobile ? "small" : "medium"} 
               fullWidth={isMobile}
               sx={{
                 "&.MuiButton-contained": {
@@ -584,9 +599,10 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
                     backgroundColor: "var(--gold-light)",
                   },
                 },
-                fontSize: '14px',
-                padding: '13px 23px',
-                minHeight: '36px'
+                // 🚀 REDUCED FONT/PADDING ON MOBILE
+                fontSize: isMobile ? '12px' : '14px', 
+                padding: isMobile ? '8px 10px' : '13px 23px',
+                minHeight: isMobile ? '30px' : '36px'
               }}
             >
               Buy
@@ -594,7 +610,8 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
             <Button
               variant={transactionType === "rent" ? "contained" : "outlined"}
               onClick={() => setTransactionType("rent")}
-              size="medium"
+              // 🚀 REDUCED SIZE TO SMALLER FOR MOBILE
+              size={isMobile ? "small" : "medium"}
               fullWidth={isMobile}
               sx={{
                 "&.MuiButton-contained": {
@@ -611,9 +628,10 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
                     backgroundColor: "var(--gold-light)",
                   },
                 },
-                fontSize: '14px',
-                padding: '13px 18px',
-                minHeight: '36px'
+                // 🚀 REDUCED FONT/PADDING ON MOBILE
+                fontSize: isMobile ? '12px' : '14px', 
+                padding: isMobile ? '8px 10px' : '13px 18px',
+                minHeight: isMobile ? '30px' : '36px'
               }}
             >
               Rent
@@ -625,8 +643,10 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
             flex: 1,
             display: 'flex',
             alignItems: 'center',
-            gap: '24px',
-            padding: '8px 12px',
+            // 🚀 REDUCED GAP ON MOBILE
+            gap: isMobile ? '16px' : '24px', 
+            // 🚀 REDUCED PADDING ON MOBILE
+            padding: isMobile ? '6px 10px' : '8px 12px', 
             borderRadius: '8px',
             backgroundColor: "var(--gold-light)",
             border: '1px solid var(--gold-base)',
@@ -644,14 +664,16 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
               <span style={{ 
                 fontWeight: 600, 
                 color: 'var(--location-blue-800)',
-                fontSize: '14px',
+                // 🚀 REDUCED FONT SIZE ON MOBILE
+                fontSize: isMobile ? '12px' : '14px', 
               }}>
-                {transactionType === "buy" ? "Buy Price:" : "Monthly Rent:"}
+                {transactionType === "buy" ? "Price:" : "Rent:"} {/* Shortened label for mobile */}
               </span>
               <span style={{ 
                 fontWeight: 'bold', 
                 color: 'var(--gold-base)',
-                fontSize: '14px'
+                // 🚀 REDUCED FONT SIZE ON MOBILE
+                fontSize: isMobile ? '12px' : '14px',
               }}>
                 {getRangeText()}
               </span>
@@ -677,8 +699,9 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
                   color: "var(--gold-base)",
                   "& .MuiSlider-thumb": {
                     backgroundColor: "var(--gold-base)",
-                    width: 14,
-                    height: 14,
+                    // 🚀 REDUCED THUMB SIZE ON MOBILE
+                    width: isMobile ? 12 : 14, 
+                    height: isMobile ? 12 : 14,
                   },
                   "& .MuiSlider-track": {
                     backgroundColor: "var(--gold-base)",
@@ -697,11 +720,16 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
         {/* Filter Dropdowns Section with Uniform Spacing */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '8px',
-          marginBottom: '16px'
+          // 🚀 Grid always uses 1 column on mobile
+          gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(200px, 1fr))', 
+          // 🚀 REDUCED GAP ON MOBILE
+          gap: isMobile ? '8px' : '8px',
+          // 🚀 REDUCED MARGIN BOTTOM ON MOBILE
+          marginBottom: isMobile ? '12px' : '16px'
         }}>
-          {/* Property Type Dropdown */}
+          {/* All CustomAutocomplete components will need internal sizing adjustments 
+              (assuming CustomAutocomplete uses TextField, its height will shrink 
+               due to less padding in the layout) */}
           <CustomAutocomplete
             label="Property Type"
             multiple={true}
@@ -710,7 +738,6 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
             options={PropertyType.fieldData}
           />
 
-          {/* Other filter components */}
           <CustomAutocomplete
             label="Bedroom"
             multiple={true}
@@ -761,10 +788,13 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
         <div style={{ 
           display: 'flex', 
           alignItems: 'flex-start',
-          gap: '12px',
-          marginBottom: '12px',
+          // 🚀 REDUCED GAP ON MOBILE
+          gap: isMobile ? '8px' : '12px',
+          // 🚀 REDUCED MARGIN BOTTOM ON MOBILE
+          marginBottom: isMobile ? '8px' : '12px',
           flexWrap: isMobile ? 'wrap' : 'nowrap'
         }}>
+          {/* CreatableDropdown (assumed to be responsive/takes full width on mobile) */}
           <div style={{ flex: 1, minWidth: isMobile ? '100%' : 'auto' }}>
            <CreatableDropdown
             dropdownLabel={data.fieldData[0].InputLabel} // Add this prop
@@ -785,21 +815,25 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
           
           <div style={{ 
             display: 'flex', 
-            gap: '8px',
+            // 🚀 REDUCED GAP ON MOBILE
+            gap: isMobile ? '4px' : '8px',
             flex: isMobile ? '1 1 100%' : 'none'
           }}>
+            {/* Search Button */}
             <Button
             className="button"
               onClick={handleSearch}
               sx={{
-                minWidth: '120px',
-                height: "53px",
+                // 🚀 REDUCED MIN-WIDTH/HEIGHT ON MOBILE
+                minWidth: isMobile ? '100px' : '120px', 
+                height: isMobile ? "40px" : "53px",
                 background: "linear-gradient(135deg, var(--gold-base), var(--gold-dark)) !important",
                 color: "white !important",
                 border: "none !important",
                 borderRadius: "12px !important",
                 fontWeight: "600 !important",
-                fontSize: "14px !important",
+                // 🚀 REDUCED FONT SIZE ON MOBILE
+                fontSize: isMobile ? "12px !important" : "14px !important",
                 boxShadow: "0 2px 4px -1px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.06) !important",
                 transition: "all 0.3s ease !important",
                 "&:hover": {
@@ -807,31 +841,35 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
                   transform: "translateY(-2px) translateZ(0) !important",
                   boxShadow:" 0 8px 20px rgba(0, 0, 0, 0.2) !important"
                 },
+                flex: 1 // Take up equal space
               }}
             >
               Search
             </Button>
+            {/* Clear All Button */}
             <Button
-            
               onClick={handleClearAll}
               variant="outlined"
               sx={{
-                minWidth: '120px',
-                height: "53px",
+                // 🚀 REDUCED MIN-WIDTH/HEIGHT ON MOBILE
+                minWidth: isMobile ? '100px' : '120px', 
+                height: isMobile ? "40px" : "53px",
                 borderColor: "var(--gold-base)",
                 color: "var(--gold-base)",
                 borderRadius: "12px",
                 fontWeight: "600",
-                fontSize: "14px",
+                // 🚀 REDUCED FONT SIZE ON MOBILE
+                fontSize: isMobile ? "12px" : "14px",
                 "&:hover": {
                   borderColor: "var(--gold-dark)",
                   backgroundColor: "var(--gold-light)",
                   transform: "translateY(-2px) translateZ(0)",
                   boxShadow:" 0 8px 20px rgba(0, 0, 0, 0.1)"
                 },
+                flex: 1 // Take up equal space
               }}
             >
-              Clear All
+              Clear
             </Button>
           </div>
         </div>
@@ -844,7 +882,8 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
       {/* Mobile Filter Button */}
       {isMobile && (
         <div style={{ 
-          padding: '16px',
+          // 🚀 REDUCED PADDING ON MOBILE CONTAINER
+          padding: '12px', 
           borderRadius: '8px',
           backgroundColor: 'white',
           position: 'relative',
@@ -855,8 +894,8 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
             <svg 
               className="absolute -top-4 -right-4 opacity-10"
-              width="80"
-              height="80"
+              width="50" // Reduced size
+              height="50" // Reduced size
               viewBox="0 0 100 100"
               xmlns="http://www.w3.org/2000/svg"
               style={{
@@ -884,7 +923,8 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
               startIcon={<FilterListIcon />}
               onClick={handleMobileOpen}
               fullWidth
-              size="medium"
+              // 🚀 USED SMALL SIZE ON MOBILE BUTTON
+              size="small"
               sx={{
                 borderColor: "var(--gold-base)",
                 color: "var(--gold-base)",
@@ -892,8 +932,9 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
                   borderColor: "var(--gold-dark)",
                   backgroundColor: "var(--gold-light)",
                 },
-                fontSize: '14px',
-                padding: '8px 16px',
+                // 🚀 REDUCED FONT/PADDING ON MOBILE
+                fontSize: '12px',
+                padding: '6px 12px',
               }}
             >
               Filters
@@ -905,12 +946,12 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
                   backgroundColor: 'var(--location-blue-600)',
                   color: 'white',
                   borderRadius: '50%',
-                  width: '20px',
-                  height: '20px',
+                  width: '18px', // Reduced size
+                  height: '18px', // Reduced size
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '11px'
+                  fontSize: '10px' // Reduced font size
                 }}>
                   {selectedValues.propertyType.length +
                     selectedValues.bedroom.length +
@@ -952,39 +993,14 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
           },
         }}
       >
-        {/* Drawer Hexagon Background */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <svg 
-            className="absolute -top-8 -left-8 opacity-5"
-            width="100"
-            height="100"
-            viewBox="0 0 100 100"
-            xmlns="http://www.w3.org/2000/svg"
-            style={{
-              animation: 'floatHexagon1 8s ease-in-out infinite'
-            }}
-          >
-            <defs>
-              <linearGradient id="drawerHexagon" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="var(--gold-base)" />
-                <stop offset="100%" stopColor="var(--gold-dark)" />
-              </linearGradient>
-            </defs>
-            <polygon
-              points="50,15 85,30 85,70 50,85 15,70 15,30"
-              fill="url(#drawerHexagon)"
-              strokeWidth="1"
-              stroke="var(--gold-base)"
-            />
-          </svg>
-        </div>
-        
+        {/* Drawer Header */}
         <div
           style={{
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            padding: "12px",
+            // 🚀 REDUCED PADDING ON DRAWER HEADER
+            padding: "8px 12px", 
             borderBottom: "1px solid var(--location-gray-300)",
             position: 'relative',
             zIndex: 1,
@@ -992,7 +1008,8 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
           }}
         >
           <h2 style={{ 
-            fontSize: "18px",
+            // 🚀 REDUCED FONT SIZE ON DRAWER HEADER
+            fontSize: "16px",
             fontWeight: "bold",
             margin: 0,
             color: "var(--location-blue-800)"
@@ -1002,16 +1019,19 @@ const isAutocompleteRequired = isFieldRequired(data.fieldData[0].DropdownLabel);
           <IconButton
             onClick={handleMobileClose}
             sx={{ color: "var(--location-blue-800)" }}
+            size="small" // Reduced button size
           >
-            <CloseIcon />
+            <CloseIcon fontSize="small" /> {/* Reduced icon size */}
           </IconButton>
         </div>
         <div style={{ 
           overflowY: "auto", 
-          padding: "16px",
+          // 🚀 REDUCED PADDING ON DRAWER CONTENT
+          padding: "8px",
           position: 'relative',
           zIndex: 1
         }}>
+          {/* FilterContent renders the now-compacted filters */}
           <FilterContent />
         </div>
       </Drawer>

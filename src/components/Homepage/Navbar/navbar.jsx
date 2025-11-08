@@ -51,7 +51,7 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [hoveredItem, setHoveredItem] = useState(null);
   const [isLoginHovered, setIsLoginHovered] = useState(false);
-  const [authModalOpen, setAuthModalOpen] = useState(false); // ✅ added
+  const [authModalOpen, setAuthModalOpen] = useState(false);
 
   const logoRef = useRef(null);
   const loginRef = useRef(null);
@@ -64,35 +64,51 @@ const Navbar = () => {
     { title: "Contact", path: "/contact" }
   ];
 
+  // Function to handle link click and close menu on mobile
+  const handleLinkClick = () => {
+    setIsMenuOpen(false);
+  };
+
   return (
     <>
       <nav className="navbar bg-white shadow-md">
-        <div className="navbar-container">
+        {/* KEY CHANGE: Flexbox for desktop centering and equal spacing */}
+        <div className="navbar-container flex justify-between items-center px-4 sm:px-6 lg:px-8">
 
-          <div className="navbar-header">
-            <Link to="/" className="navbar-logo">
-              <img ref={logoRef} src="/logo.png" width={80} height={45} alt="Float UI logo" />
-            </Link>
-
+          {/* Left Section (Logo and Mobile Hamburger) */}
+          <div className="navbar-header flex justify-between items-center sm:justify-start">
+            
+            {/* Hamburger on Left (Visible only on mobile) */}
             <button 
-              className="navbar-toggle"
+              className="navbar-toggle order-1 sm:order-none sm:hidden" // Hidden on desktop
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
               </svg>
             </button>
+            
+            {/* Logo (Stays on the left) */}
+            <Link to="/" className="navbar-logo order-2 sm:order-none">
+              <img ref={logoRef} src="/logo.png" width={80} height={45} alt="Float UI logo" />
+            </Link>
           </div>
 
-          <div className={`navbar-menu ${isMenuOpen ? '' : 'navbar-menu-hidden'}`}>
-            <ul className="navbar-list">
+          {/* Center Section (Navigation Links) */}
+          <div className={`navbar-menu ${isMenuOpen ? '' : 'navbar-menu-hidden'} sm:flex sm:items-center`}> 
+            {/* 🚀 MODIFIED: Reduced spacing from space-x-6 lg:space-x-10 to space-x-4 lg:space-x-8 */}
+            <ul className="navbar-list flex space-x-4 lg:space-x-8"> 
               {navigation.map((item, idx) => (
                 <li key={idx} className="navbar-item relative"
                   onMouseEnter={() => setHoveredItem(idx)}
                   onMouseLeave={() => setHoveredItem(null)}
                 >
                   <AnimatedContent direction="vertical" distance={60} duration={2.6} delay={0.1 + (idx * 0.1)} ease="elastic.out(1, 0.8)" initialOpacity={0} animateOpacity={true} scale={0.8} reverse={true}>
-                    <Link to={item.path} className={`navbar-link group ${location.pathname === item.path ? 'navbar-link-active' : ''}`}>
+                    <Link 
+                      to={item.path} 
+                      className={`navbar-link group ${location.pathname === item.path ? 'navbar-link-active' : ''}`}
+                      onClick={handleLinkClick} // Closes the menu on link click
+                    >
                       {item.title}
                       <span className={`triangle-indicator ${hoveredItem === idx || location.pathname === item.path ? 'triangle-visible' : ''}`}></span>
                     </Link>
@@ -100,9 +116,10 @@ const Navbar = () => {
                 </li>
               ))}
 
-              <li className="navbar-item">
+              {/* Phone Section (Hidden on smaller screens, shown on large screens) */}
+              <li className="navbar-item hidden lg:block">
                 <a href="tel:34567876545" className="navbar-phone-section">
-                  <div className="phone-content">
+                  <div className="phone-content text-xs">
                     <div className="phone-number">34567876545 / 546576767564</div>
                     <div className="phone-text">Call our experts</div>
                   </div>
@@ -111,18 +128,19 @@ const Navbar = () => {
             </ul>
           </div>
 
-          {/* ✅ Login button now opens modal but UI stays same */}
-          <div className="navbar-button-container">
+          {/* Right Section (Login button) */}
+          <div className="navbar-button-container order-3 sm:order-none ml-auto sm:ml-0"> 
             <button
-              className="navbar-button"
+              // Small size (h-8, text-xs, min-w-0) on mobile, standard size on sm: and up
+              className="navbar-button text-xs px-2 py-1 h-8 w-auto min-w-0 sm:text-base sm:px-4 sm:py-2 sm:h-auto" 
               ref={loginRef}
               onMouseEnter={() => setIsLoginHovered(true)}
               onMouseLeave={() => setIsLoginHovered(false)}
-              onClick={() => setAuthModalOpen(true)} // ✅ open modal
+              onClick={() => setAuthModalOpen(true)}
             >
-              <span className="login-content">
-                <span className="login-text">Login</span>
-                <span className={`login-arrow ${isLoginHovered ? 'login-arrow-visible' : ''}`}>→</span>
+              <span className="login-content flex items-center">
+                <span className="login-text text-xs sm:text-base">Login</span>
+                <span className={`login-arrow text-xs ml-1 ${isLoginHovered ? 'login-arrow-visible' : ''}`}>→</span>
               </span>
             </button>
           </div>
@@ -130,7 +148,7 @@ const Navbar = () => {
         </div>
       </nav>
 
-      {/* ✅ Modal */}
+      {/* Modal */}
       {authModalOpen && (
         <AuthFlowModal
           isOpen={authModalOpen}

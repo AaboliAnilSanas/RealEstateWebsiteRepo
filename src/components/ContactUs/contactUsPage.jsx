@@ -34,8 +34,9 @@ const ContactUsPage = () => {
   ];
 
   return (
+    // CHANGE 1: Replaced 'h-screen overflow-hidden' with 'min-h-screen' to allow full page scrolling on small screens
     <div
-      className={`relative h-screen overflow-hidden bg-gradient-to-br from-blue-50 via-white to-blue-100 transition-all duration-700 ${
+      className={`relative min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 transition-all duration-700 ${
         isLoaded ? "animate-pageLoad" : "opacity-0 translate-y-5"
       }`}
     >
@@ -66,8 +67,9 @@ const ContactUsPage = () => {
                 className="fill-yellow-500"></path>
         </svg>
       </div>
-
-      <div className="relative z-10 h-full flex flex-col max-w-7xl mx-auto px-6 lg:px-8 py-8">
+      
+      {/* CHANGE 2: Removed 'h-full' to allow the main content to grow */}
+      <div className="relative z-10 flex flex-col max-w-7xl mx-auto px-6 lg:px-8 py-8">
         {/* Compact Header */}
         <div className={`text-center mb-6 transition-all duration-700 ${
           isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-8'
@@ -82,9 +84,11 @@ const ContactUsPage = () => {
         </div>
 
         {/* Main Content - Flex Grow */}
-        <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6 overflow-hidden">
+        {/* CHANGE 3: Removed 'flex-1' and 'overflow-hidden' for small screens, added 'lg:flex-1 lg:overflow-hidden' for large screens */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:flex-1 lg:overflow-hidden">
           {/* Left Section - Timeline with Scroll */}
-          <div className={`flex flex-col min-h-0 transition-all duration-700 delay-200 ${
+          {/* CHANGE 4: Prefix 'min-h-0' with 'lg:' */}
+          <div className={`flex flex-col lg:min-h-0 transition-all duration-700 delay-200 ${
             isLoaded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'
           }`}>
             {/* Premium Intro Card */}
@@ -106,7 +110,8 @@ const ContactUsPage = () => {
             </div>
 
             {/* Contact Methods Timeline with Scroll */}
-            <div className="flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-blue-300 scrollbar-track-transparent">
+            {/* CHANGE 5: Prefix 'flex-1' and 'overflow-y-auto' with 'lg:' */}
+            <div className="lg:flex-1 lg:overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-blue-300 scrollbar-track-transparent">
               <div className="relative pl-8">
                 {/* Gradient Timeline Line */}
                 <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-600 via-yellow-500 to-blue-600 rounded-full shadow-lg"></div>
@@ -175,7 +180,8 @@ const ContactUsPage = () => {
           </div>
 
           {/* Right Section - Contact Form */}
-          <div className={`lg:pl-4 flex flex-col min-h-0 overflow-y-auto scrollbar-thin scrollbar-thumb-blue-300 scrollbar-track-transparent transition-all duration-700 delay-300 ${
+          {/* CHANGE 6: Prefix 'min-h-0' and 'overflow-y-auto' with 'lg:' */}
+          <div className={`lg:pl-4 flex flex-col lg:min-h-0 lg:overflow-y-auto scrollbar-thin scrollbar-thumb-blue-300 scrollbar-track-transparent transition-all duration-700 delay-300 ${
             isLoaded ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'
           }`}>
             <ContactForm />

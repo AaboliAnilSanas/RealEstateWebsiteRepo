@@ -4,7 +4,7 @@ const LocationCard = ({ image, location }) => {
   return (
     <div className="flex flex-col items-center text-center group cursor-pointer relative">
       {/* Square Card Container with Rounded Image - Updated hover effect */}
-      <div className="relative mb-4 rounded-2xl overflow-hidden border-4 border-white shadow-2xl group-hover:shadow-2xl transition-all duration-300 w-48 h-48 sm:w-56 sm:h-56 lg:w-64 lg:h-64 xl:w-80 xl:h-80 group-hover:-translate-y-4 group-hover:border-b-8 group-hover:border-b-[var(--gold-base)]">
+      <div className="relative mb-4 rounded-2xl overflow-hidden border-4 border-white shadow-2xl group-hover:shadow-2xl transition-all duration-300 w-64 h-64 sm:w-64 sm:h-64 lg:w-64 lg:h-64 xl:w-80 xl:h-80 group-hover:-translate-y-4 group-hover:border-b-8 group-hover:border-b-[var(--gold-base)]">
         <img 
           src={image} 
           alt={location}
@@ -86,7 +86,7 @@ const LocationSection = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [cardsToShow, setCardsToShow] = useState(4);
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
-  const [isHovering, setIsHovering] = useState(false);
+  const [isHovering, setIsHovered] = useState(false);
   const intervalRef = useRef(null);
 
   // Handle cursor movement
@@ -103,12 +103,16 @@ const LocationSection = () => {
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 640) {
+        // Mobile screens: 1 card
         setCardsToShow(1);
-      } else if (window.innerWidth < 768) {
+      } else if (window.innerWidth <= 768) { 
+        // Small tablet screens (up to 768px): 2 cards (Specifically for 768*1024)
         setCardsToShow(2);
-      } else if (window.innerWidth < 1024) {
+      } else if (window.innerWidth <= 1366) { 
+        // Tablet/Small Laptop (769px up to 1366px): 3 cards (Covers 1024*x, 1280*x)
         setCardsToShow(3);
       } else {
+        // Larger screens: 4 cards
         setCardsToShow(4);
       }
     };
@@ -147,11 +151,11 @@ const LocationSection = () => {
   }, [currentIndex, maxIndex, isHovering]);
 
   const handleMouseEnter = () => {
-    setIsHovering(true);
+    setIsHovered(true);
   };
 
   const handleMouseLeave = () => {
-    setIsHovering(false);
+    setIsHovered(false);
   };
 
   const getVisibleLocations = () => {
@@ -160,7 +164,9 @@ const LocationSection = () => {
   };
 
   return (
-    <div className="relative pt-60 pb-40 px-4 -mt-60 sm:px-6 lg:px-8 location-section-bg overflow-hidden">
+    // Outer section wrapper has padding
+    // The gap reduction is here: 'pb-20' instead of 'pb-40'
+    <div className="relative pt-60 pb-20 px-4 -mt-60 sm:px-6 lg:px-8 location-section-bg overflow-hidden">
       <style>{`
         @keyframes fadeIn {
           from {
@@ -208,10 +214,11 @@ const LocationSection = () => {
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full bg-gradient-to-r from-[var(--location-blue-100)] to-[var(--gold-light)] opacity-20 blur-3xl"></div>
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto">
-        {/* Section Header - Centered without arrows */}
-        <div className="text-center mb-20">
-          <h2 className="text-4xl lg:text-5xl font-bold text-[var(--location-blue-800)] mb-6">
+      {/* Inner Content Wrapper */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-0">
+        {/* Section Header - Reduced base text size to text-2xl for mobile */}
+        <div className="text-center mb-12 sm:mb-20"> 
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-[var(--location-blue-800)] mb-6 whitespace-nowrap">
             Explore Prime <span className="text-[var(--gold-base)]">Locations</span>
           </h2>
           <div className="w-32 h-1.5 bg-gradient-to-r from-[var(--gold-base)] to-[var(--location-blue-400)] rounded-full mx-auto shadow-lg"></div>
@@ -222,7 +229,7 @@ const LocationSection = () => {
 
         {/* Carousel Container - Centered with square cards */}
         <div 
-          className="flex justify-center items-center gap-6 lg:gap-6 xl:gap-18 transition-all duration-700 ease-in-out"
+          className="flex justify-center items-center gap-6 lg:gap-6 xl:gap-18 transition-all duration-700 ease-in-out px-0 md:px-8"
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
