@@ -18,7 +18,7 @@ const CollapsibleSection = ({ id, title, children, activeSection, icon: Icon }) 
   return (
     <section 
       id={id} 
-      className="mb-8 overflow-hidden rounded-2xl bg-white/95 backdrop-blur-sm shadow-2xl border-2 border-blue-100 animate-section-appear"
+      className="mb-4 sm:mb-6 md:mb-8 overflow-hidden rounded-xl sm:rounded-2xl bg-white/95 backdrop-blur-sm shadow-xl sm:shadow-2xl border-2 border-blue-100 animate-section-appear"
     >
       <style>{`
         @keyframes section-appear {
@@ -60,24 +60,24 @@ const CollapsibleSection = ({ id, title, children, activeSection, icon: Icon }) 
       `}</style>
 
       {/* Enhanced Header with Premium Gradient */}
-      <div className="section-header bg-gradient-to-r from-blue-900 via-blue-600 to-blue-900 px-8 py-7">
-        <div className="flex items-center gap-4" style={{ animation: 'title-slide 0.6s cubic-bezier(0.16, 1, 0.3, 1)' }}>
+      <div className="section-header bg-gradient-to-r from-blue-900 via-blue-600 to-blue-900 px-3 py-3 sm:px-5 sm:py-4 lg:px-6 lg:py-5">
+        <div className="flex items-center gap-2 sm:gap-3 lg:gap-4" style={{ animation: 'title-slide 0.6s cubic-bezier(0.16, 1, 0.3, 1)' }}>
           {Icon && (
-            <div className="section-icon flex items-center justify-center w-14 h-14 rounded-xl bg-white/20 backdrop-blur-sm shadow-2xl border-2 border-white/30">
-              <Icon className="w-7 h-7 text-white" />
+            <div className="section-icon flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-lg bg-white/20 backdrop-blur-sm shadow-lg border border-white/30 flex-shrink-0">
+              <Icon className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
             </div>
           )}
-          <div className="flex-1">
-            <h2 className="text-3xl font-bold text-white tracking-tight drop-shadow-lg">
+          <div className="flex-1 min-w-0">
+            <h2 className="text-sm sm:text-xl lg:text-2xl font-bold text-white tracking-tight drop-shadow-lg">
               {title}
             </h2>
-            <div className="mt-2 h-1 w-24 bg-gradient-to-r from-gold-base via-gold-light to-transparent rounded-full shadow-lg"></div>
+            <div className="mt-0.5 sm:mt-1 lg:mt-1.5 h-0.5 w-10 sm:w-16 lg:w-20 bg-gradient-to-r from-gold-base via-gold-light to-transparent rounded-full shadow-lg"></div>
           </div>
         </div>
       </div>
       
       {/* Content with Enhanced Padding */}
-      <div className="p-8 bg-gradient-to-br from-white to-blue-50/20">
+      <div className="p-3 sm:p-5 lg:p-6 bg-gradient-to-br from-white to-blue-50/20">
         {children}
       </div>
     </section>
@@ -102,7 +102,7 @@ const PropertyBodySections = ({ property, activeSection }) => {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3 sm:space-y-4 md:space-y-6">
       <style>{`
         @keyframes feature-pop {
           from { opacity: 0; transform: scale(0.92) translateY(10px); }
@@ -136,26 +136,26 @@ const PropertyBodySections = ({ property, activeSection }) => {
         activeSection={activeSection}
         icon={Home}
       >
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 via-white to-gold-50/40 p-8 border-2 border-gold-base/30 shadow-xl">
-          <div className="absolute top-0 right-0 w-72 h-72 bg-gradient-to-br from-gold-base/10 to-blue-400/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 left-0 w-56 h-56 bg-gradient-to-tr from-blue-400/10 to-gold-base/10 rounded-full blur-3xl"></div>
+        <div className="relative overflow-hidden rounded-lg sm:rounded-xl lg:rounded-2xl bg-gradient-to-br from-blue-50 via-white to-gold-50/40 p-3 sm:p-5 lg:p-6 border-2 border-gold-base/30 shadow-lg">
+          <div className="absolute top-0 right-0 w-24 h-24 sm:w-56 sm:h-56 bg-gradient-to-br from-gold-base/10 to-blue-400/10 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-20 h-20 sm:w-40 sm:h-40 bg-gradient-to-tr from-blue-400/10 to-gold-base/10 rounded-full blur-3xl"></div>
           
-          <p className="relative z-10 text-lg leading-relaxed text-gray-700 font-medium mb-6">
+          <p className="relative z-10 text-[10px] sm:text-sm lg:text-base leading-snug text-gray-700 font-medium mb-2 sm:mb-4 lg:mb-5">
             {property.uniqueSellingPoints}
           </p>
           
-          <div className="relative z-10 flex flex-wrap items-center gap-3">
-            <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-5 py-3 rounded-full shadow-lg border-2 border-green-200 hover:scale-105 transition-transform">
-              <CheckCircle className="w-5 h-5 text-green-500" />
-              <span className="text-sm font-bold text-gray-800">Verified Property</span>
+          <div className="relative z-10 flex flex-wrap items-center gap-1.5 sm:gap-2 lg:gap-3">
+            <div className="flex items-center gap-1 lg:gap-1.5 bg-white/80 backdrop-blur-sm px-2 py-1 sm:px-3 sm:py-1.5 lg:px-4 lg:py-2 rounded-full shadow-md border border-green-200">
+              <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5 text-green-500" />
+              <span className="text-[9px] sm:text-xs lg:text-sm font-bold text-gray-800">Verified</span>
             </div>
-            <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-5 py-3 rounded-full shadow-lg border-2 border-gold-base/30 hover:scale-105 transition-transform">
-              <TrendingUp className="w-5 h-5 text-gold-base" />
-              <span className="text-sm font-bold text-gray-800">Premium Location</span>
+            <div className="flex items-center gap-1 lg:gap-1.5 bg-white/80 backdrop-blur-sm px-2 py-1 sm:px-3 sm:py-1.5 lg:px-4 lg:py-2 rounded-full shadow-md border border-gold-base/30">
+              <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5 text-gold-base" />
+              <span className="text-[9px] sm:text-xs lg:text-sm font-bold text-gray-800">Premium</span>
             </div>
-            <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-5 py-3 rounded-full shadow-lg border-2 border-blue-200 hover:scale-105 transition-transform">
-              <Sparkles className="w-5 h-5 text-blue-600" />
-              <span className="text-sm font-bold text-gray-800">Luxury Living</span>
+            <div className="flex items-center gap-1 lg:gap-1.5 bg-white/80 backdrop-blur-sm px-2 py-1 sm:px-3 sm:py-1.5 lg:px-4 lg:py-2 rounded-full shadow-md border border-blue-200">
+              <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5 text-blue-600" />
+              <span className="text-[9px] sm:text-xs lg:text-sm font-bold text-gray-800">Luxury</span>
             </div>
           </div>
         </div>
@@ -168,8 +168,7 @@ const PropertyBodySections = ({ property, activeSection }) => {
         activeSection={activeSection}
         icon={Briefcase}
       >
-        {/* Adjusted grid for responsiveness: 2 columns on small/mobile, 4 columns on large */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
           <SpecItem icon={BedDouble} label="Bedrooms" value={property.bedrooms} />
           <SpecItem icon={Bath} label="Bathrooms" value={property.bathrooms} />
           <SpecItem icon={Maximize2} label="Carpet Area" value={property.carpetArea} />
@@ -184,40 +183,38 @@ const PropertyBodySections = ({ property, activeSection }) => {
         activeSection={activeSection}
         icon={Sparkles}
       >
-        <div className="space-y-6">
-          <div className="relative overflow-hidden rounded-2xl border-2 border-gold-base/40 bg-gradient-to-br from-white via-gold-50/20 to-blue-50/30 p-8 shadow-xl">
-            <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-gold-base/15 to-transparent rounded-full blur-2xl"></div>
-            <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-blue-400/15 to-transparent rounded-full blur-2xl"></div>
-            <p className="relative z-10 text-base leading-relaxed text-gray-700 font-medium">
-              This exceptional property represents the pinnacle of modern living, combining sophisticated design with premium amenities. Every detail has been carefully curated to provide an unparalleled lifestyle experience in one of the city's most sought-after locations.
+        <div className="space-y-2 sm:space-y-3 lg:space-y-4">
+          <div className="relative overflow-hidden rounded-lg sm:rounded-xl lg:rounded-2xl border-2 border-gold-base/40 bg-gradient-to-br from-white via-gold-50/20 to-blue-50/30 p-3 sm:p-5 lg:p-6 shadow-lg">
+            <div className="absolute top-0 right-0 w-16 h-16 sm:w-24 sm:h-24 bg-gradient-to-br from-gold-base/15 to-transparent rounded-full blur-2xl"></div>
+            <div className="absolute bottom-0 left-0 w-12 h-12 sm:w-20 sm:h-20 bg-gradient-to-tr from-blue-400/15 to-transparent rounded-full blur-2xl"></div>
+            <p className="relative z-10 text-[10px] sm:text-xs lg:text-sm leading-snug text-gray-700 font-medium">
+              This exceptional property represents the pinnacle of modern living, combining sophisticated design with premium amenities. Every detail has been carefully curated to provide an unparalleled lifestyle experience.
             </p>
           </div>
           
-          {/* Key Highlights Cards */}
-          {/* Adjusted grid for responsiveness: 1 column on mobile, 3 columns on medium/large */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-2xl border-2 border-blue-200 shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300">
-              <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center mb-4 shadow-lg">
-                <Home className="w-7 h-7 text-white" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-3 lg:gap-4">
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-3 sm:p-4 lg:p-5 rounded-lg sm:rounded-xl lg:rounded-2xl border border-blue-200 shadow-md">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center mb-1.5 sm:mb-2 lg:mb-3 shadow-md">
+                <Home className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
               </div>
-              <h4 className="font-bold text-blue-900 mb-2 text-lg">Prime Location</h4>
-              <p className="text-sm text-gray-600 font-medium">Strategically located in the heart of the city with excellent connectivity</p>
+              <h4 className="font-bold text-blue-900 mb-0.5 sm:mb-1 lg:mb-1.5 text-xs sm:text-sm lg:text-base">Prime Location</h4>
+              <p className="text-[9px] sm:text-[10px] lg:text-xs text-gray-600 font-medium leading-tight">Strategically located with excellent connectivity</p>
             </div>
             
-            <div className="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-2xl border-2 border-green-200 shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300">
-              <div className="w-14 h-14 bg-gradient-to-br from-green-600 to-green-700 rounded-xl flex items-center justify-center mb-4 shadow-lg">
-                <CheckCircle className="w-7 h-7 text-white" />
+            <div className="bg-gradient-to-br from-green-50 to-green-100 p-3 sm:p-4 lg:p-5 rounded-lg sm:rounded-xl lg:rounded-2xl border border-green-200 shadow-md">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-green-600 to-green-700 rounded-lg flex items-center justify-center mb-1.5 sm:mb-2 lg:mb-3 shadow-md">
+                <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
               </div>
-              <h4 className="font-bold text-green-900 mb-2 text-lg">Ready to Move</h4>
-              <p className="text-sm text-gray-600 font-medium">Immediate possession available for hassle-free relocation</p>
+              <h4 className="font-bold text-green-900 mb-0.5 sm:mb-1 lg:mb-1.5 text-xs sm:text-sm lg:text-base">Ready to Move</h4>
+              <p className="text-[9px] sm:text-[10px] lg:text-xs text-gray-600 font-medium leading-tight">Immediate possession available</p>
             </div>
             
-            <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-2xl border-2 border-purple-200 shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300">
-              <div className="w-14 h-14 bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl flex items-center justify-center mb-4 shadow-lg">
-                <Sparkles className="w-7 h-7 text-white" />
+            <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-3 sm:p-4 lg:p-5 rounded-lg sm:rounded-xl lg:rounded-2xl border border-purple-200 shadow-md">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center mb-1.5 sm:mb-2 lg:mb-3 shadow-md">
+                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
               </div>
-              <h4 className="font-bold text-purple-900 mb-2 text-lg">Luxury Living</h4>
-              <p className="text-sm text-gray-600 font-medium">Premium finishes and world-class amenities throughout</p>
+              <h4 className="font-bold text-purple-900 mb-0.5 sm:mb-1 lg:mb-1.5 text-xs sm:text-sm lg:text-base">Luxury Living</h4>
+              <p className="text-[9px] sm:text-[10px] lg:text-xs text-gray-600 font-medium leading-tight">Premium finishes and world-class amenities</p>
             </div>
           </div>
         </div>
@@ -230,22 +227,21 @@ const PropertyBodySections = ({ property, activeSection }) => {
         activeSection={activeSection}
         icon={CheckCircle}
       >
-        {/* Adjusted grid for responsiveness: 1 column on small/mobile, 2 columns on medium/large */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="grid grid-cols-2 md:grid-cols-2 gap-2 sm:gap-3 lg:gap-4">
           {detailedFeatures.map((item, index) => (
             <div 
               key={index}
-              className="feature-item group relative overflow-hidden flex items-center justify-between border-2 border-blue-100 bg-white p-6 rounded-xl transition-all duration-300 hover:border-gold-base hover:shadow-2xl hover:scale-[1.03]"
+              className="feature-item group relative overflow-hidden flex items-center justify-between border-2 border-blue-100 bg-white p-1.5 sm:p-2 md:p-3 lg:p-4 rounded-lg lg:rounded-xl transition-all duration-300 hover:border-gold-base hover:shadow-lg"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-gold-base/5 via-blue-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               
-              <span className="relative z-10 flex items-center gap-3 text-sm font-bold text-gray-600 transition-colors group-hover:text-blue-900">
-                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-blue-50 group-hover:bg-gradient-to-br group-hover:from-gold-base/20 group-hover:to-blue-100 transition-all duration-300 shadow-md">
-                  <item.icon className="h-6 w-6 text-blue-600 group-hover:text-gold-base transition-all duration-300 group-hover:scale-110" />
+              <span className="relative z-10 flex items-center gap-1 sm:gap-1.5 md:gap-2 lg:gap-3 text-[8px] sm:text-[9px] md:text-[10px] lg:text-xs font-bold text-gray-600 transition-colors group-hover:text-blue-900">
+                <div className="flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 lg:w-10 lg:h-10 rounded-lg bg-blue-50 group-hover:bg-gradient-to-br group-hover:from-gold-base/20 group-hover:to-blue-100 transition-all duration-300 shadow-sm flex-shrink-0">
+                  <item.icon className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 lg:h-5 lg:w-5 text-blue-600 group-hover:text-gold-base transition-all duration-300" />
                 </div>
-                {item.label}
+                <span className="leading-tight">{item.label}</span>
               </span>
-              <span className="relative z-10 text-base font-bold text-blue-900 group-hover:text-gold-base transition-colors duration-300">
+              <span className="relative z-10 text-[8px] sm:text-[10px] md:text-xs lg:text-sm font-bold text-blue-900 group-hover:text-gold-base transition-colors duration-300 ml-1">
                 {item.value}
               </span>
             </div>
@@ -260,19 +256,18 @@ const PropertyBodySections = ({ property, activeSection }) => {
         activeSection={activeSection}
         icon={Sparkles}
       >
-        {/* Adjusted grid for responsiveness: 1 column on small/mobile, 2 on medium, 3 on large */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 lg:gap-4">
           {property.amenities.map((amenity, index) => (
             <div
               key={index}
-              className="feature-item group relative overflow-hidden flex items-center gap-4 rounded-xl border-2 border-blue-100 bg-white p-5 shadow-md transition-all duration-300 hover:border-gold-base hover:shadow-2xl hover:scale-105"
+              className="feature-item group relative overflow-hidden flex items-center gap-2 lg:gap-3 rounded-lg lg:rounded-xl border-2 border-blue-100 bg-white p-2 sm:p-3 lg:p-4 shadow-sm transition-all duration-300 hover:border-gold-base hover:shadow-lg"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-gold-base/10 via-transparent to-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               
-              <div className="relative z-10 flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 shadow-xl group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">
-                <CheckCircle className="h-7 w-7 text-white" />
+              <div className="relative z-10 flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 lg:w-10 lg:h-10 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 shadow-md group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
+                <CheckCircle className="h-4 w-4 sm:h-4.5 sm:w-4.5 lg:h-5 lg:w-5 text-white" />
               </div>
-              <span className="relative z-10 text-sm font-bold text-gray-800 group-hover:text-gold-base transition-colors duration-300">
+              <span className="relative z-10 text-[9px] sm:text-[10px] lg:text-xs font-bold text-gray-800 group-hover:text-gold-base transition-colors duration-300 leading-tight">
                 {amenity}
               </span>
             </div>

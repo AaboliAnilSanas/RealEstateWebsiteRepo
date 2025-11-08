@@ -24,7 +24,7 @@ const PropertyHeaderAndGallery = ({ property }) => {
   };
 
   return (
-    <div className="flex flex-col space-y-4">
+    <div className="flex flex-col space-y-3 sm:space-y-4">
       <style>{`
         @keyframes elegant-fade-in {
           from { opacity: 0; transform: translateY(20px); }
@@ -87,59 +87,65 @@ const PropertyHeaderAndGallery = ({ property }) => {
         }
       `}</style>
 
-      {/* Header Section */}
-      <header className="relative overflow-hidden rounded-xl header-bg px-6 py-4 premium-shadow elegant-fade-in backdrop-blur-xl border border-white/60 flex-shrink-0">
-        <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-br from-blue-200/20 to-transparent rounded-full blur-3xl"></div>
+      {/* Header Section - Mobile Optimized */}
+      <header className="relative overflow-hidden rounded-lg sm:rounded-xl header-bg px-3 py-3 sm:px-6 sm:py-4 premium-shadow elegant-fade-in backdrop-blur-xl border border-white/60 flex-shrink-0">
+        <div className="absolute top-0 right-0 w-32 h-32 sm:w-48 sm:h-48 bg-gradient-to-br from-blue-200/20 to-transparent rounded-full blur-3xl"></div>
         <div className="absolute top-0 left-0 right-0 h-0.5 gold-shimmer"></div>
 
-        <div className="relative z-10 flex items-center justify-between">
-          <div className="flex-1">
-            <div className="mb-2 flex items-center gap-2">
-              <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-blue-600 to-blue-500 px-3 py-1 text-xs font-semibold text-white shadow-lg subtle-float uppercase tracking-wider">
-                <Award className="h-3 w-3" />
+        <div className="relative z-10">
+          {/* Top Row: Badges and Price */}
+          <div className="flex items-start justify-between gap-2 mb-2 sm:mb-3">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-blue-600 to-blue-500 px-2 py-0.5 text-[9px] sm:text-xs font-semibold text-white shadow-lg subtle-float uppercase tracking-wider">
+                <Award className="h-2 w-2 sm:h-3 sm:w-3" />
                 {property.transactionType}
               </span>
-              <span className="inline-flex items-center rounded-full bg-gradient-to-r from-slate-700 to-slate-600 px-3 py-1 text-xs font-semibold text-white shadow-md uppercase tracking-wider">
+              <span className="inline-flex items-center rounded-full bg-gradient-to-r from-slate-700 to-slate-600 px-2 py-0.5 text-[9px] sm:text-xs font-semibold text-white shadow-md uppercase tracking-wider">
                 {property.propertyCategory}
               </span>
             </div>
 
-            <h1 className="mb-1 text-2xl font-bold text-slate-800 tracking-tight">
-              {property.apartmentSociety}: <span className="font-light text-slate-600">{property.propertyType}</span>
-            </h1>
-            <div className="flex items-center gap-2 text-sm text-slate-600">
-              <MapPin className="h-4 w-4 text-slate-500" />
-              <span className="font-medium">{location}</span>
+            {/* Price Section - Compact on Mobile */}
+            <div className="flex items-center gap-1 flex-shrink-0">
+              <div className="flex items-center justify-center w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg">
+                <DollarSign className="h-3.5 w-3.5 sm:h-5 sm:w-5 text-white" />
+              </div>
+              <span className="text-sm sm:text-3xl font-bold bg-gradient-to-r from-blue-700 to-blue-400 bg-clip-text text-transparent price-glow-blue whitespace-nowrap">
+                {property.price}
+              </span>
             </div>
           </div>
 
-          {/* Price Section - Blue Theme */}
-          <div className="flex items-center gap-2 ml-6">
-            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg">
-              <DollarSign className="h-5 w-5 text-white" />
-            </div>
-            <span className="text-3xl font-bold bg-gradient-to-r from-blue-700 to-blue-400 bg-clip-text text-transparent price-glow-blue">
-              {property.price}
-            </span>
+          {/* Title - Smaller on Mobile, No Truncate */}
+          <h1 className="mb-1 text-sm sm:text-2xl font-bold text-slate-800 tracking-tight leading-tight">
+            {property.apartmentSociety}: <span className="font-light text-slate-600">{property.propertyType}</span>
+          </h1>
+
+          {/* Location - Smaller on Mobile, Can Wrap */}
+          <div className="flex items-start gap-1.5 text-[10px] sm:text-sm text-slate-600">
+            <MapPin className="h-3 w-3 sm:h-4 sm:w-4 text-slate-500 flex-shrink-0 mt-0.5" />
+            <span className="font-medium leading-snug">{location}</span>
           </div>
         </div>
       </header>
 
-      {/* Gallery Section (unchanged) */}
+      {/* Gallery Section - Horizontal on small, Vertical sidebar on medium+ */}
       <section
         id="property-gallery"
-        className="overflow-hidden rounded-2xl bg-white gallery-shadow elegant-fade-in flex flex-1 h-[60vh] max-h-[600px]"
+        className="overflow-hidden rounded-xl sm:rounded-2xl bg-white gallery-shadow elegant-fade-in"
         style={{ animationDelay: '0.2s' }}
       >
-        <div className="flex flex-1 gap-4 p-4 overflow-hidden">
-          <div className="w-64 flex-shrink-0 overflow-y-auto">
-            <div className="bg-gradient-to-b from-slate-50 to-white rounded-xl p-3 h-full">
-              <div className="grid grid-cols-2 gap-2">
+        <div className="flex flex-col md:flex-row gap-2 sm:gap-4 p-2 sm:p-4">
+          
+          {/* Thumbnail column - Hidden on small, shown vertically on medium+ */}
+          <div className="hidden md:block md:w-32 lg:w-64 flex-shrink-0 overflow-y-auto max-h-[400px]">
+            <div className="bg-gradient-to-b from-slate-50 to-white rounded-lg sm:rounded-xl p-2 sm:p-3 h-full">
+              <div className="grid grid-cols-2 gap-1 sm:gap-2">
                 {property.photos.map((img, index) => (
                   <button
                     key={index}
                     onClick={() => handleThumbnailClick(img)}
-                    className={`group relative overflow-hidden rounded-lg transition-all duration-300 focus:outline-none ${
+                    className={`group relative overflow-hidden rounded-md sm:rounded-lg transition-all duration-300 focus:outline-none ${
                       mainImage === img
                         ? 'thumbnail-active scale-105'
                         : 'thumbnail-shadow hover:scale-105 hover:shadow-xl'
@@ -161,7 +167,7 @@ const PropertyHeaderAndGallery = ({ property }) => {
                         }`}
                       ></div>
                       {mainImage === img && (
-                        <div className="absolute bottom-1.5 right-1.5 w-2 h-2 rounded-full bg-blue-500 shadow-lg"></div>
+                        <div className="absolute bottom-1 right-1 w-1.5 h-1.5 sm:bottom-1.5 sm:right-1.5 sm:w-2 sm:h-2 rounded-full bg-blue-500 shadow-lg"></div>
                       )}
                     </div>
                   </button>
@@ -170,39 +176,89 @@ const PropertyHeaderAndGallery = ({ property }) => {
             </div>
           </div>
 
-          {/* Main Image */}
-          <div className="flex-1 relative overflow-hidden rounded-xl bg-slate-900">
-            <img
-              src={mainImage}
-              alt="Main Property View"
-              className={`h-full w-full object-cover transition-all duration-700 ${
-                isImageLoaded && !imageTransition ? 'image-reveal' : ''
-              } ${imageTransition ? 'image-transition' : ''}`}
-              onLoad={() => setIsImageLoaded(true)}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20 pointer-events-none"></div>
-            <div className="absolute inset-0 bg-gradient-to-r from-black/20 via-transparent to-black/20 pointer-events-none"></div>
+          {/* Main Image and Mobile Thumbnails Container */}
+          <div className="flex-1 flex flex-col gap-2">
+            {/* Main Image */}
+            <div className="relative overflow-hidden rounded-lg sm:rounded-xl bg-slate-900 aspect-video md:aspect-auto md:h-[400px]">
+              <img
+                src={mainImage}
+                alt="Main Property View"
+                className={`h-full w-full object-cover transition-all duration-700 ${
+                  isImageLoaded && !imageTransition ? 'image-reveal' : ''
+                } ${imageTransition ? 'image-transition' : ''}`}
+                onLoad={() => setIsImageLoaded(true)}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20 pointer-events-none"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-black/20 via-transparent to-black/20 pointer-events-none"></div>
 
-            <div className="absolute top-4 left-4">
-              <div className="inline-flex items-center gap-2 rounded-full bg-white/95 backdrop-blur-md px-4 py-2 shadow-2xl border border-white/40">
-                <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
-                <span className="text-xs font-semibold text-slate-800 uppercase tracking-wide">
-                  {property.availabilityStatus}
-                </span>
+              <div className="absolute top-2 left-2 sm:top-4 sm:left-4">
+                <div className="inline-flex items-center gap-1 rounded-full bg-white/95 backdrop-blur-md px-2 py-1 sm:px-4 sm:py-2 shadow-xl border border-white/40">
+                  <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-green-500 animate-pulse"></div>
+                  <span className="text-[9px] sm:text-xs font-semibold text-slate-800 uppercase tracking-wide">
+                    {property.availabilityStatus}
+                  </span>
+                </div>
+              </div>
+
+              <div className="absolute bottom-2 right-2 sm:bottom-4 sm:right-4">
+                <div className="inline-flex items-center gap-1 rounded-full bg-black/70 backdrop-blur-md px-2 py-1 sm:px-3 sm:py-1.5 shadow-lg border border-white/10">
+                  <Eye className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-white/90" />
+                  <span className="text-[9px] sm:text-xs font-medium text-white/90">
+                    {property.photos.findIndex(img => img === mainImage) + 1} / {property.photos.length}
+                  </span>
+                </div>
               </div>
             </div>
 
-            <div className="absolute bottom-4 right-4">
-              <div className="inline-flex items-center gap-1.5 rounded-full bg-black/70 backdrop-blur-md px-3 py-1.5 shadow-lg border border-white/10">
-                <Eye className="h-3.5 w-3.5 text-white/90" />
-                <span className="text-xs font-medium text-white/90">
-                  {property.photos.findIndex(img => img === mainImage) + 1} / {property.photos.length}
-                </span>
+            {/* Thumbnail Gallery - Horizontal Scrollable (Mobile Only) */}
+            <div className="md:hidden w-full overflow-x-auto scrollbar-hide">
+              <div className="flex gap-2 pb-1">
+                {property.photos.map((img, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleThumbnailClick(img)}
+                    className={`group relative overflow-hidden rounded-md transition-all duration-300 focus:outline-none flex-shrink-0 ${
+                      mainImage === img
+                        ? 'thumbnail-active scale-105'
+                        : 'thumbnail-shadow hover:scale-105 hover:shadow-xl'
+                    }`}
+                  >
+                    <div className="relative w-20 h-20">
+                      <img
+                        src={img}
+                        alt={`View ${index + 1}`}
+                        className={`h-full w-full object-cover transition-all duration-500 ${
+                          mainImage === img ? 'opacity-100' : 'opacity-75 group-hover:opacity-100'
+                        }`}
+                      />
+                      <div
+                        className={`absolute inset-0 transition-opacity duration-300 ${
+                          mainImage === img
+                            ? 'bg-gradient-to-br from-blue-400/20 to-transparent opacity-100'
+                            : 'bg-gradient-to-br from-slate-800/20 to-transparent opacity-0 group-hover:opacity-100'
+                        }`}
+                      ></div>
+                      {mainImage === img && (
+                        <div className="absolute bottom-1 right-1 w-1.5 h-1.5 rounded-full bg-blue-500 shadow-lg"></div>
+                      )}
+                    </div>
+                  </button>
+                ))}
               </div>
             </div>
           </div>
         </div>
       </section>
+
+      <style jsx>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </div>
   );
 };

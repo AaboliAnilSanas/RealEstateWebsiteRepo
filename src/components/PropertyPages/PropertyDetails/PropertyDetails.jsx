@@ -144,7 +144,7 @@ const PropertyDetails = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50/50 pt-10">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50/50 pt-3 sm:pt-10">
       {/* Single FloatingActions component handles all three buttons */}
       <FloatingActions />
       
@@ -221,15 +221,15 @@ const PropertyDetails = () => {
       `}</style>
       
       <div 
-        className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
+        className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8"
       >
         {/* Breadcrumb / Back Link - Staggered load: 0s */}
         <Link 
           to="/properties" 
-          className="group mb-6 inline-flex items-center gap-2 text-sm font-bold text-blue-600 transition-all duration-300 hover:text-purple-600 hover:translate-x-1 bg-white px-4 py-2 rounded-full shadow-md hover:shadow-lg animate-page-load"
+          className="group mb-4 sm:mb-6 inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-blue-600 transition-all duration-300 hover:text-purple-600 hover:translate-x-1 bg-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-full shadow-md hover:shadow-lg animate-page-load"
           style={{ animationDelay: '0s' }}
         >
-          <Home className="h-4 w-4" />
+          <Home className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           <span>Back to Listings</span>
         </Link>
 
@@ -241,17 +241,18 @@ const PropertyDetails = () => {
 
       {/* Main Content Layout */}
       <div 
-        className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-10 pb-20"
+        className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 mt-6 sm:mt-10 pb-16 sm:pb-20"
       >
         {/* Sticky Nav and Body Sections Container - Scroll Triggered */}
         {/* Default: flex-col (stacked) on mobile/tablet, lg:flex-row (side-by-side) on large screens */}
         <div 
           ref={bodyRef}
-          className="flex flex-col lg:flex-row gap-8"
+          className="flex flex-col lg:flex-row gap-6 sm:gap-8"
         >
           {/* Sticky Navigation Sidebar - SLIDE IN FROM LEFT */}
           {/* Default: full width, not sticky. lg:sticky, lg:w-1/4 on large screens */}
-          <div className={`w-full mb-6 lg:mb-0 lg:sticky lg:top-20 lg:w-1/4 lg:self-start slide-in-left-on-scroll ${isBodyInView ? 'in-view' : ''}`}>
+          <div className={`w-full mb-4 sm:mb-6 lg:mb-0 lg:sticky lg:top-20 lg:w-1/4 lg:self-start slide-in-left-on-scroll ${isBodyInView ? 'in-view' : ''}`}>
+            {/* On small screens, the nav should scroll with the content, not stick */}
             <StickyNav activeSection={activeSection} setActiveSection={setActiveSection} />
           </div>
           
@@ -269,31 +270,31 @@ const PropertyDetails = () => {
         <section 
           ref={locationRef}
           id="location-map" 
-          className={`mt-8 overflow-hidden rounded-2xl bg-white shadow-xl border border-blue-100 slide-in-right-on-scroll ${isLocationInView ? 'in-view' : ''}`}
+          className={`mt-6 sm:mt-8 overflow-hidden rounded-xl sm:rounded-2xl bg-white shadow-xl border border-blue-100 slide-in-right-on-scroll ${isLocationInView ? 'in-view' : ''}`}
         >
           {/* Header */}
-          <div className="section-header bg-gradient-to-r from-blue-800 via-blue-600 to-blue-800 px-8 py-6">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm shadow-lg">
-                <MapPin className="w-6 h-6 text-white" />
+          <div className="section-header bg-gradient-to-r from-blue-800 via-blue-600 to-blue-800 px-5 py-4 sm:px-8 sm:py-6">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-white/20 backdrop-blur-sm shadow-lg">
+                <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
               <div className="flex-1">
-                <h2 className="text-3xl font-bold text-white tracking-tight">
+                <h2 className="text-xl sm:text-3xl font-bold text-white tracking-tight">
                   Location
                 </h2>
-                <div className="mt-1 h-1 w-20 bg-gradient-to-r from-yellow-400 to-transparent rounded-full"></div>
+                <div className="mt-1 h-0.5 sm:h-1 w-16 sm:w-20 bg-gradient-to-r from-yellow-400 to-transparent rounded-full"></div>
               </div>
             </div>
           </div>
           
           {/* Content */}
-          <div className="p-8">
-            <div className="space-y-6">
-              <h3 className="text-xl font-bold text-blue-800 mb-4">
+          <div className="p-5 sm:p-8">
+            <div className="space-y-5 sm:space-y-6">
+              <h3 className="text-lg sm:text-xl font-bold text-blue-800 mb-3 sm:mb-4">
                 {property.apartmentSociety} Locality
               </h3>
               
-              <div className="relative w-full h-[300px] sm:h-[400px] overflow-hidden rounded-2xl shadow-2xl border-4 border-blue-100">
+              <div className="relative w-full h-[250px] sm:h-[400px] overflow-hidden rounded-xl sm:rounded-2xl shadow-xl sm:shadow-2xl border-4 border-blue-100">
                 {/* Map Embed */}
                 <iframe
                   title="Property Location Map"
@@ -303,18 +304,18 @@ const PropertyDetails = () => {
                   allowFullScreen
                   referrerPolicy="no-referrer-when-downgrade"
                   src={`https://maps.google.com/maps?q=${property.latitude},${property.longitude}&z=15&output=embed`}
-                  className="border-0 rounded-xl"
+                  className="border-0 rounded-lg sm:rounded-xl"
                 ></iframe>
                 
                 {/* Coordinates Display */}
-                <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-xl shadow-lg border border-blue-100 text-sm font-medium text-blue-800">
-                  Latitude: <span className="font-bold text-yellow-600">{property.latitude}</span>, 
-                  Longitude: <span className="font-bold text-yellow-600">{property.longitude}</span>
+                <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg sm:rounded-xl shadow-lg border border-blue-100 text-xs sm:text-sm font-medium text-blue-800">
+                  Lat: <span className="font-bold text-yellow-600">{property.latitude}</span>, 
+                  Lon: <span className="font-bold text-yellow-600">{property.longitude}</span>
                 </div>
               </div>
 
-              <div className="p-6 bg-blue-50 rounded-xl border border-blue-100">
-                <p className="text-base text-gray-700 font-medium">
+              <div className="p-4 sm:p-6 bg-blue-50 rounded-xl border border-blue-100">
+                <p className="text-sm sm:text-base text-gray-700 font-medium">
                   The property is located in the <strong>{property.locality}</strong> area of <strong>{property.city}</strong>. This neighborhood is known for its excellent connectivity and premium real estate.
                 </p>
               </div>
