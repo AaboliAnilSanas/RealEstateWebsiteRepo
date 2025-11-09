@@ -588,3 +588,122 @@ body {
     gap: 0;
   }
 }
+/* Mobile Styles */
+@media (max-width: 768px) {
+  /* 1. Ensure the toggle is visible */
+  .navbar-toggle {
+    display: block;
+    /* Use a clear color */
+    color: var(--primary-color-dark);
+    padding: 0.3rem; /* Reduced padding for smaller icon */
+  }
+  
+  /* 2. Update navbar-container and header padding */
+  .navbar-container {
+    padding: 0.5rem 1rem; /* Reduced horizontal and vertical padding for mobile */
+  }
+
+  /* Keep the menu hidden/visible transition */
+  .navbar-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    flex-direction: column;
+    padding: 0; /* Remove padding here, move it to list items */
+    transform: translateY(0);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+
+  .navbar-menu-hidden {
+    transform: translateY(-10px);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .navbar-list {
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+  }
+
+  .navbar-item {
+    width: 100%;
+    /* Add a subtle divider */
+    border-bottom: 1px solid #f0f0f0;
+  }
+  
+  .navbar-item:last-child {
+      border-bottom: none;
+  }
+
+  /* 3. Reduce padding for links */
+  .navbar-link {
+    padding: 0.8rem 2.5rem; /* Reduced vertical and horizontal padding */
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .navbar-phone-section {
+    padding: 0.8rem 1.5rem;
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  /* Remove the button from the expanded menu */
+  .navbar-button-container {
+    /* Position the button on the main nav bar on the right */
+    padding: 0;
+    width: auto;
+    min-height: auto;
+    margin-left: auto; /* Push to the right */
+  }
+
+  .navbar-button {
+    /* Keep mobile button size as defined in JSX, but ensure it's compact */
+    padding: 0.5rem 0.75rem;
+    height: auto;
+    width: auto;
+    min-width: auto;
+  }
+  
+  /* 4. Add Login Icon on mobile (adjusting flex for icon space) */
+  .login-content {
+      gap: 0.3rem;
+  }
+
+  /* Simplify login button on mobile */
+  .login-arrow {
+    display: none;
+  }
+  
+  .navbar-button::before {
+    display: none;
+  }
+  
+  .navbar-button:hover .login-content {
+    transform: none;
+    gap: 0.3rem; /* maintain gap for icon */
+  }
+  
+  /* Rest of the mobile styles (for indicator) */
+  .triangle-indicator {
+    bottom: auto;
+    top: 50%;
+    left: 1.5rem;
+    transform: translateY(-50%) rotate(-90deg) scale(0);
+    border-bottom-color: var(--primary-color);
+  }
+
+  .triangle-visible {
+    transform: translateY(-50%) rotate(-90deg) scale(1);
+  }
+  
+  .navbar-link:hover,
+  .navbar-phone-section:hover,
+  .navbar-button:hover {
+    transform: none;
+  }
+}

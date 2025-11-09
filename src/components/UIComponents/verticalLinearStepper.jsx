@@ -231,7 +231,7 @@ function VerticalLinearStepper({ SellerFormDetails, activeStep, onStepChange, fo
 
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ width: "100%", maxWidth: "95%", mx: "auto", mt: "var(--spacing-lg)", mb: "var(--spacing-xl)" }}>
+      <Box sx={{ width: "100%", maxWidth: "98%", mx: "auto", mt: "2", mb: "var(--spacing-xl)" }}>
         <Stepper nonLinear activeStep={activeStep} orientation="vertical">
           {steps.map((step, index) => {
             const isCompleted = completedSteps.includes(index) || isStepCompleted(index, step.fields, formData);
@@ -280,7 +280,7 @@ function VerticalLinearStepper({ SellerFormDetails, activeStep, onStepChange, fo
                     sx={{ 
                       border: "1px solid #BFDBFE", // Light blue border
                       mb: 3, 
-                      p: 3,
+                      p: 1,
                       background: "linear-gradient(135deg, #EFF6FF, white)" // Light blue to white
                     }}
                   >

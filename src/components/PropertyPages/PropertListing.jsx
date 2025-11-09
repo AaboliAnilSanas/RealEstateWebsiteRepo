@@ -16,6 +16,10 @@ import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
+import IconButton from "@mui/material/IconButton";
+import Drawer from "@mui/material/Drawer";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import CloseIcon from "@mui/icons-material/Close";
 import debounce from "lodash/debounce";
 import { motion, AnimatePresence } from "framer-motion";
 import Loader from "../UIComponents/PageLoader.jsx";
@@ -26,6 +30,7 @@ const PropertyListing = () => {
   const [displayedProperties, setDisplayedProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterLoading, setFilterLoading] = useState(false);
+  const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -607,6 +612,16 @@ const PropertyListing = () => {
     });
   };
 
+  // Toggle mobile filter drawer
+  const toggleMobileFilter = () => {
+    setMobileFilterOpen(!mobileFilterOpen);
+  };
+
+  // Apply filters and close mobile drawer
+  const applyFiltersAndClose = () => {
+    setMobileFilterOpen(false);
+  };
+
   // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -694,15 +709,210 @@ const PropertyListing = () => {
     </Box>
   );
 
+  // Filter Content Component (reused in both desktop and mobile)
+  const FilterContent = ({ onApply }) => (
+    <Box>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Typography variant="h6" sx={{ fontWeight: "bold", color: colors.blue[800] }}>
+          Filters
+        </Typography>
+        <Button 
+          onClick={resetFilters} 
+          size="small" 
+          variant="outlined"
+          sx={{
+            borderColor: colors.gold.base,
+            color: colors.gold.base,
+            '&:hover': {
+              borderColor: colors.gold.dark,
+              backgroundColor: colors.gold[100],
+            }
+          }}
+        >
+          Reset All
+        </Button>
+      </Box>
+
+      {/* Price Range */}
+      <Box sx={{ mb: 2 }}>
+        <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold", fontSize: "1rem", color: colors.blue[800] }}>
+          Price Range ({filters.transaction_type === "buy" ? "Buy" : "Rent"})
+        </Typography>
+        <Slider
+          value={[filters.filters.budget_range.min, filters.filters.budget_range.max]}
+          onChange={(_, newValue) => {
+            handleBudgetRangeChange('min', newValue[0]);
+            handleBudgetRangeChange('max', newValue[1]);
+          }}
+          valueLabelDisplay="auto"
+          valueLabelFormat={(value) => formatPrice(value, filters.transaction_type)}
+          min={getCurrentPriceRange().min}
+          max={getCurrentPriceRange().max}
+          step={getCurrentPriceRange().step}
+          sx={{
+            color: colors.gold.base, // Gold slider
+            marginTop:'0px',
+            paddingBottom:'1px',
+            paddingLeft:'2px',
+            '& .MuiSlider-thumb': {
+              backgroundColor: colors.gold.base,
+              height:'10px',
+              width:'10px',
+              '&:hover': {
+                backgroundColor: colors.gold.dark,
+              }
+            },
+            '& .MuiSlider-track': {
+              backgroundColor: colors.gold.base,
+              height:'3px'
+            },
+            '& .MuiSlider-rail': {
+              backgroundColor: colors.gray[300],
+            },
+          }}
+        />
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
+          <Typography variant="body2" sx={{ color: colors.gray[600] }}>
+            {formatPrice(filters.filters.budget_range.min, filters.transaction_type)}
+          </Typography>
+          <Typography variant="body2" sx={{ color: colors.gray[600] }}>
+            {formatPrice(filters.filters.budget_range.max, filters.transaction_type)}
+          </Typography>
+        </Box>
+      </Box>
+
+      {/* Transaction Type */}
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold", fontSize: "1rem", color: colors.blue[800] }}>
+          Transaction Type
+        </Typography>
+        <FormControl fullWidth size="small">
+          <Select
+            value={filters.transaction_type}
+            onChange={(e) => handleFilterChange('transaction_type', e.target.value)}
+            sx={{
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: colors.gray[300],
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: colors.gold.base,
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: colors.gold.base,
+              },
+            }}
+          >
+            {filterOptions.transaction_type.map(option => (
+              <MenuItem key={option} value={option}>
+                {option === "buy" ? "Buy" : "Rent"}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Box>
+
+      {/* City Dropdown */}
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold", fontSize: "1rem", color: colors.blue[800] }}>
+          City
+        </Typography>
+        <FormControl fullWidth size="small">
+          <Select
+            value={filters.filters.city}
+            onChange={(e) => handleFilterChange('city', e.target.value, true)}
+            sx={{
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: colors.gray[300],
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: colors.gold.base,
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: colors.gold.base,
+              },
+            }}
+          >
+            <MenuItem value="">All Cities</MenuItem>
+            {filterOptions.city.map(option => (
+              <MenuItem key={option} value={option}>
+                {option}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Box>
+      
+      {/* Property Type */}
+      <FilterSection
+        title="Property Type"
+        options={filterOptions.property_type}
+        filterType="property_type"
+      />
+
+      {/* Possession Status */}
+      <FilterSection
+        title="Possession Status"
+        options={filterOptions.possession_status}
+        filterType="possession_status"
+      />
+
+      {/* Bedrooms */}
+      <FilterSection
+        title="Bedrooms"
+        options={filterOptions.bedroom}
+        filterType="bedroom"
+      />
+
+      {/* Bathrooms */}
+      <FilterSection
+        title="Bathrooms"
+        options={filterOptions.bathroom}
+        filterType="bathroom"
+      />
+
+      {/* Parking */}
+      <FilterSection
+        title="Parking"
+        options={filterOptions.parking}
+        filterType="parking"
+      />
+
+      {filterLoading && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 2, py: 1 }}>
+          <CircularProgress size={16} sx={{ color: colors.gold.base }} />
+          <Typography variant="body2" sx={{ ml: 1, color: colors.gray[600] }}>
+            Updating results...
+          </Typography>
+        </Box>
+      )}
+
+      {/* Apply Button for Mobile */}
+      {onApply && (
+        <Box sx={{ mt: 3, pt: 2, borderTop: 1, borderColor: colors.gray[300] }}>
+          <Button
+            fullWidth
+            variant="contained"
+            onClick={onApply}
+            sx={{
+              backgroundColor: colors.gold.base,
+              color: 'white',
+              '&:hover': {
+                backgroundColor: colors.gold.dark,
+              }
+            }}
+          >
+            Apply Filters
+          </Button>
+        </Box>
+      )}
+    </Box>
+  );
+
   if (loading) {
     return (
-      // <--- UPDATED LOADER IMPLEMENTATION HERE:
       <Loader loading={loading} fullScreen={false} theme="gold" />
-      // END UPDATED LOADER IMPLEMENTATION --->
     );
   }
-
-  const currentPriceRange = getCurrentPriceRange();
 
   return (
     <Box sx={{ padding: { xs: 1, sm: 2 }, width: '100%' }} className="-mt-1">
@@ -711,14 +921,52 @@ const PropertyListing = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <Typography variant="h5" component="h1" gutterBottom sx={{ fontWeight: "bold", mb: 3, color: colors.blue[800] }}>
+        {/* Mobile Filter Header */}
+        <Box sx={{ 
+          display: { xs: 'flex', md: 'none' }, 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          mb: 2 
+        }}>
+          <Typography variant="h5" component="h1" sx={{ fontWeight: "bold", color: colors.blue[800] }}>
+            Properties
+          </Typography>
+          <Button
+            variant="outlined"
+            startIcon={<FilterListIcon />}
+            onClick={toggleMobileFilter}
+            sx={{
+              borderColor: colors.gold.base,
+              color: colors.gold.base,
+              '&:hover': {
+                borderColor: colors.gold.dark,
+                backgroundColor: colors.gold[50],
+              }
+            }}
+          >
+            Filters
+          </Button>
+        </Box>
+
+        {/* Desktop Title */}
+        <Typography 
+          variant="h5" 
+          component="h1" 
+          gutterBottom 
+          sx={{ 
+            fontWeight: "bold", 
+            mb: 3, 
+            color: colors.blue[800],
+            display: { xs: 'none', md: 'block' }
+          }}
+        >
           Property Listings: <span style={{ color: colors.gold.base }}>{filteredProperties.length} properties found</span> 
         </Typography>
       </motion.div>
 
       <Grid container spacing={2} className="-mt-2">
-        {/* Filters Sidebar - Responsive width */}
-        <Grid item xs={12} md={4} lg={2.4} sx={{ width: '20%' }}>
+        {/* Desktop Filters Sidebar */}
+        <Grid item xs={12} md={4} lg={2.4} sx={{ display: { xs: 'none', md: 'block' } }}>
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -746,185 +994,20 @@ const PropertyListing = () => {
                 background: colors.gold.dark,
               }
             }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h6" sx={{ fontWeight: "bold", color: colors.blue[800] }}>
-                  Filters
-                </Typography>
-                <Button 
-                  onClick={resetFilters} 
-                  size="small" 
-                  variant="outlined"
-                  sx={{
-                    borderColor: colors.gold.base,
-                    color: colors.gold.base,
-                    '&:hover': {
-                      borderColor: colors.gold.dark,
-                      backgroundColor: colors.gold[100],
-                    }
-                  }}
-                >
-                  Reset All
-                </Button>
-              </Box>
-
-              {/* Price Range */}
-              <Box sx={{ mb: 2 }}>
-                <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold", fontSize: "1rem", color: colors.blue[800] }}>
-                  Price Range ({filters.transaction_type === "buy" ? "Buy" : "Rent"})
-                </Typography>
-                <Slider
-                  value={[filters.filters.budget_range.min, filters.filters.budget_range.max]}
-                  onChange={(_, newValue) => {
-                    handleBudgetRangeChange('min', newValue[0]);
-                    handleBudgetRangeChange('max', newValue[1]);
-                  }}
-                  valueLabelDisplay="auto"
-                  valueLabelFormat={(value) => formatPrice(value, filters.transaction_type)}
-                  min={currentPriceRange.min}
-                  max={currentPriceRange.max}
-                  step={currentPriceRange.step}
-                  sx={{
-                    color: colors.gold.base, // Gold slider
-                    marginTop:'0px',
-                    paddingBottom:'1px',
-                    paddingLeft:'2px',
-                    '& .MuiSlider-thumb': {
-                      backgroundColor: colors.gold.base,
-                      height:'10px',
-                      width:'10px',
-                      '&:hover': {
-                        backgroundColor: colors.gold.dark,
-                      }
-                    },
-                    '& .MuiSlider-track': {
-                      backgroundColor: colors.gold.base,
-                      height:'3px'
-                    },
-                    '& .MuiSlider-rail': {
-                      backgroundColor: colors.gray[300],
-                    },
-                  }}
-                />
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
-                  <Typography variant="body2" sx={{ color: colors.gray[600] }}>
-                    {formatPrice(filters.filters.budget_range.min, filters.transaction_type)}
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: colors.gray[600] }}>
-                    {formatPrice(filters.filters.budget_range.max, filters.transaction_type)}
-                  </Typography>
-                </Box>
-              </Box>
-
-              {/* Transaction Type */}
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold", fontSize: "1rem", color: colors.blue[800] }}>
-                  Transaction Type
-                </Typography>
-                <FormControl fullWidth size="small">
-                  <Select
-                    value={filters.transaction_type}
-                    onChange={(e) => handleFilterChange('transaction_type', e.target.value)}
-                    sx={{
-                      '& .MuiOutlinedInput-notchedOutline': {
-                        borderColor: colors.gray[300],
-                      },
-                      '&:hover .MuiOutlinedInput-notchedOutline': {
-                        borderColor: colors.gold.base,
-                      },
-                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                        borderColor: colors.gold.base,
-                      },
-                    }}
-                  >
-                    {filterOptions.transaction_type.map(option => (
-                      <MenuItem key={option} value={option}>
-                        {option === "buy" ? "Buy" : "Rent"}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Box>
-
-              {/* City Dropdown */}
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold", fontSize: "1rem", color: colors.blue[800] }}>
-                  City
-                </Typography>
-                <FormControl fullWidth size="small">
-                  <Select
-                    value={filters.filters.city}
-                    onChange={(e) => handleFilterChange('city', e.target.value, true)}
-                    sx={{
-                      '& .MuiOutlinedInput-notchedOutline': {
-                        borderColor: colors.gray[300],
-                      },
-                      '&:hover .MuiOutlinedInput-notchedOutline': {
-                        borderColor: colors.gold.base,
-                      },
-                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                        borderColor: colors.gold.base,
-                      },
-                    }}
-                  >
-                    <MenuItem value="">All Cities</MenuItem>
-                    {filterOptions.city.map(option => (
-                      <MenuItem key={option} value={option}>
-                        {option}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Box>
-              
-              {/* Property Type */}
-              <FilterSection
-                title="Property Type"
-                options={filterOptions.property_type}
-                filterType="property_type"
-              />
-
-              {/* Possession Status */}
-              <FilterSection
-                title="Possession Status"
-                options={filterOptions.possession_status}
-                filterType="possession_status"
-              />
-
-              {/* Bedrooms */}
-              <FilterSection
-                title="Bedrooms"
-                options={filterOptions.bedroom}
-                filterType="bedroom"
-              />
-
-              {/* Bathrooms */}
-              <FilterSection
-                title="Bathrooms"
-                options={filterOptions.bathroom}
-                filterType="bathroom"
-              />
-
-              {/* Parking */}
-              <FilterSection
-                title="Parking"
-                options={filterOptions.parking}
-                filterType="parking"
-              />
-
-              {filterLoading && (
-                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 2, py: 1 }}>
-                  <CircularProgress size={16} sx={{ color: colors.gold.base }} />
-                  <Typography variant="body2" sx={{ ml: 1, color: colors.gray[600] }}>
-                    Updating results...
-                  </Typography>
-                </Box>
-              )}
+              <FilterContent />
             </Paper>
           </motion.div>
         </Grid>
 
-        {/* Property Listings - Responsive width */}
+        {/* Property Listings */}
         <Grid item xs={12} md={8} lg={9.6} flex={1}>
+          {/* Mobile Results Count */}
+          <Box sx={{ display: { xs: 'block', md: 'none' }, mb: 2 }}>
+            <Typography variant="body1" sx={{ color: colors.gray[600] }}>
+              {filteredProperties.length} properties found
+            </Typography>
+          </Box>
+
           {filterLoading ? (
             <motion.div
               initial={{ opacity: 0 }}
@@ -1058,6 +1141,32 @@ const PropertyListing = () => {
           )}
         </Grid>
       </Grid>
+
+      {/* Mobile Filter Drawer */}
+      <Drawer
+        anchor="right"
+        open={mobileFilterOpen}
+        onClose={toggleMobileFilter}
+        sx={{
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: '400px' },
+            p: 3,
+          },
+        }}
+      >
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <Typography variant="h6" sx={{ fontWeight: "bold", color: colors.blue[800] }}>
+            Filters
+          </Typography>
+          <IconButton onClick={toggleMobileFilter}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
+        
+        <Box sx={{ height: '100%', overflowY: 'auto', pb: 2 }}>
+          <FilterContent onApply={applyFiltersAndClose} />
+        </Box>
+      </Drawer>
     </Box>
   );
 };

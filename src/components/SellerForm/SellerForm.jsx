@@ -111,12 +111,12 @@ const SellerForm = () => {
           fieldData: ['1', '2', '3','4','+']
         },
         {
-          label: 'Add Area Details',
+          label: 'Add Area Details*',
           subLabel: 'At least one area is mandatory',
           fieldType: 'CreatableDropdown',
           fieldData: [
             { InputLabel: 'Carpet Area*',DropdownLabel:'Units*', units: ['sq.ft', 'sq.yards'] },
-            { InputLabel: 'Built-up Area*', DropdownLabel:'Units*', units: ['sq.ft', 'acres'] },
+            { InputLabel: 'Built-up Area', DropdownLabel:'Units', units: ['sq.ft', 'acres'] },
             { InputLabel: 'Super build-up Area', DropdownLabel:'Units', units: ['sq.ft', 'cents'] },
           ],
           inputFirst:true
@@ -170,12 +170,78 @@ const SellerForm = () => {
       ]
     },
     {
-      header: 'Photos, Videos',
-      label: 'Add one video of property',
-      subLabel: 'Property with photos and videos get higher page views. Make sure you follow video guidelines.',
+      header: 'Amenities',
+      label: 'Select the amenities available in your property',
+      subLabel: 'Choose all that apply to attract more buyers',
+      icon: '⭐',
+      description: 'Highlight the features that make your property stand out',
+      gradient: 'from-[var(--location-blue-700)] to-[var(--location-blue-900)]',
+      fields: [
+        {
+          label: 'Basic Amenities*',
+          fieldType: 'CheckboxGroup',
+          fieldData: [
+            'Power Backup',
+            'Water Supply',
+            'Parking',
+            'Security',
+            'Lift',
+            'Fire Safety'
+          ]
+        },
+        {
+          label: 'Luxury Amenities',
+          fieldType: 'CheckboxGroup', 
+          fieldData: [
+            'Swimming Pool',
+            'Gym',
+            'Club House',
+            'Landscaped Garden',
+            'Children\'s Play Area',
+            'Jogging Track'
+          ]
+        },
+        {
+          label: 'Interior Amenities',
+          fieldType: 'CheckboxGroup',
+          fieldData: [
+            'Modular Kitchen',
+            'Wooden Flooring',
+            'Air Conditioning',
+            'Wi-Fi',
+            'Modular Wardrobes',
+            'Balcony/Terrace'
+          ]
+        },
+        {
+          label: 'Community Amenities',
+          fieldType: 'CheckboxGroup',
+          fieldData: [
+            'Shopping Center',
+            'Hospital',
+            'School',
+            'Public Transport',
+            'Restaurant',
+            'Park'
+          ]
+        },
+        {
+          label: 'Additional Amenities',
+          fieldType: 'CreatableDropdown',
+          fieldData: [
+            { InputLabel: 'Other Amenities', DropdownLabel: 'Type', units: ['Add custom amenity'] },         
+          ],
+          inputFirst: true
+        }
+      ]
+    },
+    {
+      header: 'Photos & Videos',
+      label: 'Add photos and videos of your property',
+      subLabel: 'Properties with photos and videos get higher page views',
       icon: '📷',
       description: 'Visual content increases engagement and trust with potential buyers',
-      gradient: 'from-[var(--location-blue-700)] to-[var(--location-blue-900)]',
+      gradient: 'from-[var(--location-blue-800)] to-[var(--location-blue-900)]',
       fields: [
         {
           label: 'Upload Videos',

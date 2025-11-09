@@ -11,9 +11,14 @@ import BathtubIcon from '@mui/icons-material/Bathtub';
 import HotelIcon from '@mui/icons-material/Hotel';
 import SquareFootIcon from '@mui/icons-material/SquareFoot';
 import BalconyIcon from '@mui/icons-material/OutdoorGrill';
-import { Link } from 'react-router-dom'; // 👈 NEW IMPORT
+import { Link } from 'react-router-dom';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 const ListingCard = ({ propertyData }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   if (!propertyData) {
     return null;
   }
@@ -23,20 +28,22 @@ const ListingCard = ({ propertyData }) => {
   return (
     <Card sx={{ 
       display: 'flex', 
+      flexDirection: isMobile ? 'column' : 'row',
       width: '100%', 
-      height: 250, // Reduced from 250
+      height: isMobile ? 'auto' : 250,
       mb: 2,
       boxSizing: 'border-box'
     }}>
-      {/* Left Section - Image */}
+      {/* Image Section */}
       <Box sx={{ 
-        width: '30%', 
+        width: isMobile ? '100%' : '30%', 
+        height: isMobile ? 200 : '100%',
         flexShrink: 0 
       }}>
         <Box
           component="img"
           src={media?.imageUrl || "/real-estate-hero.jpg"}
-          alt="Real Estate Hero"
+          alt="Property"
           sx={{
             width: '100%',
             height: '100%',
@@ -46,31 +53,42 @@ const ListingCard = ({ propertyData }) => {
         />
       </Box>
 
-      {/* Right Section - Content */}
+      {/* Content Section */}
       <Box sx={{ 
         display: 'flex', 
         flexDirection: 'column', 
         flex: 1,
-        p: 2, // Reduced from 2
+        p: isMobile ? 1.5 : 2,
         minWidth: 0
       }}>
         <CardContent sx={{ 
           flex: '1 0 auto', 
           p: 0, 
-          pb: 0.5, // Reduced
-          '&:last-child': { pb: 0.5 }
+          pb: isMobile ? 0.5 : 0.5,
+          '&:last-child': { pb: isMobile ? 0.5 : 0.5 }
         }}>
-          {/* Title and Price */}
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-            <Box sx={{ minWidth: 0, flex: 1, mr: 1 }}>
+          {/* Title and Price - Stack vertically on mobile */}
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: isMobile ? 'column' : 'row',
+            justifyContent: 'space-between', 
+            alignItems: isMobile ? 'flex-start' : 'flex-start',
+            mb: 1,
+            gap: isMobile ? 0.5 : 0
+          }}>
+            <Box sx={{ 
+              minWidth: 0, 
+              flex: 1, 
+              mr: isMobile ? 0 : 1 
+            }}>
               <Typography 
                 variant="h6" 
                 component="div" 
                 sx={{ 
                   fontWeight: 'bold',
-                  fontSize: '1rem' // Standardized
+                  fontSize: isMobile ? '0.95rem' : '1rem'
                 }} 
-                noWrap
+                noWrap={!isMobile}
               >
                 {basicDetails?.propertyType}
               </Typography>
@@ -78,9 +96,9 @@ const ListingCard = ({ propertyData }) => {
                 variant="body2" 
                 sx={{ 
                   color: 'text.secondary',
-                  fontSize: '0.875rem' // Standardized
+                  fontSize: isMobile ? '0.8rem' : '0.875rem'
                 }} 
-                noWrap
+                noWrap={!isMobile}
               >
                 For {basicDetails?.transactionType?.toLowerCase()}
               </Typography>
@@ -92,7 +110,8 @@ const ListingCard = ({ propertyData }) => {
                 color: 'primary.main', 
                 fontWeight: 'bold', 
                 flexShrink: 0,
-                fontSize: '1rem' // Standardized
+                fontSize: isMobile ? '0.95rem' : '1rem',
+                alignSelf: isMobile ? 'flex-start' : 'auto'
               }}
             >
               {propertyProfile?.price}
@@ -100,9 +119,13 @@ const ListingCard = ({ propertyData }) => {
           </Box>
 
           {/* Location */}
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            mb: isMobile ? 1 : 1.5 
+          }}>
             <LocationOnIcon sx={{ 
-              fontSize: 16, 
+              fontSize: isMobile ? 14 : 16, 
               color: 'text.secondary', 
               mr: 0.5, 
               flexShrink: 0 
@@ -111,45 +134,110 @@ const ListingCard = ({ propertyData }) => {
               variant="body2" 
               sx={{ 
                 color: 'text.secondary',
-                fontSize: '0.875rem'
+                fontSize: isMobile ? '0.8rem' : '0.875rem'
               }} 
-              noWrap
+              noWrap={!isMobile}
             >
               {location?.apartment}, {location?.locality}, {location?.city}
             </Typography>
           </Box>
 
           {/* Additional Details */}
-          <Stack direction="row" spacing={1} sx={{ mb: 1.5, flexWrap: 'wrap' }}>
-            <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
+          <Stack 
+            direction="row" 
+            spacing={1} 
+            sx={{ 
+              mb: isMobile ? 1 : 1.5, 
+              flexWrap: 'wrap',
+              gap: isMobile ? 0.5 : 1
+            }}
+          >
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                color: 'text.secondary', 
+                fontSize: isMobile ? '0.75rem' : '0.875rem' 
+              }}
+            >
               Floor: {propertyProfile?.floor}/{propertyProfile?.totalFloors}
             </Typography>
-            <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                color: 'text.secondary', 
+                fontSize: isMobile ? '0.75rem' : '0.875rem' 
+              }}
+            >
               • {propertyProfile?.availability}
             </Typography>
           </Stack>
-          {/* Key Features */}
-          <Stack direction="row" spacing={1.5} sx={{ mb: 1.5 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-              <HotelIcon sx={{ fontSize: 16, color: 'primary.main', mr: 0.5 }} />
-              <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+
+          {/* Key Features - Adjust spacing and wrap on mobile */}
+          <Stack 
+            direction="row" 
+            spacing={isMobile ? 1 : 1.5} 
+            sx={{ 
+              mb: isMobile ? 1 : 1.5,
+              flexWrap: isMobile ? 'wrap' : 'nowrap'
+            }}
+          >
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              flexShrink: 0,
+              mb: isMobile ? 0.5 : 0
+            }}>
+              <HotelIcon sx={{ 
+                fontSize: isMobile ? 14 : 16, 
+                color: 'primary.main', 
+                mr: 0.5 
+              }} />
+              <Typography 
+                variant="body2" 
+                sx={{ fontSize: isMobile ? '0.75rem' : '0.875rem' }}
+              >
                 {propertyProfile?.bedrooms} Beds
               </Typography>
             </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-              <BathtubIcon sx={{ fontSize: 16, color: 'primary.main', mr: 0.5 }} />
-              <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              flexShrink: 0,
+              mb: isMobile ? 0.5 : 0
+            }}>
+              <BathtubIcon sx={{ 
+                fontSize: isMobile ? 14 : 16, 
+                color: 'primary.main', 
+                mr: 0.5 
+              }} />
+              <Typography 
+                variant="body2" 
+                sx={{ fontSize: isMobile ? '0.75rem' : '0.875rem' }}
+              >
                 {propertyProfile?.bathrooms} Baths
               </Typography>
             </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-              <BalconyIcon sx={{ fontSize: 16, color: 'primary.main', mr: 0.5 }} />
-              <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              flexShrink: 0,
+              mb: isMobile ? 0.5 : 0
+            }}>
+              <BalconyIcon sx={{ 
+                fontSize: isMobile ? 14 : 16, 
+                color: 'primary.main', 
+                mr: 0.5 
+              }} />
+              <Typography 
+                variant="body2" 
+                sx={{ fontSize: isMobile ? '0.75rem' : '0.875rem' }}
+              >
                 {propertyProfile?.balconies} Balcony
               </Typography>
             </Box>
           </Stack>
-          {/* Description */}
+
+          {/* Description - Show fewer lines on mobile */}
           <Tooltip 
             title={propertyProfile?.description || ''}
             placement="top"
@@ -160,11 +248,11 @@ const ListingCard = ({ propertyData }) => {
               sx={{ 
                 color: 'text.secondary',
                 display: '-webkit-box',
-                WebkitLineClamp: 2,
+                WebkitLineClamp: isMobile ? 1 : 2,
                 WebkitBoxOrient: 'vertical',
                 overflow: 'hidden',
                 cursor: 'pointer',
-                fontSize: '0.875rem',
+                fontSize: isMobile ? '0.8rem' : '0.875rem',
                 lineHeight: 1.4,
                 '&:hover': {
                   color: 'text.primary'
@@ -177,28 +265,55 @@ const ListingCard = ({ propertyData }) => {
         </CardContent>
 
         {/* Bottom Section - Action Buttons */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 'auto' }}>
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            {/* 👈 LINK WRAPPER */}
-            <Link to={`/properties/${propertyData.id}`} style={{ textDecoration: 'none' }}>
+        <Box sx={{ 
+          display: 'flex', 
+          flexDirection: isMobile ? 'column' : 'row',
+          justifyContent: 'space-between', 
+          alignItems: isMobile ? 'stretch' : 'center',
+          gap: isMobile ? 1 : 0,
+          mt: 'auto' 
+        }}>
+          <Box sx={{ 
+            display: 'flex', 
+            gap: 1,
+            justifyContent: isMobile ? 'space-between' : 'flex-start'
+          }}>
+            <Link to={`/properties/${propertyData.id}`} style={{ textDecoration: 'none', flex: isMobile ? 1 : 'none' }}>
               <Button 
                 size="small" 
                 variant="outlined"
-                sx={{ fontSize: '0.875rem', minWidth: 'auto', px: 1.5 }}
+                sx={{ 
+                  fontSize: isMobile ? '0.75rem' : '0.875rem', 
+                  minWidth: 'auto', 
+                  px: isMobile ? 1 : 1.5,
+                  width: isMobile ? '100%' : 'auto'
+                }}
               >
                 View Details
               </Button>
             </Link>
-            {/* 👈 END LINK WRAPPER */}
             <Button 
               size="small" 
               variant="contained"
-              sx={{ fontSize: '0.875rem', minWidth: 'auto', px: 1.5 }}
+              sx={{ 
+                fontSize: isMobile ? '0.75rem' : '0.875rem', 
+                minWidth: 'auto', 
+                px: isMobile ? 1 : 1.5,
+                width: isMobile ? '100%' : 'auto'
+              }}
             >
               Contact
             </Button>
           </Box>
-          <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
+          <Typography 
+            variant="caption" 
+            sx={{ 
+              color: 'text.secondary', 
+              fontSize: isMobile ? '0.7rem' : '0.75rem',
+              textAlign: isMobile ? 'center' : 'right',
+              mt: isMobile ? 0.5 : 0
+            }}
+          >
             ID: {propertyData.id}
           </Typography>
         </Box>

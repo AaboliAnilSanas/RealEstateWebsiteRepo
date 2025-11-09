@@ -23,54 +23,44 @@ const CreatableDropdown = ({
   dropdownError = false,
   textfieldisRequired = false,
   textfieldError = false,
-  inputFirst = true 
+  inputFirst = true,
+  onValidationChange
 }) => {
   // Remove asterisk from labels for display
   const getDisplayLabel = (label) => {
     return label ? label.replace(/\*$/, '') : label;
   };
 
-  // Initialize state for all fields
+  // Initialize state for all fields - now as an array
   const [fieldValues, setFieldValues] = useState(() => {
-    const initialValues = {};
-    fieldData?.forEach((field, index) => {
-      const fieldKey = field.InputLabel || `field_${index}`;
-      initialValues[fieldKey] = {
-        textField: value?.textField || '',
-        autocomplete: value?.autocomplete || ''
-      };
-    });
-    return initialValues;
+    if (value && Array.isArray(value)) {
+      return value;
+    }
+    
+    // Create initial values for each field
+    return fieldData?.map((field, index) => ({
+      textField: '',
+      autocomplete: '',
+      fieldKey: field.InputLabel || `field_${index}`
+    })) || [];
   });
 
-  // Local error state to handle field-specific errors
-  const [localErrors, setLocalErrors] = useState({
-    textField: false,
-    autocomplete: false
-  });
+  // Track if validation should be shown (after form submission attempt)
+  const [showValidation, setShowValidation] = useState(false);
 
-  // Update local errors when props change
+  // Show validation when parent errors change (after Next button click)
   useEffect(() => {
-    setLocalErrors({
-      textField: textfieldError,
-      autocomplete: dropdownError
-    });
-  }, [textfieldError, dropdownError]);
+    if (dropdownError || textfieldError) {
+      setShowValidation(true);
+    }
+  }, [dropdownError, textfieldError]);
 
   // Sync with external value changes
   useEffect(() => {
-    if (value) {
-      const newFieldValues = {};
-      fieldData?.forEach((field, index) => {
-        const fieldKey = field.InputLabel || `field_${index}`;
-        newFieldValues[fieldKey] = {
-          textField: value.textField || '',
-          autocomplete: value.autocomplete || ''
-        };
-      });
-      setFieldValues(newFieldValues);
+    if (value && Array.isArray(value)) {
+      setFieldValues(value);
     }
-  }, [value, fieldData]);
+  }, [value]);
 
   // Debounced onChange callback for text field
   const debouncedOnChange = useCallback(
@@ -89,99 +79,56 @@ const CreatableDropdown = ({
     };
   }, [debouncedOnChange]);
 
-  const handleInputChange = (fieldKey, event) => {
+  const handleInputChange = (index, event) => {
     const newValue = event.target.value;
     
-    // Clear text field error when user starts typing
-    if (localErrors.textField) {
-      setLocalErrors(prev => ({
-        ...prev,
-        textField: false
-      }));
-    }
-    
     setFieldValues(prev => {
-      const updatedValues = {
-        ...prev,
-        [fieldKey]: {
-          ...prev[fieldKey],
-          textField: newValue
-        }
+      const updatedValues = [...prev];
+      updatedValues[index] = {
+        ...updatedValues[index],
+        textField: newValue
       };
       
-      // Get the first field value (since there's typically only one field)
-      const firstFieldKey = Object.keys(updatedValues)[0];
-      const firstFieldValue = updatedValues[firstFieldKey];
-      
-      // Use debounced function to update parent
-      debouncedOnChange(firstFieldValue);
+      // Update parent with all field values
+      debouncedOnChange(updatedValues);
       
       return updatedValues;
     });
   };
 
-  const handleAutocompleteChange = (fieldKey, event, newValue) => {
+  const handleAutocompleteChange = (index, event, newValue) => {
     const stringValue = newValue || '';
     
-    // Clear autocomplete error when user selects an option
-    if (localErrors.autocomplete) {
-      setLocalErrors(prev => ({
-        ...prev,
-        autocomplete: false
-      }));
-    }
-    
     setFieldValues(prev => {
-      const updatedValues = {
-        ...prev,
-        [fieldKey]: {
-          ...prev[fieldKey],
-          autocomplete: stringValue
-        }
+      const updatedValues = [...prev];
+      updatedValues[index] = {
+        ...updatedValues[index],
+        autocomplete: stringValue
       };
-      
-      // Get the first field value (since there's typically only one field)
-      const firstFieldKey = Object.keys(updatedValues)[0];
-      const firstFieldValue = updatedValues[firstFieldKey];
       
       // Update parent immediately for autocomplete changes
       if (onChange) {
-        onChange(firstFieldValue);
+        onChange(updatedValues);
       }
       
       return updatedValues;
     });
   };
 
-  const handleAutocompleteInputChange = (fieldKey, event, newValue) => {
-    // This handles free text input in the autocomplete field
+  const handleAutocompleteInputChange = (index, event, newValue) => {
     if (event && event.type === 'change') {
       const stringValue = newValue || '';
       
-      // Clear autocomplete error when user starts typing
-      if (localErrors.autocomplete) {
-        setLocalErrors(prev => ({
-          ...prev,
-          autocomplete: false
-        }));
-      }
-      
       setFieldValues(prev => {
-        const updatedValues = {
-          ...prev,
-          [fieldKey]: {
-            ...prev[fieldKey],
-            autocomplete: stringValue
-          }
+        const updatedValues = [...prev];
+        updatedValues[index] = {
+          ...updatedValues[index],
+          autocomplete: stringValue
         };
         
-        // Get the first field value (since there's typically only one field)
-        const firstFieldKey = Object.keys(updatedValues)[0];
-        const firstFieldValue = updatedValues[firstFieldKey];
-        
-        // Also update parent immediately for autocomplete text input
+        // Update parent immediately for autocomplete text input
         if (onChange) {
-          onChange(firstFieldValue);
+          onChange(updatedValues);
         }
         
         return updatedValues;
@@ -189,36 +136,63 @@ const CreatableDropdown = ({
     }
   };
 
+  // Check if a specific field has validation error
+  const hasFieldError = (field, index) => {
+    // Don't show validation until after submission attempt
+    if (!showValidation && !dropdownError && !textfieldError) {
+      return false;
+    }
+
+    const currentValue = fieldValues[index] || { textField: '', autocomplete: '' };
+    
+    const isTextFieldRequired = field?.InputLabel?.includes('*');
+    const isDropdownRequired = field?.DropdownLabel?.includes('*');
+    
+    const hasTextFieldError = isTextFieldRequired && (!currentValue.textField || currentValue.textField.trim() === '');
+    const hasDropdownError = isDropdownRequired && (!currentValue.autocomplete || currentValue.autocomplete.trim() === '');
+    
+    return hasTextFieldError || hasDropdownError;
+  };
+
   // Separate border colors for each field - Validation logic
-  const getOverallBorderColor = () => {
-    if (localErrors.textField || localErrors.autocomplete) return '1px solid #ef4444';
+  const getOverallBorderColor = (index) => {
+    const field = fieldData?.[index];
+    
+    if (!field) return '1px solid var(--location-gray-300)';
+    
+    if (hasFieldError(field, index)) {
+      return '1px solid #ef4444';
+    }
+    
     return '1px solid var(--location-gray-300)';
   };
 
   // Get field-specific error state and helper text
-  const getTextFieldErrorProps = (field) => {
+  const getTextFieldErrorProps = (field, index) => {
     const isRequired = field?.InputLabel?.includes('*') || false;
-    const fieldKey = field.InputLabel || `field_${0}`;
-    const currentValue = fieldValues[fieldKey] || { textField: '', autocomplete: '' };
+    const currentValue = fieldValues[index] || { textField: '', autocomplete: '' };
+    
+    const hasError = (showValidation || dropdownError || textfieldError) && 
+                    isRequired && 
+                    (!currentValue.textField || currentValue.textField.trim() === '');
     
     return {
-      error: localErrors.textField && isRequired && (!currentValue.textField || currentValue.textField.trim() === ''),
-      // helperText: localErrors.textField && isRequired && (!currentValue.textField || currentValue.textField.trim() === '') 
-      //   ? `${getDisplayLabel(field.InputLabel)} is required` 
-      //   : ''
+      error: hasError,
+      // helperText: hasError ? `${getDisplayLabel(field.InputLabel)} is required` : ''
     };
   };
 
-  const getAutocompleteErrorProps = (field) => {
+  const getAutocompleteErrorProps = (field, index) => {
     const isRequired = field?.DropdownLabel?.includes('*') || false;
-    const fieldKey = field.InputLabel || `field_${0}`;
-    const currentValue = fieldValues[fieldKey] || { textField: '', autocomplete: '' };
+    const currentValue = fieldValues[index] || { textField: '', autocomplete: '' };
+    
+    const hasError = (showValidation || dropdownError || textfieldError) && 
+                    isRequired && 
+                    (!currentValue.autocomplete || currentValue.autocomplete.trim() === '');
     
     return {
-      error: localErrors.autocomplete && isRequired && (!currentValue.autocomplete || currentValue.autocomplete.trim() === ''),
-      // helperText: localErrors.autocomplete && isRequired && (!currentValue.autocomplete || currentValue.autocomplete.trim() === '') 
-      //   ? `${getDisplayLabel(field.DropdownLabel)} is required` 
-      //   : ''
+      error: hasError,
+      // helperText: hasError ? `${getDisplayLabel(field.DropdownLabel)} is required` : ''
     };
   };
 
@@ -235,10 +209,10 @@ const CreatableDropdown = ({
         const isTextFieldRequired = field?.InputLabel?.includes('*') || false;
         const isDropdownRequired = field?.DropdownLabel?.includes('*') || false;
         
-        const currentValue = fieldValues[fieldKey] || { textField: '', autocomplete: '' };
+        const currentValue = fieldValues[index] || { textField: '', autocomplete: '' };
         
-        const textFieldErrorProps = getTextFieldErrorProps(field);
-        const autocompleteErrorProps = getAutocompleteErrorProps(field);
+        const textFieldErrorProps = getTextFieldErrorProps(field, index);
+        const autocompleteErrorProps = getAutocompleteErrorProps(field, index);
 
         return (
           <Box 
@@ -248,11 +222,11 @@ const CreatableDropdown = ({
               width: '100%', 
               scrollPaddingLeft:'2px',
               flexDirection: inputFirst ? 'row' : 'row-reverse',
-              border: getOverallBorderColor(),
+              border: getOverallBorderColor(index),
               borderRadius: '6px',
               marginLeft:'2px',
               '&:hover': {
-                border: localErrors.textField || localErrors.autocomplete 
+                border: getOverallBorderColor(index) === '1px solid #ef4444' 
                   ? '1px solid #ef4444' 
                   : '1px solid var(--gold-base)',
               },
@@ -273,7 +247,7 @@ const CreatableDropdown = ({
                 placeholder={placeholder}
                 variant="standard"
                 value={currentValue.textField}
-                onChange={(event) => handleInputChange(fieldKey, event)}
+                onChange={(event) => handleInputChange(index, event)}
                 error={textFieldErrorProps.error}
                 helperText={textFieldErrorProps.helperText}
                 required={isTextFieldRequired}
@@ -318,13 +292,13 @@ const CreatableDropdown = ({
               orientation="vertical" 
               flexItem 
               sx={{ 
-                backgroundColor: localErrors.textField || localErrors.autocomplete 
+                backgroundColor: getOverallBorderColor(index) === '1px solid #ef4444' 
                   ? '#ef4444' 
                   : 'var(--location-gray-300)',
                 height: '80%',
                 margin: '4px 0px',
                 '&:hover': {
-                  backgroundColor: localErrors.textField || localErrors.autocomplete 
+                  backgroundColor: getOverallBorderColor(index) === '1px solid #ef4444' 
                     ? '#ef4444' 
                     : 'var(--gold-base)',
                 },
@@ -341,8 +315,8 @@ const CreatableDropdown = ({
                 freeSolo
                 options={options}
                 value={currentValue.autocomplete}
-                onChange={(event, newValue) => handleAutocompleteChange(fieldKey, event, newValue)}
-                onInputChange={(event, newValue) => handleAutocompleteInputChange(fieldKey, event, newValue)}
+                onChange={(event, newValue) => handleAutocompleteChange(index, event, newValue)}
+                onInputChange={(event, newValue) => handleAutocompleteInputChange(index, event, newValue)}
                 renderInput={(params) => (
                   <TextField 
                     {...params} 

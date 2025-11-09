@@ -1,212 +1,195 @@
 // hooks/useSimpleValidation.js
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
 export const useSimpleValidation = () => {
   const [errors, setErrors] = useState({});
   const [completedSteps, setCompletedSteps] = useState([]);
 
-  // Enhanced validation for CreatableDropdown - checks individual field requirements
-  const validateCreatableDropdown = (value, isRequired, fieldData = []) => {
-    if (!isRequired) return true;
-    
-    // If no value at all
-    if (!value || typeof value !== 'object') return false;
-    
-    let allRequiredFieldsValid = true;
-    
-    // Check each field in fieldData for its specific requirements
-    fieldData.forEach((field, index) => {
-      const fieldKey = field.InputLabel || `field_${index}`;
-      
-      // Check if this specific field is required
-      const isTextFieldRequired = field?.InputLabel?.includes('*') || false;
-      const isDropdownRequired = field?.DropdownLabel?.includes('*') || false;
-      
-      // For CreatableDropdown, the value structure is { textField: '', autocomplete: '' }
-      // not nested under fieldKey
-      const textFieldValue = value.textField || '';
-      const dropdownValue = value.autocomplete || '';
-      
-      // Validate text field if required
-      if (isTextFieldRequired) {
-        const textFieldValid = textFieldValue && textFieldValue.trim() !== '';
-        if (!textFieldValid) {
-          allRequiredFieldsValid = false;
+  // Enhanced validation for CreatableDropdown
+  const validateCreatableDropdown = (value, fieldData = [], fieldLabel = '') => {
+    // If no value at all and field is required (main label has *)
+    if (!value && fieldLabel.includes('*')) {
+      return false;
+    }
+
+    // Handle array of values (multiple fields in CreatableDropdown)
+    if (Array.isArray(value)) {
+      // If main field is required (has *), check if at least one field is filled
+      if (fieldLabel.includes('*')) {
+        const atLeastOneFilled = value.some(fieldValue => {
+          const textFieldValue = fieldValue?.textField || '';
+          const dropdownValue = fieldValue?.autocomplete || '';
+          return textFieldValue.trim() !== '' && dropdownValue.trim() !== '';
+        });
+        
+        if (!atLeastOneFilled) {
+          return false;
         }
       }
       
-      // Validate dropdown field if required
-      if (isDropdownRequired) {
-        const dropdownValid = dropdownValue && dropdownValue.trim() !== '';
-        if (!dropdownValid) {
-          allRequiredFieldsValid = false;
+      // Check each field in fieldData for its specific requirements
+      for (let i = 0; i < fieldData.length; i++) {
+        const field = fieldData[i];
+        const fieldValue = value[i] || { textField: '', autocomplete: '' };
+        
+        // Check if this specific field is required (nested requirement)
+        const isTextFieldRequired = field?.InputLabel?.includes('*') || false;
+        const isDropdownRequired = field?.DropdownLabel?.includes('*') || false;
+        
+        const textFieldValue = fieldValue.textField || '';
+        const dropdownValue = fieldValue.autocomplete || '';
+        
+        // Validate text field if required
+        if (isTextFieldRequired && (!textFieldValue || textFieldValue.trim() === '')) {
+          return false;
+        }
+        
+        // Validate dropdown field if required
+        if (isDropdownRequired && (!dropdownValue || dropdownValue.trim() === '')) {
+          return false;
         }
       }
-    });
+    } 
+    // Handle single object value
+    else if (value) {
+      const field = fieldData[0]; // Single field
+      if (field) {
+        const isTextFieldRequired = field?.InputLabel?.includes('*') || false;
+        const isDropdownRequired = field?.DropdownLabel?.includes('*') || false;
+        
+        const textFieldValue = value.textField || '';
+        const dropdownValue = value.autocomplete || '';
+        
+        // Validate text field if required
+        if (isTextFieldRequired && (!textFieldValue || textFieldValue.trim() === '')) {
+          return false;
+        }
+        
+        // Validate dropdown field if required
+        if (isDropdownRequired && (!dropdownValue || dropdownValue.trim() === '')) {
+          return false;
+        }
+      }
+    }
     
-    return allRequiredFieldsValid;
-  };
-
-  const validateFileUpload = (value, isRequired) => {
-    if (!isRequired) return true;
-    return value && value.length > 0;
-  };
-
-  const validateArrayField = (value, isRequired) => {
-    if (!isRequired) return true;
-    return value && value !== '' && !(Array.isArray(value) && value.length === 0);
-  };
-
-  const validateTextField = (value, isRequired) => {
-    if (!isRequired) return true;
-    return value && value !== '' && !(Array.isArray(value) && value.length === 0);
+    return true;
   };
 
   // Check if a specific step is completed
-  const isStepCompleted = (stepIndex, stepFields, formData) => {
-    const stepFieldsValid = stepFields.every(field => {
-      const fieldName = field.label;
-      const isRequired = field.label.includes('*');
-      const value = formData[fieldName];
-
-      if (!isRequired) return true;
-      
-      let fieldValid = true;
-      
-      switch (field.fieldType) {
-        case "CreatableDropdown":
-          fieldValid = validateCreatableDropdown(value, isRequired, field.fieldData);
-          break;
-        case "UploadFile":
-          fieldValid = validateFileUpload(value, isRequired);
-          break;
-        case "Chips":
-        case "RadioButton":
-          fieldValid = validateArrayField(value, isRequired);
-          break;
-        case "InputField":
-        case "TextArea":
-          fieldValid = validateTextField(value, isRequired);
-          break;
-        default:
-          fieldValid = value && value !== '' && !(Array.isArray(value) && value.length === 0);
-          break;
-      }
-      
-      return fieldValid;
-    });
+  const isStepCompleted = useCallback((stepIndex, stepFields, formData) => {
+    if (!stepFields || !formData) return false;
     
-    return stepFieldsValid;
-  };
-
-  // Main step validation function
-  const validateStep = (stepFields, formData, stepIndex = null) => {
-    const newErrors = {};
-    let isValid = true;
-
-    stepFields.forEach(field => {
+    for (let field of stepFields) {
       const fieldName = field.label;
       const isRequired = field.label.includes('*');
       const value = formData[fieldName];
 
-      if (isRequired) {
+      // For required fields, validate based on field type
+      if (isRequired || field.fieldType === "CreatableDropdown") {
         let fieldValid = true;
         
         switch (field.fieldType) {
           case "CreatableDropdown":
-            fieldValid = validateCreatableDropdown(value, isRequired, field.fieldData);
-            if (!fieldValid) {
-              newErrors[fieldName] = `${getDisplayLabel(fieldName)} is required`;
-            }
+            // For CreatableDropdown, validate based on nested requirements
+            fieldValid = validateCreatableDropdown(value, field.fieldData, field.label);
             break;
+            
           case "UploadFile":
-            fieldValid = validateFileUpload(value, isRequired);
-            if (!fieldValid) {
-              newErrors[fieldName] = `${getDisplayLabel(fieldName)} is required`;
-            }
+            fieldValid = value && Array.isArray(value) && value.length > 0;
             break;
+            
           case "Chips":
           case "RadioButton":
-            fieldValid = validateArrayField(value, isRequired);
-            if (!fieldValid) {
-              newErrors[fieldName] = `${getDisplayLabel(fieldName)} is required`;
-            }
+            fieldValid = value && value !== '';
             break;
+            
           case "InputField":
           case "TextArea":
-            fieldValid = validateTextField(value, isRequired);
-            if (!fieldValid) {
-              newErrors[fieldName] = `${getDisplayLabel(fieldName)} is required`;
-            }
+            fieldValid = value && value.trim() !== '';
             break;
+            
           default:
-            fieldValid = value && value !== '' && !(Array.isArray(value) && value.length === 0);
-            if (!fieldValid) {
-              newErrors[fieldName] = `${getDisplayLabel(fieldName)} is required`;
-            }
+            fieldValid = value && value !== '';
             break;
         }
         
         if (!fieldValid) {
-          isValid = false;
+          console.log('Field validation failed:', fieldName, 'Value:', value, 'Field:', field);
+          return false;
+        }
+      }
+    }
+    
+    console.log('Step completed:', stepIndex);
+    return true;
+  }, []);
+
+  // Main step validation function
+  const validateStep = useCallback((fields, formData, stepIndex) => {
+    const newErrors = {};
+    let isValid = true;
+
+    fields.forEach(field => {
+      const fieldName = field.label;
+      const fieldValue = formData[fieldName];
+      const isRequired = field.label.includes('*');
+
+      // For required fields or CreatableDropdown (which has nested requirements)
+      if (isRequired || field.fieldType === "CreatableDropdown") {
+        let fieldValid = true;
+        
+        switch (field.fieldType) {
+          case 'CreatableDropdown':
+            fieldValid = validateCreatableDropdown(fieldValue, field.fieldData, field.label);
+            if (!fieldValid) {
+              newErrors[fieldName] = `${field.label.replace('*', '')} is required`;
+              isValid = false;
+            }
+            break;
+            
+          case 'InputField':
+          case 'TextArea':
+            if (!fieldValue || fieldValue.trim() === '') {
+              newErrors[fieldName] = `${field.label.replace('*', '')} is required`;
+              isValid = false;
+            }
+            break;
+            
+          case 'Chips':
+          case 'RadioButton':
+            if (!fieldValue || fieldValue === '') {
+              newErrors[fieldName] = `${field.label.replace('*', '')} is required`;
+              isValid = false;
+            }
+            break;
+            
+          case 'UploadFile':
+            if (!fieldValue || (Array.isArray(fieldValue) && fieldValue.length === 0)) {
+              newErrors[fieldName] = `${field.label.replace('*', '')} is required`;
+              isValid = false;
+            }
+            break;
+            
+          default:
+            if (!fieldValue) {
+              newErrors[fieldName] = `${field.label.replace('*', '')} is required`;
+              isValid = false;
+            }
         }
       }
     });
 
-    setErrors(newErrors);
+    setErrors(prev => ({ ...prev, ...newErrors }));
     
-    // Update completed steps if this step is valid
-    if (isValid && stepIndex !== null) {
-      setCompletedSteps(prev => {
-        if (!prev.includes(stepIndex)) {
-          return [...prev, stepIndex];
-        }
-        return prev;
-      });
+    // Update completed steps
+    if (isValid && !completedSteps.includes(stepIndex)) {
+      setCompletedSteps(prev => [...prev, stepIndex]);
+    } else if (!isValid && completedSteps.includes(stepIndex)) {
+      setCompletedSteps(prev => prev.filter(step => step !== stepIndex));
     }
     
     return isValid;
-  };
-
-  // Validate a single field
-  const validateField = (fieldName, fieldType, value, isRequired = false, fieldData = []) => {
-    const newErrors = { ...errors };
-    
-    if (isRequired) {
-      let fieldValid = true;
-      
-      switch (fieldType) {
-        case "CreatableDropdown":
-          fieldValid = validateCreatableDropdown(value, isRequired, fieldData);
-          break;
-        case "UploadFile":
-          fieldValid = validateFileUpload(value, isRequired);
-          break;
-        case "Chips":
-        case "RadioButton":
-          fieldValid = validateArrayField(value, isRequired);
-          break;
-        case "InputField":
-        case "TextArea":
-          fieldValid = validateTextField(value, isRequired);
-          break;
-        default:
-          fieldValid = value && value !== '' && !(Array.isArray(value) && value.length === 0);
-          break;
-      }
-      
-      if (!fieldValid) {
-        newErrors[fieldName] = `${getDisplayLabel(fieldName)} is required`;
-      } else {
-        delete newErrors[fieldName];
-      }
-    } else {
-      delete newErrors[fieldName];
-    }
-    
-    setErrors(newErrors);
-    return !newErrors[fieldName];
-  };
+  }, [completedSteps]);
 
   const clearFieldError = (fieldName) => {
     setErrors(prev => {
@@ -216,30 +199,17 @@ export const useSimpleValidation = () => {
     });
   };
 
-  const clearErrors = () => setErrors({});
-
-  const hasErrors = () => Object.keys(errors).length > 0;
-
-  const getFieldError = (fieldName) => errors[fieldName];
-
-  // Helper function to remove asterisk from labels
-  const getDisplayLabel = (label) => {
-    return label ? label.replace(/\*$/, '') : label;
+  const clearErrors = () => {
+    setErrors({});
+    setCompletedSteps([]);
   };
 
   return {
     errors,
     completedSteps,
     validateStep,
-    validateField,
-    isStepCompleted,
     clearFieldError,
     clearErrors,
-    hasErrors,
-    getFieldError,
-    validateCreatableDropdown,
-    validateFileUpload,
-    validateArrayField,
-    validateTextField
+    isStepCompleted
   };
 };

@@ -5,7 +5,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import Navbar from '../components/Homepage/Navbar/navbar.jsx';
 import Contactus from '../components/ContactUs/contactUsPage.jsx';
 import SellerForm from '../components/SellerForm/SellerForm.jsx';
-import FilterComponent from '../components/UIComponents/FilterComponent.jsx';
+// import FilterComponent from '../components/UIComponents/FilterComponent.jsx';
 import PropertyListing from '../components/PropertyPages/PropertListing.jsx';
 import HomePage from '../components/Homepage/homepage.jsx';
 import Layout from '../components/Layout/layout.jsx';
@@ -34,10 +34,10 @@ const router = createBrowserRouter([
         path: 'sell',
         element: <SellerForm />,
       },
-      {
-        path: 'filters',
-        element: <FilterComponent />,
-      },
+      // {
+      //   path: 'filters',
+      //   element: <FilterComponent />,
+      // },
       {
         path: 'contact',
         element: <Contactus />,

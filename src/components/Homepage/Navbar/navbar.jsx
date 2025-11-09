@@ -5,6 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import AuthFlowModal from '../../Authentication/AuthFlowModal';
 gsap.registerPlugin(ScrollTrigger);
 
+// Utility component for GSAP animations
 const AnimatedContent = ({ children, distance = 100, direction = 'vertical', reverse = false, duration = 0.8, ease = 'power3.out', initialOpacity = 0, animateOpacity = true, scale = 1, threshold = 0.1, delay = 0, onComplete }) => {
   const ref = useRef(null);
 
@@ -39,6 +40,7 @@ const AnimatedContent = ({ children, distance = 100, direction = 'vertical', rev
     });
 
     return () => {
+      // Clean up GSAP and ScrollTrigger instances on unmount
       ScrollTrigger.getAll().forEach(t => t.kill());
       gsap.killTweensOf(el);
     };
@@ -72,19 +74,24 @@ const Navbar = () => {
   return (
     <>
       <nav className="navbar bg-white shadow-md">
-        {/* KEY CHANGE: Flexbox for desktop centering and equal spacing */}
         <div className="navbar-container flex justify-between items-center px-4 sm:px-6 lg:px-8">
 
           {/* Left Section (Logo and Mobile Hamburger) */}
           <div className="navbar-header flex justify-between items-center sm:justify-start">
             
-            {/* Hamburger on Left (Visible only on mobile) */}
+            {/* 🍔 Hamburger/Close Toggle Button (Mobile Only) */}
             <button 
-              className="navbar-toggle order-1 sm:order-none sm:hidden" // Hidden on desktop
+              className="navbar-toggle order-1 sm:order-none sm:hidden" 
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
+              <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                {isMenuOpen ? (
+                  // Close Icon (X) when menu is open
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  // Menu Icon (3 Lines) when menu is closed
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
               </svg>
             </button>
             
@@ -95,8 +102,8 @@ const Navbar = () => {
           </div>
 
           {/* Center Section (Navigation Links) */}
+          {/* Menu is hidden using CSS class 'navbar-menu-hidden' on mobile */}
           <div className={`navbar-menu ${isMenuOpen ? '' : 'navbar-menu-hidden'} sm:flex sm:items-center`}> 
-            {/* 🚀 MODIFIED: Reduced spacing from space-x-6 lg:space-x-10 to space-x-4 lg:space-x-8 */}
             <ul className="navbar-list flex space-x-4 lg:space-x-8"> 
               {navigation.map((item, idx) => (
                 <li key={idx} className="navbar-item relative"
@@ -128,10 +135,10 @@ const Navbar = () => {
             </ul>
           </div>
 
-          {/* Right Section (Login button) */}
+          {/* Right Section (Login button - Icon on Mobile, Text on Desktop) */}
           <div className="navbar-button-container order-3 sm:order-none ml-auto sm:ml-0"> 
             <button
-              // Small size (h-8, text-xs, min-w-0) on mobile, standard size on sm: and up
+              // Ensure compact sizing on mobile
               className="navbar-button text-xs px-2 py-1 h-8 w-auto min-w-0 sm:text-base sm:px-4 sm:py-2 sm:h-auto" 
               ref={loginRef}
               onMouseEnter={() => setIsLoginHovered(true)}
@@ -139,8 +146,15 @@ const Navbar = () => {
               onClick={() => setAuthModalOpen(true)}
             >
               <span className="login-content flex items-center">
-                <span className="login-text text-xs sm:text-base">Login</span>
-                <span className={`login-arrow text-xs ml-1 ${isLoginHovered ? 'login-arrow-visible' : ''}`}>→</span>
+                
+                {/* 👤 Login Icon: Visible only on mobile (sm:hidden) */}
+                <svg className="h-4 w-4 sm:hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                
+                {/* Text & Arrow: Hidden on mobile, visible on desktop (hidden sm:inline) */}
+                <span className="login-text text-xs sm:text-base hidden sm:inline">Login</span>
+                <span className={`login-arrow text-xs ml-1 ${isLoginHovered ? 'login-arrow-visible' : ''} hidden sm:inline`}>→</span>
               </span>
             </button>
           </div>

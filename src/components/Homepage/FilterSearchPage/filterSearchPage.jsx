@@ -1,7 +1,7 @@
 import React from "react";
-import FilterComponent from "../../UIComponents/FilterComponent";
+import FilterComponent from "../../UIComponents/SearchComponent";
 
-const FilterSearchPage = () => {
+const FilterSearchPage = ({ onSearch, mobileOpen, onMobileClose }) => {
   // Define your data in the page component
   const filterData = {
     fieldType: "CreatableDropdown",
@@ -61,18 +61,14 @@ const FilterSearchPage = () => {
     },
   };
 
-  // Handle search results
-  const handleSearchResults = (filterData) => {
-    console.log("Search results:", filterData);
-    // Here you can make API calls, update state, etc.
-  };
-
   return (
     <div>
       <FilterComponent
         data={filterData}
         filterOptions={filterOptions}
-        onSearch={handleSearchResults}
+        onSearch={onSearch}
+        mobileOpen={mobileOpen}
+        onMobileClose={onMobileClose}
       />
     </div>
   );
