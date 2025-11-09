@@ -9,12 +9,14 @@ const LeftSideProgress = ({
   SellerFormDetailsData,
   progressPercentage,
   setActiveStep,
-  formData
+  formData,
+  isMobile = false,
+  onCloseMobile
 }) => {
   const { isStepCompleted } = useSimpleValidation();
   
   const slideInVariants = {
-    hidden: { x: -100, opacity: 0 },
+    hidden: { x: isMobile ? -300 : -100, opacity: 0 },
     visible: {
       x: 0,
       opacity: 1,
@@ -28,10 +30,8 @@ const LeftSideProgress = ({
 
   // Check if step is accessible for navigation
   const isStepAccessible = (stepIndex) => {
-    // Allow going back to any previous step
     if (stepIndex <= activeStep) return true;
     
-    // For future steps, check if all previous steps are completed
     for (let i = 0; i < stepIndex; i++) {
       if (!isStepCompleted(i, SellerFormDetailsData[i].fields, formData)) {
         return false;
@@ -43,6 +43,9 @@ const LeftSideProgress = ({
   const handleStepClick = (index) => {
     if (isStepAccessible(index)) {
       setActiveStep(index);
+      if (isMobile && onCloseMobile) {
+        onCloseMobile();
+      }
     }
   };
 
@@ -83,42 +86,70 @@ const LeftSideProgress = ({
           animate="visible"
           exit="hidden"
           variants={slideInVariants}
-          className="w-110 pr-20 mt-0 bg-white/95 backdrop-blur-xl border-r border-[var(--location-blue-200)]/60 shadow-2xl relative"
+          className={`${isMobile ? 
+            'w-full h-full fixed inset-0 z-40 bg-white overflow-y-auto mobile-safe-area' : 
+            'w-110 pr-20 mt-0 bg-white/95 backdrop-blur-xl border-r border-[var(--location-blue-200)]/60 shadow-2xl relative'}`}
         >
-          {/* Sidebar Background with Premium Pattern */}
-          <div className="absolute inset-0 bg-[linear-gradient(135deg,_rgba(37,99,235,0.03)_0%,_transparent_50%)]"></div>
-          <div className="absolute inset-0 opacity-[0.02] bg-[linear-gradient(45deg,_transparent_48%,_#000_48%,_#000_52%,_transparent_52%)] bg-[size:20px_20px]"></div>
+          {/* Mobile Header */}
+          {isMobile && (
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between z-10">
+              <h2 className="text-xl font-bold text-[var(--location-blue-800)]">Listing Progress</h2>
+              <button 
+                onClick={onCloseMobile}
+                className="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          )}
 
-          <div className="relative z-10 h-full flex flex-col p-8">
+          {/* Sidebar Background with Premium Pattern */}
+          {!isMobile && (
+            <>
+              <div className="absolute inset-0 bg-[linear-gradient(135deg,_rgba(37,99,235,0.03)_0%,_transparent_50%)]"></div>
+              <div className="absolute inset-0 opacity-[0.02] bg-[linear-gradient(45deg,_transparent_48%,_#000_48%,_#000_52%,_transparent_52%)] bg-[size:20px_20px]"></div>
+            </>
+          )}
+
+          <div className={`relative z-10 h-full flex flex-col ${isMobile ? 'p-4' : 'p-8'}`}>
             {/* Progress Header */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="mb-8"
+              className={`${isMobile ? 'mb-6' : 'mb-8'}`}
             >
               {/* Premium Badge */}
-              <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-white/80 to-[var(--location-blue-100)]/10 border border-[var(--location-blue-300)] backdrop-blur-sm mb-4 shadow-lg"
-              >
+              {!isMobile && (
                 <motion.div
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  className="w-3 h-3 bg-gradient-to-r from-[var(--location-blue-400)] to-[var(--location-blue-600)] rounded-full mr-2"
-                />
-                <span className="text-xs font-semibold bg-gradient-to-r from-[var(--location-blue-600)] to-[var(--location-blue-800)] bg-clip-text text-transparent">
-                  LISTING PROGRESS
-                </span>
-              </motion.div>
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-white/80 to-[var(--location-blue-100)]/10 border border-[var(--location-blue-300)] backdrop-blur-sm mb-4 shadow-lg"
+                >
+                  <motion.div
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="w-3 h-3 bg-gradient-to-r from-[var(--location-blue-400)] to-[var(--location-blue-600)] rounded-full mr-2"
+                  />
+                  <span className="text-xs font-semibold bg-gradient-to-r from-[var(--location-blue-600)] to-[var(--location-blue-800)] bg-clip-text text-transparent">
+                    LISTING PROGRESS
+                  </span>
+                </motion.div>
+              )}
               
-              <div className="text-2xl font-black bg-gradient-to-r from-[var(--location-blue-600)] to-[var(--location-blue-800)] bg-clip-text text-transparent mb-2">
-                Almost There!
+              <div className={`font-black bg-gradient-to-r from-[var(--location-blue-600)] to-[var(--location-blue-800)] bg-clip-text text-transparent mb-2 ${
+                isMobile ? 'text-xl' : 'text-2xl'
+              }`}>
+                {isMobile ? 'Your Progress' : 'Almost There!'}
               </div>
               <p className="text-[var(--location-gray-600)] text-sm">
-                Complete your premium listing in few steps
+                {isMobile ? 
+                  `Step ${activeStep + 1} of ${SellerFormDetailsData.length}` : 
+                  'Complete your premium listing in few steps'
+                }
               </p>
             </motion.div>
 
@@ -127,7 +158,7 @@ const LeftSideProgress = ({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 }}
-              className="mb-8"
+              className={`${isMobile ? 'mb-6' : 'mb-8'}`}
             >
               <div className="flex justify-between items-center mb-3">
                 <span className="text-[var(--location-blue-800)] text-sm font-medium">Progress</span>
@@ -157,7 +188,7 @@ const LeftSideProgress = ({
             </motion.div>
 
             {/* Steps Navigation */}
-            <div className="space-y-4 flex-1 overflow-y-auto gradient-scrollbar">
+            <div className={`space-y-3 flex-1 overflow-y-auto ${isMobile ? 'pb-20' : ''}`}>
               {SellerFormDetailsData.map((step, index) => {
                 const isCompleted = isStepCompleted(index, step.fields, formData);
                 const isAccessible = isStepAccessible(index);
@@ -179,12 +210,14 @@ const LeftSideProgress = ({
                         : isAccessible
                         ? 'bg-white/60 border-[var(--location-blue-200)]/30 hover:bg-white hover:border-[var(--location-blue-200)] hover:shadow-md'
                         : 'bg-gray-100/50 border-gray-200/30 cursor-not-allowed'
-                    }`}
+                    } ${isMobile ? 'rounded-lg' : ''}`}
                   >
                     <div className="flex items-center gap-3">
                       <motion.div
                         whileHover={isAccessible ? { scale: 1.1 } : {}}
-                        className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-300 ${
+                        className={`flex items-center justify-center transition-all duration-300 ${
+                          isMobile ? 'w-8 h-8 rounded-md' : 'w-10 h-10 rounded-lg'
+                        } ${
                           isCurrent
                             ? 'bg-gradient-to-br from-[var(--location-blue-500)] to-[var(--location-blue-600)] text-white shadow-lg shadow-[var(--location-blue-500)]/25'
                             : isCompleted
@@ -194,10 +227,12 @@ const LeftSideProgress = ({
                             : 'bg-gray-200 text-gray-400'
                         }`}
                       >
-                        <span className="text-lg">{step.icon}</span>
+                        <span className={isMobile ? 'text-base' : 'text-lg'}>{step.icon}</span>
                       </motion.div>
                       <div className="flex-1 min-w-0">
-                        <div className={`font-semibold text-sm transition-colors ${
+                        <div className={`font-semibold transition-colors ${
+                          isMobile ? 'text-sm' : 'text-sm'
+                        } ${
                           isCurrent 
                             ? 'text-[var(--location-blue-700)]' 
                             : isCompleted
@@ -208,7 +243,9 @@ const LeftSideProgress = ({
                         }`}>
                           {step.header}
                         </div>
-                        <div className={`text-xs mt-1 ${
+                        <div className={`mt-1 ${
+                          isMobile ? 'text-xs' : 'text-xs'
+                        } ${
                           isCurrent 
                             ? 'text-[var(--location-blue-600)]' 
                             : isCompleted
@@ -217,7 +254,7 @@ const LeftSideProgress = ({
                             ? 'text-[var(--location-gray-600)] group-hover:text-[var(--location-gray-700)]'
                             : 'text-gray-400'
                         }`}>
-                          {step.description}
+                          {isMobile ? step.header : step.description}
                         </div>
                       </div>
                       {isCurrent && (
@@ -231,9 +268,11 @@ const LeftSideProgress = ({
                         <motion.div
                           initial={{ scale: 0 }}
                           animate={{ scale: 1 }}
-                          className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center"
+                          className={`bg-green-500 rounded-full flex items-center justify-center ${
+                            isMobile ? 'w-3 h-3' : 'w-4 h-4'
+                          }`}
                         >
-                          <svg className="w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className={`text-white ${isMobile ? 'w-1.5 h-1.5' : 'w-2 h-2'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                           </svg>
                         </motion.div>
@@ -247,25 +286,39 @@ const LeftSideProgress = ({
               })}
             </div>
 
-            {/* Quick Stats */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.2 }}
-              className="mt-6 p-4 bg-gradient-to-r from-[var(--location-blue-50)]/50 to-[var(--location-blue-100)]/30 rounded-xl border border-[var(--location-blue-200)]/50"
-            >
-              <h3 className="font-semibold text-[var(--location-blue-800)] text-sm mb-3">Listing Impact</h3>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="text-center">
-                  <div className="text-lg font-black bg-gradient-to-r from-[var(--location-blue-600)] to-[var(--location-blue-800)] bg-clip-text text-transparent">3.2x</div>
-                  <div className="text-[var(--location-gray-600)] text-xs">More Views</div>
+            {/* Quick Stats - Hidden on mobile */}
+            {!isMobile && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.2 }}
+                className="mt-6 p-4 bg-gradient-to-r from-[var(--location-blue-50)]/50 to-[var(--location-blue-100)]/30 rounded-xl border border-[var(--location-blue-200)]/50"
+              >
+                <h3 className="font-semibold text-[var(--location-blue-800)] text-sm mb-3">Listing Impact</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="text-center">
+                    <div className="text-lg font-black bg-gradient-to-r from-[var(--location-blue-600)] to-[var(--location-blue-800)] bg-clip-text text-transparent">3.2x</div>
+                    <div className="text-[var(--location-gray-600)] text-xs">More Views</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-lg font-black bg-gradient-to-r from-[var(--gold-base)] to-[var(--gold-dark)] bg-clip-text text-transparent">89%</div>
+                    <div className="text-[var(--location-gray-600)] text-xs">Faster Sale</div>
+                  </div>
                 </div>
-                <div className="text-center">
-                  <div className="text-lg font-black bg-gradient-to-r from-[var(--gold-base)] to-[var(--gold-dark)] bg-clip-text text-transparent">89%</div>
-                  <div className="text-[var(--location-gray-600)] text-xs">Faster Sale</div>
-                </div>
+              </motion.div>
+            )}
+
+            {/* Mobile Continue Button */}
+            {isMobile && (
+              <div className="sticky bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 mt-6">
+                <button
+                  onClick={onCloseMobile}
+                  className="w-full py-3 bg-gradient-to-r from-[var(--location-blue-500)] to-[var(--location-blue-700)] text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                >
+                  Continue to Step {activeStep + 1}
+                </button>
               </div>
-            </motion.div>
+            )}
           </div>
         </motion.div>
       )}
