@@ -283,6 +283,29 @@ const SellerForm = () => {
   const toggleSidebar = () => {
     setIsSidebarVisible(!isSidebarVisible);
   };
+  // Add this to your SellerForm component
+React.useEffect(() => {
+  console.log('=== FORM STATE DEBUG ===');
+  console.log('Form Data:', formData);
+  
+  // Check photos specifically
+  const photoFields = SellerFormDetailsData.flatMap(step => 
+    step.fields.filter(field => field.fieldType === 'UploadFile')
+  );
+  
+  photoFields.forEach(field => {
+    const fieldName = field.label;
+    const value = formData[fieldName];
+    console.log(`Photo Field "${fieldName}":`, {
+      exists: !!value,
+      isArray: Array.isArray(value),
+      fileCount: value?.length || 0,
+      files: value || 'No files'
+    });
+  });
+  
+  console.log('=== END DEBUG ===');
+}, [formData]);
 
   return (
     <div className={`relative ${isMobile ? 'min-h-screen' : 'min-h-[92vh]'} flex flex-col md:flex-row bg-gradient-to-br from-[var(--location-blue-50)] via-[var(--location-blue-100)] to-[var(--location-cyan-100)] overflow-hidden`}>

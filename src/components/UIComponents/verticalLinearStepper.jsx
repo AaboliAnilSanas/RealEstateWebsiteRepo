@@ -114,6 +114,11 @@ function VerticalLinearStepper({ SellerFormDetails, activeStep, onStepChange, fo
     }
   };
 
+  // Check if all steps are completed for the Finish button
+  const isAllStepsCompleted = () => {
+    return steps.every((step, index) => isStepCompleted(index, step.fields, formData));
+  };
+
   const handleFinish = () => {
     // Validate all steps
     let allValid = true;
@@ -310,7 +315,7 @@ function VerticalLinearStepper({ SellerFormDetails, activeStep, onStepChange, fo
                       <Button
                         variant="contained"
                         onClick={index === steps.length - 1 ? handleFinish : handleNext}
-                        disabled={!isStepCompleted(index, step.fields, formData)}
+                        disabled={index === steps.length - 1 ? !isAllStepsCompleted() : !isStepCompleted(index, step.fields, formData)}
                         sx={{
                           mt: 1, mr: 1,
                           background: "linear-gradient(90deg, #d2a63f, #b8860b)", // Gold gradient
@@ -339,13 +344,16 @@ function VerticalLinearStepper({ SellerFormDetails, activeStep, onStepChange, fo
         {activeStep === steps.length && (
           <Paper square elevation={0} sx={{ 
             p: "var(--padding-y)", 
+            py:"20px",
+            mb:"10px",
+            
             textAlign: "center", 
             background: "linear-gradient(135deg, #fef9c3, #fbf1d4)", // Light gold gradient
             borderRadius: "var(--radius-lg)",
             border: "1px solid #fde047" // Light gold border
           }}>
             <Typography sx={{ 
-              mb: "var(--gap)", 
+              mb: "10px", 
               color: "#b8860b", // Dark gold
               fontWeight: "bold",
               fontSize: "1.1rem"

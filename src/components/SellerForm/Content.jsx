@@ -36,6 +36,18 @@ const Content = ({ formDetails, formData, updateFormData, errors, isMobile = fal
     return label ? label.replace(/\*$/, '') : label;
   };
 
+  // Check if field should be numeric based on label
+  const isNumericField = (fieldLabel) => {
+    const label = fieldLabel.toLowerCase();
+    return label.includes('price') || 
+           label.includes('area') || 
+           label.includes('carpet') || 
+           label.includes('built') || 
+           label.includes('super') ||
+           label.includes('floor') ||
+           label.includes('year');
+  };
+
   return (
     <div>
       <div className={`mb-2 ${isMobile ? 'px-1' : 'px-2'}`}>
@@ -59,6 +71,7 @@ const Content = ({ formDetails, formData, updateFormData, errors, isMobile = fal
           const isRequired = field.label.includes("*");
           const error = errors[fieldName];
           const isDropdownValid = dropdownValidations[fieldName] !== false;
+          const shouldBeNumeric = isNumericField(field.label);
 
           return (
             <div
@@ -76,6 +89,11 @@ const Content = ({ formDetails, formData, updateFormData, errors, isMobile = fal
                   {getDisplayLabel(field.label)}
                   {isRequired && (
                     <span className="text-red-500 text-sm font-semibold">*</span>
+                  )}
+                  {shouldBeNumeric && (
+                    <span className="text-blue-500 text-xs font-normal bg-blue-50 px-2 py-1 rounded">
+                      Numeric
+                    </span>
                   )}
                 </h3>
               )}
@@ -114,6 +132,7 @@ const Content = ({ formDetails, formData, updateFormData, errors, isMobile = fal
                           {...commonProps}
                           InputLabels={field.fieldData || []}
                           Width={"100%"}
+                          isNumeric={shouldBeNumeric}
                         />
                       </div>
                     );
@@ -177,6 +196,7 @@ const Content = ({ formDetails, formData, updateFormData, errors, isMobile = fal
                           textfieldError={!!errors[fieldName]}
                           onValidationChange={(isValid) => handleDropdownValidation(fieldName, isValid)}
                           isMobile={isMobile}
+                          isNumericField={shouldBeNumeric}
                         />
                         {errors[fieldName] && (
                           <div className="flex items-center gap-2 text-red-600 bg-red-50/80 px-3 py-1 rounded-lg border border-red-200 mt-1">
