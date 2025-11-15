@@ -126,7 +126,7 @@ export default function ModernOtpForm({
             setError('');
             
             // ** API CALL: Resend OTP (Replaces dummy promise) **
-            await axiosInstance.post('auth/send-otp', {
+            await axiosInstance.post('auth/resend-otp', {
                 email: email
             });
             // ** END API CALL **
