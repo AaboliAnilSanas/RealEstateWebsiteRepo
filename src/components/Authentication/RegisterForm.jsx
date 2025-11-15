@@ -32,7 +32,8 @@ export default function ModernRegisterForm({
     } catch (error) {
       console.error('Error sending OTP:', error.response?.data || error.message);
       setError(error.response?.data?.message || 'Failed to send OTP. Please check your network.');
-    } finally {
+    } 
+    finally {
       setLoading(false);
     }
   };

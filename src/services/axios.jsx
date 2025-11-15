@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:7000/api/',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/',
   timeout:parseInt(import.meta.env.VITE_API_TIMEOUT) || 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -10,18 +10,21 @@ const axiosInstance = axios.create({
 });
 
 // Request interceptor
-axiosInstance.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('authToken');
+axiosInstance.interceptors.request.use((config) => {
+  const isPublicApi =
+    config.url.includes("send-otp") ||
+    config.url.includes("verify-otp") ;
+
+  if (!isPublicApi) {
+    const token = localStorage.getItem("authToken");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
   }
-);
+
+  return config;
+});
+
 
 // Response interceptor (FIXED: You had request interceptor twice)
 axiosInstance.interceptors.response.use(

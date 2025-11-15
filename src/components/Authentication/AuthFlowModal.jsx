@@ -52,13 +52,29 @@ export default function AuthFlowModal({
 
   // Step 2 -> Step 3
   const handleVerifyOtp = (result) => {
-    if (result.success && result.token) {
+  if (result.success && result.token) {
+    
+    // CASE 1: User already exists → login directly
+    if (result.status === "login_successful") {
+      console.log("Login successful");
+      console.log("User:", result.user?.fullName); // if backend returns user
+
+      localStorage.setItem("authToken", result.token);
+
+      // toast.success("Login Successful");
+
+      onClose();   // CLOSE MODAL
+      return;      // ✔ STOP – DO NOT GO TO REGISTER
+    }
+
+    // CASE 2: New user → must complete registration
+    if (result.status === "proceed_to_registration") {
       setAuthToken(result.token);
-      localStorage.setItem('authToken', result.token);
       setStep(STEPS.DETAILS);
     }
-    // If verification fails, OtpForm will handle the error display
-  };
+  }
+};
+
   
   // Step 3 -> Finish
   const handleCreateAccount = (result) => {

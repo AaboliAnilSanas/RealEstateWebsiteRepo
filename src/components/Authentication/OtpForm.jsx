@@ -70,10 +70,10 @@ export default function ModernOtpForm({
             inputRefs.current[index + 1].focus();
         }
         
-        if (newOtp.every(digit => digit.length === 1)) {
-            // ** MODIFIED: Call API function when OTP is complete **
-            setTimeout(handleVerify, 100); 
-        }
+        // if (newOtp.every(digit => digit.length === 1)) {
+        //     // ** MODIFIED: Call API function when OTP is complete **
+        //     setTimeout(handleVerify, 100); 
+        // }
     };
 
     const handleKeyDown = (e, index) => {
