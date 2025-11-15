@@ -12,6 +12,14 @@ export default function ModernOtpForm({
     const [error, setError] = useState('');
     const [resending, setResending] = useState(false);
     const [loading, setLoading] = useState(false);
+    
+    // 1. New states for cooldown and success message
+    const [cooldownSeconds, setCooldownSeconds] = useState(0); 
+    const [successMessage, setSuccessMessage] = useState(''); 
+    
+    // 2. New state to control if the countdown timer should be *displayed*
+    const [showCountdownTimer, setShowCountdownTimer] = useState(false); 
+    
     const inputRefs = useRef([]);
     
     const isOtpComplete = otp.every(digit => digit.length === 1);
@@ -20,9 +28,30 @@ export default function ModernOtpForm({
         setTimeout(() => inputRefs.current[0]?.focus(), 100);
     }, []);
 
-    // ** ADDED API CALL FUNCTION: Verify OTP **
+    // 3. Timer useEffect for countdown logic
+    useEffect(() => {
+        let timer;
+        if (cooldownSeconds > 0) {
+            timer = setInterval(() => {
+                setCooldownSeconds(prev => prev - 1);
+            }, 1000);
+        } else if (cooldownSeconds === 0) {
+            // When timer hits zero, reset display/error states
+            if (error && error.includes('seconds before resending')) {
+                setError('');
+            }
+            if (successMessage) {
+                 setTimeout(() => setSuccessMessage(''), 1000); 
+            }
+            // Crucially, turn off the countdown display
+            setShowCountdownTimer(false); 
+        }
+        return () => clearInterval(timer);
+    }, [cooldownSeconds, error, successMessage]);
+
+
     const handleVerify = async () => {
-        if (!isOtpComplete || loading) return; // Prevent double submission
+        if (!isOtpComplete || loading) return; 
         
         setLoading(true);
         setError('');
@@ -36,16 +65,14 @@ export default function ModernOtpForm({
             
             const data = response.data;
             
-            // Store token in localStorage for subsequent API calls (like registration)
             if (data.token) {
                 localStorage.setItem('authToken', data.token);
             }
             
-            // Pass the crucial status and token back to AuthFlowModal
             onVerify({
-                success: true, // Always true if API call succeeds and we get a token/message
+                success: true, 
                 token: data.token,
-                status: data.status, // "login_successful" or "proceed_to_registration"
+                status: data.status, 
                 message: data.message
             });
             
@@ -56,8 +83,7 @@ export default function ModernOtpForm({
             setLoading(false);
         }
     };
-    // ** END API CALL FUNCTION **
-
+    
     const handleInputChange = (e, index) => {
         const value = e.target.value.replace(/[^0-9]/g, '').slice(-1);
         
@@ -69,11 +95,6 @@ export default function ModernOtpForm({
         if (value && index < 5) {
             inputRefs.current[index + 1].focus();
         }
-        
-        // if (newOtp.every(digit => digit.length === 1)) {
-        //     // ** MODIFIED: Call API function when OTP is complete **
-        //     setTimeout(handleVerify, 100); 
-        // }
     };
 
     const handleKeyDown = (e, index) => {
@@ -111,30 +132,53 @@ export default function ModernOtpForm({
         } else {
             inputRefs.current[5]?.focus();
             if (newOtp.every(digit => digit)) {
-                // ** MODIFIED: Call API function when OTP is complete after paste **
                  setTimeout(handleVerify, 100);
             }
         }
     };
 
-    // ** MODIFIED: Use the actual handleVerify function for manual click **
     const handleManualVerify = handleVerify;
 
+    // 4. Modified handleResendOtp to implement visibility logic
     const handleResendOtp = async () => {
+        // Prevent resending if button is disabled
+        if (cooldownSeconds > 0) return;
+        
         try {
             setResending(true);
             setError('');
+            setSuccessMessage(''); 
             
-            // ** API CALL: Resend OTP (Replaces dummy promise) **
-            await axiosInstance.post('auth/resend-otp', {
+            const response = await axiosInstance.post('auth/resend-otp', {
                 email: email
             });
-            // ** END API CALL **
+            
+            const message = response.data.message || 'A new OTP has been sent to you.';
             
             setOtp(['', '', '', '', '', '']);
             setTimeout(() => inputRefs.current[0]?.focus(), 100);
+            
+            // --- SUCCESS PATH ---
+            setSuccessMessage(message);
+            setCooldownSeconds(60); // Keep button disabled for 60s
+            setShowCountdownTimer(false); // **DO NOT show the timer on success**
+
         } catch (error) {
-            setError('Failed to resend OTP. Please try again.');
+            // Error handling (Check for CooldownException)
+            const errorMessage = error.response?.data?.message || 'Failed to resend OTP.';
+            
+            const cooldownMatch = errorMessage.match(/Please wait (\d+) more seconds before resending./);
+            
+            if (cooldownMatch) {
+                const seconds = parseInt(cooldownMatch[1], 10);
+                // --- COOLDOWN ERROR PATH ---
+                setError(errorMessage); 
+                setCooldownSeconds(seconds); 
+                setShowCountdownTimer(true); // **Show the timer on cooldown error**
+            } else {
+                setError(errorMessage);
+                setShowCountdownTimer(false);
+            }
         } finally {
             setResending(false);
         }
@@ -142,7 +186,7 @@ export default function ModernOtpForm({
 
     return (
         <div className="relative bg-gradient-to-br from-blue-50 via-white to-blue-50 rounded-2xl shadow-2xl overflow-hidden max-w-md mx-auto">
-            {/* Decorative Elements */}
+            {/* Decorative Elements (omitted for brevity) */}
             <div className="absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" 
                  style={{ background: 'radial-gradient(circle, rgba(59, 130, 246, 0.15), rgba(210, 166, 63, 0.15))' }} />
             <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"
@@ -202,17 +246,19 @@ export default function ModernOtpForm({
                         ))}
                     </div>
 
-                    {/* Error Message */}
-                    {error && (
-                        <div className="flex items-start gap-2 p-4 bg-red-50 border border-red-200 rounded-xl animate-shake">
-                            <div className="flex-shrink-0 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center mt-0.5">
-                                <span className="text-white text-xs font-bold">!</span>
+                    {/* Error/Success Message */}
+                    {(successMessage || error) && (
+                        <div className={`flex items-start gap-2 p-4 rounded-xl border ${error ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'}`}>
+                            <div className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center mt-0.5 ${error ? 'bg-red-500' : 'bg-green-500'}`}>
+                                <span className="text-white text-xs font-bold">{error ? '!' : '✓'}</span>
                             </div>
-                            <p className="text-sm text-red-700 font-medium">{error}</p>
+                            <p className={`text-sm font-medium ${error ? 'text-red-700' : 'text-green-700'}`}>
+                                {successMessage || error}
+                            </p>
                         </div>
                     )}
-
-                    {/* Verify Button */}
+                    
+                    {/* Verify Button (omitted for brevity) */}
                     <button
                         type="button"
                         onClick={handleManualVerify}
@@ -240,15 +286,24 @@ export default function ModernOtpForm({
                         </span>
                     </button>
 
-                    {/* Resend OTP */}
+                    {/* Resend OTP Section */}
                     <div className="text-center pt-1">
                         <p className="text-sm text-gray-600 mb-2">
                             Didn't receive the code?
                         </p>
+                        
+                        {/* Cooldown Timer Display - Visible ONLY on cooldown error (when setShowCountdownTimer(true) is set) */}
+                        {showCountdownTimer && cooldownSeconds > 0 && (
+                             <p className="font-semibold text-sm mb-2" style={{ color: 'var(--primary-color-light)' }}>
+                                Please wait for: <span className="text-red-600 font-bold">{cooldownSeconds} seconds</span>
+                            </p>
+                        )}
+                        
                         <button
                             type="button"
                             onClick={handleResendOtp}
-                            disabled={resending}
+                            // Button disabled when resending or cooldown is active
+                            disabled={resending || cooldownSeconds > 0} 
                             className="inline-flex items-center gap-2 font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-colors group"
                             style={{ color: 'var(--primary-color-light)' }}
                         >

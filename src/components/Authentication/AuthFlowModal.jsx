@@ -1,10 +1,11 @@
-// Authentication/AuthFlowModal.jsx
+// src/components/Authentication/AuthFlowModal.jsx
 import React, { useState } from 'react';
 import { X, ArrowLeft } from 'lucide-react';
 // Import the refactored content-only components
 import RegisterForm from './RegisterForm.jsx'; 
 import OtpForm from './OtpForm.jsx';           
 import DetailsForm from './DetailsFormContent.jsx';   
+import Toast from '../UIComponents/Toast'; // <-- ADDED IMPORT
 
 const colorTheme = {
   '--primary-color': '#d2a63f',
@@ -32,6 +33,14 @@ export default function AuthFlowModal({
   const [userEmail, setUserEmail] = useState('');
   // ADDED: Internal state for forcing closure on user's request
   const [isClosedInternally, setIsClosedInternally] = useState(false);
+  
+  // <-- ADDED TOAST STATE -->
+  const [toast, setToast] = useState({ message: '', type: '', key: 0 }); 
+  
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type, key: toast.key + 1 });
+  };
+  // <-- END TOAST STATE -->
 
   if (!isOpen || isClosedInternally) return null; // MODIFIED: Check local state
 
@@ -61,8 +70,7 @@ export default function AuthFlowModal({
 
       localStorage.setItem("authToken", result.token);
 
-      // toast.success("Login Successful");
-
+      // We still need to close the modal after login
       onClose();   // CLOSE MODAL
       return;      // ✔ STOP – DO NOT GO TO REGISTER
     }
@@ -84,7 +92,13 @@ export default function AuthFlowModal({
       if (result.user) {
         localStorage.setItem('userData', JSON.stringify(result.user));
       }
-      onClose(); // Close the modal after successful registration
+      
+      // [MODIFICATION 1] Show success toast
+      showToast("Account created successfully. Please close this toast manually.", "success"); 
+      
+      // [MODIFICATION 2] Immediately close the modal so only the toast is visible.
+      // The toast is a sibling element and will remain mounted.
+      onClose(); 
       
       // Optional: Redirect to dashboard or show success message
       // window.location.href = '/dashboard';
@@ -113,77 +127,88 @@ export default function AuthFlowModal({
   const showBackButton = step !== STEPS.REGISTER;
 
   return (
-    // Modal Overlay
-    <div 
-      className="fixed inset-0 flex items-center justify-center p-4 z-50 font-sans"
-      style={{
-        backdropFilter: "blur(1px)",        // ✅ Blur
-        WebkitBackdropFilter: "blur(1px)",  // ✅ Safari support
-        backgroundColor: "rgba(0, 0, 0, 0.45)", // ✅ Soft fade on top of blur
-      }}
-    >
+    <>
+      {/* RENDER TOAST COMPONENT (it sits outside the modal container, ensuring visibility when modal closes) */}
+      <Toast 
+        key={toast.key}
+        message={toast.message}
+        type={toast.type}
+        // Duration is ignored by Toast.jsx since dismissal is manual
+        onClose={() => setToast({ message: '', type: '', key: toast.key })}
+      />
       
-      {/* Modal Container */}
+      {/* Modal Overlay */}
       <div 
-        className="bg-white rounded-xl w-full max-w-sm sm:max-w-md overflow-hidden transform transition-all duration-300 scale-100 opacity-100"
-        style={{ boxShadow: '0 15px 60px rgba(0,0,0,0.4)', borderRadius: '16px' }}
+        className="fixed inset-0 flex items-center justify-center p-4 z-50 font-sans"
+        style={{
+          backdropFilter: "blur(1px)",        // ✅ Blur
+          WebkitBackdropFilter: "blur(1px)",  // ✅ Safari support
+          backgroundColor: "rgba(0, 0, 0, 0.45)", // ✅ Soft fade on top of blur
+        }}
       >
         
-        {/* Header */}
+        {/* Modal Container */}
         <div 
-          className="p-4 flex justify-between items-center" 
-          style={{ backgroundColor: 'white' }}
+          className="bg-white rounded-xl w-full max-w-sm sm:max-w-md overflow-hidden transform transition-all duration-300 scale-100 opacity-100"
+          style={{ boxShadow: '0 15px 60px rgba(0,0,0,0.4)', borderRadius: '16px' }}
         >
-          <div className="flex items-center">
-            {showBackButton && (
-              <button
-                onClick={handleBack}
-                className="text-gray-500 hover:text-gray-700 p-1 mr-2 rounded-full transition"
-                aria-label="Go Back"
-              >
-                <ArrowLeft size={20} />
-              </button>
-            )}
-            <h2 className="text-xl font-bold" style={{ color: colorTheme['--tertiary-color'] }}>{getModalTitle()}</h2>
+          
+          {/* Header */}
+          <div 
+            className="p-4 flex justify-between items-center" 
+            style={{ backgroundColor: 'white' }}
+          >
+            <div className="flex items-center">
+              {showBackButton && (
+                <button
+                  onClick={handleBack}
+                  className="text-gray-500 hover:text-gray-700 p-1 mr-2 rounded-full transition"
+                  aria-label="Go Back"
+                >
+                  <ArrowLeft size={20} />
+                </button>
+              )}
+              <h2 className="text-xl font-bold" style={{ color: colorTheme['--tertiary-color'] }}>{getModalTitle()}</h2>
+            </div>
+
+            <button
+              onClick={() => {
+                onClose();
+                setIsClosedInternally(true); // ADDED: Force modal to close internally
+              }}
+              className="text-gray-500 hover:text-gray-700 p-1 rounded-full transition"
+              aria-label="Close Modal"
+            >
+              <X size={20} />
+            </button>
           </div>
 
-          <button
-            onClick={() => {
-              onClose();
-              setIsClosedInternally(true); // ADDED: Force modal to close internally
-            }}
-            className="text-gray-500 hover:text-gray-700 p-1 rounded-full transition"
-            aria-label="Close Modal"
-          >
-            <X size={20} />
-          </button>
+          {/* Conditional Content Rendering */}
+          {step === STEPS.REGISTER && (
+            <RegisterForm
+              countryCodePrefix={countryCodePrefix}
+              onContinue={handleContinue}
+            />
+          )}
+
+          {step === STEPS.OTP && (
+            <OtpForm
+              phoneNumber={phoneNumber ? `${countryCodePrefix} ${phoneNumber}` : ''}
+              email={email}
+              onVerify={handleVerifyOtp}
+              onBack={handleBack}
+            />
+          )}
+
+          {step === STEPS.DETAILS && (
+            <DetailsForm 
+              onCreateAccount={handleCreateAccount}
+              countryCodePrefix={countryCodePrefix}
+              authToken={authToken}
+            />
+          )}
         </div>
-
-        {/* Conditional Content Rendering */}
-        {step === STEPS.REGISTER && (
-          <RegisterForm
-            countryCodePrefix={countryCodePrefix}
-            onContinue={handleContinue}
-          />
-        )}
-
-        {step === STEPS.OTP && (
-          <OtpForm
-            phoneNumber={phoneNumber ? `${countryCodePrefix} ${phoneNumber}` : ''}
-            email={email}
-            onVerify={handleVerifyOtp}
-            onBack={handleBack}
-          />
-        )}
-
-        {step === STEPS.DETAILS && (
-          <DetailsForm 
-            onCreateAccount={handleCreateAccount}
-            countryCodePrefix={countryCodePrefix}
-            authToken={authToken}
-          />
-        )}
       </div>
-    </div>
+    </>
   );
 }
