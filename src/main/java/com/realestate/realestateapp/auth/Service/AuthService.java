@@ -3,11 +3,16 @@ package com.realestate.realestateapp.auth.Service;
 import com.realestate.realestateapp.auth.Entity.Otp;
 import com.realestate.realestateapp.auth.Repository.OtpRepository;
 import com.realestate.realestateapp.auth.dto.*;
+import com.realestate.realestateapp.shared.exception.CooldownException;
+import com.realestate.realestateapp.shared.exception.ResourceNotFoundException;
 import com.realestate.realestateapp.shared.service.EmailService;
 import com.realestate.realestateapp.shared.service.JwtService; // <-- Import
 import com.realestate.realestateapp.shared.util.OtpUtil;
 import com.realestate.realestateapp.user.Entity.User;
 import com.realestate.realestateapp.user.Repository.UserRepository;
+import com.realestate.realestateapp.shared.exception.CooldownException;
+import com.realestate.realestateapp.shared.exception.ResourceNotFoundException;
+import java.time.Duration;
 
 import lombok.RequiredArgsConstructor;
 // Import these for registerUser
@@ -21,6 +26,9 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
+
+    // This is our cooldown period in seconds
+    private static final long OTP_COOLDOWN_SECONDS = 60;
 
     private final UserRepository userRepository;
     private final OtpRepository otpRepository;
@@ -36,6 +44,37 @@ public class AuthService {
         otpRepository.save(otp);
         emailService.sendOtpEmail(email, otpCode);
         return userRepository.findByEmail(email).isPresent() ? "email_exists" : "new_email";
+    }
+
+    @Transactional
+    public void resendOtp(EmailRequest request) {
+        String email = request.getEmail();
+        LocalDateTime now = LocalDateTime.now();
+
+        // 1. Find the existing OTP request
+        Otp otp = otpRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("No active OTP request found. Please start the login process again."));
+
+        // 2. Check the cooldown period
+        Duration timeSinceLastSend = Duration.between(otp.getLastSentAt(), now);
+        
+        if (timeSinceLastSend.getSeconds() < OTP_COOLDOWN_SECONDS) {
+            long secondsToWait = OTP_COOLDOWN_SECONDS - timeSinceLastSend.getSeconds();
+            throw new CooldownException("Please wait " + secondsToWait + " more seconds before resending.");
+        }
+
+        // 3. Cooldown has passed. Issue a new code.
+        String newOtpCode = OtpUtil.generateOtp();
+        
+        // 4. Update the *existing* OTP object
+        otp.setOtpCode(newOtpCode);
+        otp.setExpiresAt(now.plusMinutes(10));
+        otp.setLastSentAt(now);
+        
+        otpRepository.save(otp); // Save the updated record
+
+        // 5. Send the new email
+        emailService.sendOtpEmail(email, newOtpCode);
     }
 
     // --- verifyOtp is MODIFIED to return AuthResponse ---

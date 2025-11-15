@@ -22,9 +22,13 @@ public class Otp {
     @Column(nullable = false)
     private LocalDateTime expiresAt;
 
+    // @Column(nullable = false)
+    private LocalDateTime lastSentAt;
+
     public Otp(String email, String otpCode, LocalDateTime expiresAt) {
         this.email = email;
         this.otpCode = otpCode;
         this.expiresAt = expiresAt;
+        this.lastSentAt = LocalDateTime.now();
     }
 }

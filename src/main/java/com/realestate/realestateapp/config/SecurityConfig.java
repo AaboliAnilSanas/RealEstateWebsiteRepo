@@ -29,7 +29,10 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
                         // Your existing public rules
-                        .requestMatchers("/api/auth/send-otp", "/api/auth/verify-otp")
+                        .requestMatchers(
+                            "/api/auth/send-otp", 
+                            "/api/auth/verify-otp",
+                            "/api/auth/resend-otp")
                         .permitAll()
                         
                         // Your existing registration rule

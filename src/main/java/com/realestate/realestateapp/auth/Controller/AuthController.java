@@ -49,4 +49,13 @@ public class AuthController {
             return ResponseEntity.badRequest().body(new AuthResponse("error", e.getMessage(), null, null));
         }
     }
+
+    @PostMapping("/resend-otp")
+    public ResponseEntity<AuthResponse> resendOtp(@RequestBody EmailRequest request) {
+        // 1. Call the service. No try/catch needed!
+        authService.resendOtp(request);
+        
+        // 2. If it succeeds, send a 200 OK response.
+        return ResponseEntity.ok(new AuthResponse("success", "A new OTP has been sent."));
+    }
 }
