@@ -10,6 +10,9 @@ import Typography from "@mui/material/Typography";
 import Content from "../SellerForm/Content";
 import { useSimpleValidation } from "../../hooks/useSimpleValidation";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import axiosInstance from '../../services/axios'; // <-- ADDED IMPORT
+import { showToast } from "../Toast/ToastContainer";
+
 
 // Create a custom theme with golden as primary color
 const theme = createTheme({
@@ -66,8 +69,78 @@ const theme = createTheme({
 });
 
 function VerticalLinearStepper({ SellerFormDetails, activeStep, onStepChange, formData, updateFormData }) {
+  
   const steps = SellerFormDetails || [];
   const { errors, completedSteps, validateStep, clearFieldError, clearErrors, isStepCompleted } = useSimpleValidation();
+   
+  //FormData
+  const buildApiPayload = () => {
+  return {
+    basic_details: {
+      looking_to: formData["I'm looking to*"],
+      property_type: formData["What kind of property do you have ?*"],
+      property_sub_type: formData["Property Type*"]
+    },
+
+    location_details: {
+      city: formData["City*"],
+      locality: formData["Locality*"],
+      sub_locality: formData["Sub Locality"],
+      apartment_society: formData["Apartment/Society*"],
+      house_no: formData["House No."]
+    },
+
+    property_profile: {
+      bedrooms: Number(formData["No. of Bedrooms*"]) || 0,
+      bathrooms: Number(formData["No. of Bathrooms*"]) || 0,
+      balconies: Number(formData["No. of Balconies*"]) || 0,
+
+      area_details: {
+        carpet_area: { 
+          value: formData["Add Area Details*"]?.values?.[0]?.value || 0,
+          unit: formData["Add Area Details*"]?.values?.[0]?.unit || "sq.ft"
+        },
+        built_up_area: { 
+          value: formData["Add Area Details*"]?.values?.[1]?.value || 0,
+          unit: formData["Add Area Details*"]?.values?.[1]?.unit || "sq.ft"
+        }
+      },
+
+      floor_details: {
+        total_floors: formData["Floor Details"]?.values?.[0] || 0,
+        selected_floor: formData["Floor Details"]?.values?.[1] || ""
+      },
+
+      availability_status: formData["Availability Status*"],
+
+      possession_date: {
+        month: Number(formData["Age of Property / Possession By*"]?.units?.[0]) || 1,
+        year: Number(formData["Age of Property / Possession By*"]?.values?.[0]) || 2025
+      },
+
+      ownership: formData["Ownership*"],
+
+      price_details: {
+        value: Number(formData["Price Details*"]?.values?.[0]) || 0,
+        unit: formData["Price Details*"]?.units?.[0] || "₹"
+      },
+
+      description: formData["What makes your property unique"]
+    },
+
+    media: {
+      videos: (formData["Upload Videos"] || []).map(v => v.url || v),
+      photos: (formData["Upload Photos*"] || [])
+           .filter(p => typeof p === "string" || p.url)
+           .map(p => typeof p === "string" ? p : p.url),
+    },
+
+    metadata: {
+      submission_date: new Date().toISOString().split(".")[0],
+      form_version: "1.0"
+    }
+  };
+};
 
   // Check if user can navigate to a specific step
   const canNavigateToStep = (targetStep) => {
@@ -119,48 +192,42 @@ function VerticalLinearStepper({ SellerFormDetails, activeStep, onStepChange, fo
     return steps.every((step, index) => isStepCompleted(index, step.fields, formData));
   };
 
-  const handleFinish = () => {
-    // Validate all steps
-    let allValid = true;
-    
-    steps.forEach((step, index) => {
-      const stepValid = validateStep(step.fields, formData, index);
-      if (!stepValid) allValid = false;
-    });
+const handleFinish = async () => {
+  let allValid = true;
 
-    if (allValid) {
-      console.log('=== FORM SUBMISSION DATA ===');
-      console.log('Form submitted successfully!');
-      
-      // Print all form data in a readable format
-      Object.keys(formData).forEach(fieldName => {
-        const value = formData[fieldName];
-        
-        if (typeof value === 'object' && value !== null) {
-          // Handle CreatableDropdown data
-          if (value.values && value.units) {
-            console.log(`${fieldName}:`);
-            value.values.forEach((val, index) => {
-              if (val && val.trim() !== '') {
-                console.log(`  - ${val} ${value.units[index]}`);
-              }
-            });
-          } else {
-            console.log(`${fieldName}:`, value);
-          }
-        } else {
-          console.log(`${fieldName}:`, value);
-        }
-      });
-      
-      console.log('=== END FORM DATA ===');
-      onStepChange(steps.length);
+  steps.forEach((step, index) => {
+    const stepValid = validateStep(step.fields, formData, index);
+    if (!stepValid) allValid = false;
+  });
+
+  if (!allValid) {
+    showToast("error", "Please complete all required fields.");
+    return;
+  }
+
+  const payload = buildApiPayload();
+
+  try {
+    const res = await axiosInstance.post("/property/add", payload);
+
+    showToast("success", "Property added successfully!");
+
+    console.log("SUCCESS:", res.data);
+
+  } catch (error) {
+    console.error("Property Submit Error:", error?.response || error);
+
+    if (error?.response?.status === 403) {
+        showToast("error", "You are not logged in. Please login to add a property.");
+    } else if (error?.response?.status === 400) {
+        showToast("error", "Invalid property data. Please check your inputs.");
+    } else if (error?.response?.status === 500) {
+        showToast("error", "Server error. Please try again later.");
     } else {
-      console.log('Please fill all required fields before submitting.');
-      console.log('Current errors:', errors);
-      console.log('Current form data:', formData);
+        showToast("error", "Failed to submit property. Please try again.");
     }
-  };
+}
+};
 
   // Lock Icon Component with Tooltip
   const LockIconWithTooltip = ({ index }) => {

@@ -35,9 +35,14 @@
 
 import { RouterProvider } from 'react-router-dom';
 import router from './router/router';
+import ToastContainer from "./components/Toast/ToastContainer";
+
 function App() {
   return (
+    <>
+    <ToastContainer />
     <RouterProvider router={router} />
+    </>
   )
 }
 
