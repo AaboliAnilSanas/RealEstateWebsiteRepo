@@ -12,6 +12,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+// filter
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -52,6 +54,10 @@ public class Property {
     private Integer bedrooms;
     private Integer bathrooms;
     private Integer balconies;
+
+    // --- FIELD ADDED FOR FILTER ---
+    private Integer parking;
+
     @Column(name = "carpet_area_value", precision = 10, scale = 2)
     private BigDecimal carpetAreaValue;
     @Column(name = "carpet_area_unit", length = 10)
@@ -76,6 +82,13 @@ public class Property {
     private String priceUnit;
     @Lob
     private String description;
+
+    // --- FIELD ADDED FOR FILTER ---
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "property_amenities", joinColumns = @JoinColumn(name = "property_id"))
+    @Column(name = "amenity")
+    private List<String> amenities;
+
     @Column(name = "submission_date")
     private LocalDateTime submissionDate; // This is correct for your 'Z'-less string
     @Column(name = "form_version", length = 10)
@@ -85,5 +98,5 @@ public class Property {
     private LocalDateTime createdAt;
     @UpdateTimestamp
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    private LocalDateTime updatedAt;    
 }
