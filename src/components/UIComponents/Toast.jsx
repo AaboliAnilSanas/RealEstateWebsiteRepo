@@ -1,80 +1,93 @@
 // src/components/UIComponents/Toast.jsx
-import React, { useEffect, useState } from 'react';
-import { X, CheckCircle2, AlertTriangle } from 'lucide-react';
+
+import React, { useEffect, useState, useRef } from 'react';
+import { Check } from 'lucide-react'; 
 
 const Toast = ({ 
   message, 
+  header, /* ADDED: Prop for the main title */
   type = 'success', 
-  // duration is no longer used for automatic dismissal
+  duration = 0, 
   onClose 
 }) => {
   const [isVisible, setIsVisible] = useState(true);
   const [shouldRender, setShouldRender] = useState(true);
-
-  // New function to handle manual closure via the cross button
-  const handleManualClose = () => {
+  const timerRef = useRef(null); 
+  
+  const handleDismiss = () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+    
     setIsVisible(false);
-    // Remove from DOM after transition
+    
     setTimeout(() => {
       setShouldRender(false);
       if (onClose) onClose();
-    }, 300);
+    }, 300); 
   };
-    
+  
   useEffect(() => {
-    // Component should only render if a message is present
     if (!message) {
       setShouldRender(false);
+      return;
     }
+    
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
   }, [message]);
-
-  const baseClasses = "fixed right-4 z-[1000] p-4 rounded-xl shadow-2xl transition-all duration-300 transform";
-  
-  const getStyle = () => {
-    switch (type) {
-      case 'error':
-        return {
-          container: "bg-red-600 border border-red-800",
-          icon: AlertTriangle,
-          iconColor: "text-white",
-          transform: isVisible ? "translateY(0) opacity-100" : "translateY(-20px) opacity-0",
-          top: "top-4"
-        };
-      case 'success':
-      default:
-        // MODIFIED: Use a prominent green theme for success
-        return {
-          container: "bg-gradient-to-r from-emerald-600 to-green-500 border border-emerald-700",
-          icon: CheckCircle2,
-          iconColor: "text-white",
-          transform: isVisible ? "translateY(0) opacity-100" : "translateY(-20px) opacity-0",
-          top: "top-4"
-        };
-    }
-  };
 
   if (!shouldRender || !message) return null;
 
-  const { container, icon: Icon, iconColor, transform, top } = getStyle();
+  const successColor = '#4caf50'; 
+
+  const baseClasses = "fixed top-1/2 left-1/2 z-[1000] transition-all duration-300 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-sm sm:max-w-md overflow-visible";
+  
+  const containerClasses = "bg-white rounded-xl shadow-2xl overflow-visible pt-10 pb-4 relative text-center";
+  
+  const transform = isVisible ? "scale(1) opacity-100" : "scale(0.9) opacity-0";
 
   return (
     <div 
-      className={`${baseClasses} ${container} ${top} ${transform}`}
+      className={`${baseClasses}`}
       style={{
-        transitionTimingFunction: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)' // Spring effect for pop-in
+        transitionTimingFunction: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)', 
+        opacity: isVisible ? 1 : 0, 
+        transform: `${transform} -translate-x-1/2 -translate-y-1/2`,
       }}
     >
-      <div className="flex items-start gap-3">
-        <Icon className={`h-5 w-5 mt-0.5 flex-shrink-0 ${iconColor}`} />
-        <div className="text-sm font-medium text-white">
-          {message}
+      <div className={containerClasses}>
+        
+        {/* Floating Success Icon */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full flex items-center justify-center shadow-xl"
+             style={{ backgroundColor: successColor, boxShadow: `0 8px 25px ${successColor}40` }}>
+          <Check className="h-10 w-10 text-white stroke-2" />
         </div>
-        <button 
-          onClick={handleManualClose} // <-- Calls the manual close function
-          className={`ml-2 flex-shrink-0 ${iconColor} opacity-70 hover:opacity-100 transition-opacity`}
-        >
-          <X className="h-4 w-4" />
-        </button>
+        
+        {/* Title: NOW USES HEADER PROP */}
+        <h3 className="text-xl font-bold text-gray-900 mt-4 mb-2">
+          {header}
+        </h3>
+        
+        {/* Message */}
+        <p className="text-sm text-gray-600 px-6 mb-8">
+          {message}
+        </p>
+        
+        {/* Action Button */}
+        <div className="px-6 mb-4">
+          <button
+            onClick={handleDismiss}
+            className="w-full py-3 rounded-lg font-semibold text-white text-base transition-all duration-300 hover:scale-[0.99]"
+            style={{ backgroundColor: successColor, boxShadow: `0 4px 15px ${successColor}50` }}
+          >
+            OK
+          </button>
+        </div>
+        
       </div>
     </div>
   );

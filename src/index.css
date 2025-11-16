@@ -206,6 +206,26 @@ body {
   z-index: 50;
 }
 
+/* --- NEW STYLES FOR LOGGED-IN BUTTON (GOLD THEME) --- */
+.navbar-button-logged-in {
+  /* Set the default logged-in state to a gold gradient */
+  background: linear-gradient(135deg, var(--gold-base), var(--gold-dark)) !important;
+  /* Use white text for contrast on gold background */
+  color: white !important; 
+  /* Use gold shadow */
+  box-shadow: 0 4px 12px rgba(210, 166, 63, 0.4) !important; 
+}
+
+.navbar-button-logged-in:hover {
+  /* Ensure the hover state stays golden and slightly darker/reversed */
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold-base)) !important;
+  /* Maintain white text color */
+  color: white !important; 
+  /* Stronger gold shadow on hover */
+  box-shadow: 0 8px 20px rgba(210, 166, 63, 0.6) !important; 
+}
+/* --------------------------------------------------- */
+
 .navbar-container {
   display: flex;
   align-items: center;
@@ -242,6 +262,23 @@ body {
   display: flex;
   align-items: center;
 }
+
+.navbar-menu-hidden {
+    transform: translateY(-10px);
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* --- ADDED FIX FOR DESKTOP MENU VISIBILITY --- */
+/* Override navbar-menu-hidden on screens >= 640px (sm breakpoint) */
+@media (min-width: 640px) {
+  .navbar-menu-hidden {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transform: none !important;
+  }
+}
+/* --------------------------------------------- */
 
 .navbar-list {
   display: flex;
@@ -497,107 +534,11 @@ body {
 @media (max-width: 768px) {
   .navbar-toggle {
     display: block;
-  }
-
-  .navbar-menu {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: white;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    flex-direction: column;
-    padding: 1rem 0;
-    transform: translateY(0);
-    transition: transform 0.3s ease, opacity 0.3s ease;
-  }
-
-  .navbar-menu-hidden {
-    transform: translateY(-10px);
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .navbar-list {
-    flex-direction: column;
-    gap: 0;
-    width: 100%;
-  }
-
-  .navbar-item {
-    width: 100%;
-  }
-
-  .navbar-link {
-    padding: 1rem 2rem;
-    width: 100%;
-    justify-content: flex-start;
-  }
-
-  .navbar-phone-section {
-    padding: 1rem 2rem;
-    width: 100%;
-    justify-content: flex-start;
-  }
-
-  .navbar-button-container {
-    padding: 1rem 2rem;
-    width: 100%;
-    min-height: auto;
-  }
-
-  .navbar-button {
-    width: 100%;
-    text-align: center;
-    justify-content: center;
-    min-width: auto;
-    height: auto;
-  }
-
-  /* Adjust triangle for mobile */
-  .triangle-indicator {
-    bottom: auto;
-    top: 50%;
-    left: 1rem;
-    transform: translateY(-50%) rotate(-90deg) scale(0);
-    border-bottom-color: var(--primary-color);
-  }
-
-  .triangle-visible {
-    transform: translateY(-50%) rotate(-90deg) scale(1);
-  }
-
-  /* Remove transform effects on mobile for better UX */
-  .navbar-link:hover,
-  .navbar-phone-section:hover,
-  .navbar-button:hover {
-    transform: none;
-  }
-
-  /* Simplify login button on mobile */
-  .login-arrow {
-    display: none;
-  }
-  
-  .navbar-button::before {
-    display: none;
-  }
-  
-  .navbar-button:hover .login-content {
-    transform: none;
-    gap: 0;
-  }
-}
-/* Mobile Styles */
-@media (max-width: 768px) {
-  /* 1. Ensure the toggle is visible */
-  .navbar-toggle {
-    display: block;
     /* Use a clear color */
     color: var(--primary-color-dark);
     padding: 0.3rem; /* Reduced padding for smaller icon */
   }
-  
+
   /* 2. Update navbar-container and header padding */
   .navbar-container {
     padding: 0.5rem 1rem; /* Reduced horizontal and vertical padding for mobile */

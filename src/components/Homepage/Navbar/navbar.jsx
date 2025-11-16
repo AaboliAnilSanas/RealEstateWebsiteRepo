@@ -1,11 +1,13 @@
+// src/components/Homepage/Navbar/navbar.jsx
 import { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import AuthFlowModal from '../../Authentication/AuthFlowModal';
+import axiosInstance from '../../../services/axios'; // Import the axios instance for API calls
 gsap.registerPlugin(ScrollTrigger);
 
-// Utility component for GSAP animations
+// Utility component for GSAP animations (unchanged for brevity)
 const AnimatedContent = ({ children, distance = 100, direction = 'vertical', reverse = false, duration = 0.8, ease = 'power3.out', initialOpacity = 0, animateOpacity = true, scale = 1, threshold = 0.1, delay = 0, onComplete }) => {
   const ref = useRef(null);
 
@@ -40,8 +42,9 @@ const AnimatedContent = ({ children, distance = 100, direction = 'vertical', rev
     });
 
     return () => {
-      // Clean up GSAP and ScrollTrigger instances on unmount
-      ScrollTrigger.getAll().forEach(t => t.kill());
+      ScrollTrigger.getAll().forEach(t => {
+        if (t.trigger === el) t.kill();
+      });
       gsap.killTweensOf(el);
     };
   }, []);
@@ -54,6 +57,9 @@ const Navbar = () => {
   const [hoveredItem, setHoveredItem] = useState(null);
   const [isLoginHovered, setIsLoginHovered] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userName, setUserName] = useState(null); // Keeps the user's first name
 
   const logoRef = useRef(null);
   const loginRef = useRef(null);
@@ -66,10 +72,89 @@ const Navbar = () => {
     { title: "Contact", path: "/contact" }
   ];
 
-  // Function to handle link click and close menu on mobile
   const handleLinkClick = () => {
     setIsMenuOpen(false);
   };
+  
+  // Local logout helper
+  const handleLogout = () => {
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('userName');
+      localStorage.removeItem('userEmail');
+      setIsLoggedIn(false);
+      setUserName(null);
+  };
+
+  // [MODIFIED] Recheck Auth Logic (Fetches name if missing)
+  const handleRecheckAuth = async () => {
+      const token = localStorage.getItem('authToken');
+      let name = localStorage.getItem('userName');
+      
+      if (token) {
+          if (!name) {
+              try {
+                  // Fetch user name using the /api/user/me endpoint (protected by JWT)
+                  const response = await axiosInstance.get('user/me');
+                  const fullName = response.data.fullName;
+
+                  if (fullName) {
+                      localStorage.setItem('userName', fullName);
+                      name = fullName;
+                  }
+              } catch (error) {
+                  console.error("Failed to fetch user details:", error.response?.data || error.message);
+                  // If 401, token is invalid, force logout
+                  if (error.response?.status === 401) {
+                       handleLogout();
+                       return; 
+                  }
+                  // Temporary name if fetch fails but token is valid
+                  name = 'User'; 
+              }
+          }
+
+          if (name) {
+              setIsLoggedIn(true);
+              // Only show the first name
+              const firstName = name.split(' ')[0];
+              setUserName(firstName);
+          }
+      } else {
+          setIsLoggedIn(false);
+          setUserName(null);
+      }
+  };
+
+  // Handler that runs when the modal closes
+  const handleModalClose = () => {
+      handleRecheckAuth();
+      setAuthModalOpen(false);
+  };
+
+  const handleAuthButtonClick = () => {
+      if (isLoggedIn) {
+          handleLogout();
+      } else {
+          setAuthModalOpen(true);
+      }
+      setIsMenuOpen(false);
+  };
+
+  // useEffect: Initial check and focus listener
+  useEffect(() => {
+    handleRecheckAuth();
+    
+    window.addEventListener('focus', handleRecheckAuth); 
+    return () => window.removeEventListener('focus', handleRecheckAuth);
+
+  }, []);
+
+  // --- START MODIFICATION ---
+  // ADDED LOGIC: Determine button classes dynamically
+  const buttonClasses = `navbar-button text-xs px-2 py-1 h-8 w-auto min-w-0 sm:text-base sm:px-4 sm:py-2 sm:h-auto ${
+      isLoggedIn ? 'navbar-button-logged-in' : ''
+  }`;
+  // --- END MODIFICATION ---
 
   return (
     <>
@@ -86,10 +171,8 @@ const Navbar = () => {
             >
               <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 {isMenuOpen ? (
-                  // Close Icon (X) when menu is open
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 ) : (
-                  // Menu Icon (3 Lines) when menu is closed
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 )}
               </svg>
@@ -102,7 +185,6 @@ const Navbar = () => {
           </div>
 
           {/* Center Section (Navigation Links) */}
-          {/* Menu is hidden using CSS class 'navbar-menu-hidden' on mobile */}
           <div className={`navbar-menu ${isMenuOpen ? '' : 'navbar-menu-hidden'} sm:flex sm:items-center`}> 
             <ul className="navbar-list flex space-x-4 lg:space-x-8"> 
               {navigation.map((item, idx) => (
@@ -114,7 +196,7 @@ const Navbar = () => {
                     <Link 
                       to={item.path} 
                       className={`navbar-link group ${location.pathname === item.path ? 'navbar-link-active' : ''}`}
-                      onClick={handleLinkClick} // Closes the menu on link click
+                      onClick={handleLinkClick} 
                     >
                       {item.title}
                       <span className={`triangle-indicator ${hoveredItem === idx || location.pathname === item.path ? 'triangle-visible' : ''}`}></span>
@@ -135,26 +217,35 @@ const Navbar = () => {
             </ul>
           </div>
 
-          {/* Right Section (Login button - Icon on Mobile, Text on Desktop) */}
+          {/* Right Section (Login/Welcome button) */}
           <div className="navbar-button-container order-3 sm:order-none ml-auto sm:ml-0"> 
             <button
-              // Ensure compact sizing on mobile
-              className="navbar-button text-xs px-2 py-1 h-8 w-auto min-w-0 sm:text-base sm:px-4 sm:py-2 sm:h-auto" 
+              // --- MODIFIED: Use dynamic buttonClasses ---
+              className={buttonClasses} 
+              // --- END MODIFICATION ---
               ref={loginRef}
               onMouseEnter={() => setIsLoginHovered(true)}
               onMouseLeave={() => setIsLoginHovered(false)}
-              onClick={() => setAuthModalOpen(true)}
+              onClick={handleAuthButtonClick}
             >
               <span className="login-content flex items-center">
                 
-                {/* 👤 Login Icon: Visible only on mobile (sm:hidden) */}
-                <svg className="h-4 w-4 sm:hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
+                {/* [MODIFIED] Login/Welcome Text */}
+                <span className={`login-text text sm:text-base ${!isLoggedIn ? 'hidden sm:inline' : 'inline'}`}>
+                    {isLoggedIn ? `Welcome ${userName}` : 'Login'}
+                </span>
                 
-                {/* Text & Arrow: Hidden on mobile, visible on desktop (hidden sm:inline) */}
-                <span className="login-text text-xs sm:text-base hidden sm:inline">Login</span>
-                <span className={`login-arrow text-xs ml-1 ${isLoginHovered ? 'login-arrow-visible' : ''} hidden sm:inline`}>→</span>
+                {/* Icon (Visible on mobile only when logged out) */}
+                {!isLoggedIn && (
+                    <svg className="h-4 w-4 sm:hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                )}
+                
+                {/* Arrow/Indicator (Desktop only) */}
+                <span className={`login-arrow text-xs ml-1 ${isLoginHovered ? 'login-arrow-visible' : ''} hidden sm:inline`}>
+                    {isLoggedIn ? '' : '→'} 
+                </span>
               </span>
             </button>
           </div>
@@ -166,7 +257,7 @@ const Navbar = () => {
       {authModalOpen && (
         <AuthFlowModal
           isOpen={authModalOpen}
-          onClose={() => setAuthModalOpen(false)}
+          onClose={handleModalClose}
         />
       )}
     </>
