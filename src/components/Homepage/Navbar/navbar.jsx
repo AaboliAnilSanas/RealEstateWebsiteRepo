@@ -3,8 +3,9 @@ import { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ChevronDown, LogOut, User } from 'lucide-react'; // <-- ADDED ChevronDown, LogOut, User
 import AuthFlowModal from '../../Authentication/AuthFlowModal';
-import axiosInstance from '../../../services/axios'; // Import the axios instance for API calls
+import axiosInstance from '../../../services/axios'; 
 gsap.registerPlugin(ScrollTrigger);
 
 // Utility component for GSAP animations (unchanged for brevity)
@@ -52,6 +53,41 @@ const AnimatedContent = ({ children, distance = 100, direction = 'vertical', rev
   return <div ref={ref}>{children}</div>;
 };
 
+// <--- START ADDED LOGOUT CONFIRMATION MODAL COMPONENT --->
+const LogoutConfirmModal = ({ isOpen, onConfirm, onCancel, userName }) => {
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 bg-black/50 z-[1000] flex items-center justify-center p-4">
+            <div className="bg-white rounded-xl w-full max-w-sm p-6 shadow-2xl transform scale-100 opacity-100 transition-all duration-300">
+                <div className="text-center">
+                    <LogOut size={36} className="text-red-500 mx-auto mb-4" />
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">Confirm Logout</h3>
+                    <p className="text-gray-600 mb-6">
+                        Are you sure you want to log out, {userName}?
+                    </p>
+                    <div className="flex justify-center gap-3">
+                        <button
+                            onClick={onCancel}
+                            className="w-full py-2 rounded-lg font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 transition"
+                        >
+                            No, Stay Logged In
+                        </button>
+                        <button
+                            onClick={onConfirm}
+                            className="w-full py-2 rounded-lg font-semibold text-white bg-red-600 hover:bg-red-700 transition shadow-md"
+                        >
+                            Yes, Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+// <--- END ADDED LOGOUT CONFIRMATION MODAL COMPONENT --->
+
+
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [hoveredItem, setHoveredItem] = useState(null);
@@ -59,10 +95,16 @@ const Navbar = () => {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userName, setUserName] = useState(null); // Keeps the user's first name
+  const [userName, setUserName] = useState(null); 
+  
+  // <--- START NEW DROPDOWN & MODAL STATE --->
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false); 
+  // <--- END NEW DROPDOWN & MODAL STATE --->
 
   const logoRef = useRef(null);
   const loginRef = useRef(null);
+  const dropdownRef = useRef(null); // Ref for the dropdown menu
   const location = useLocation();
 
   const navigation = [
@@ -76,15 +118,36 @@ const Navbar = () => {
     setIsMenuOpen(false);
   };
   
-  // Local logout helper
-  const handleLogout = () => {
+  // Refactored logout logic
+  const performLogout = () => { // <-- NEW FUNCTION FOR ACTUAL LOGOUT
       localStorage.removeItem('authToken');
       localStorage.removeItem('userName');
       localStorage.removeItem('userEmail');
       setIsLoggedIn(false);
       setUserName(null);
+      setShowLogoutConfirm(false); // Close modal
+      setIsDropdownOpen(false); // Close dropdown
+      // Optional: Redirect to home or refresh state
+      if (location.pathname !== '/') {
+         // window.location.href = '/'; 
+      }
   };
 
+  // Handler to open the confirmation modal
+  const handleLogoutConfirmation = () => {
+      setIsDropdownOpen(false); // Close dropdown first
+      setShowLogoutConfirm(true); // Open modal
+  };
+
+  // Local logout helper
+  const handleLogout = () => {
+      if (isLoggedIn) {
+          handleLogoutConfirmation(); // Open confirmation modal
+      } else {
+          performLogout(); // Should not happen, but cleans up localStorage just in case
+      }
+  };
+  
   // [MODIFIED] Recheck Auth Logic (Fetches name if missing)
   const handleRecheckAuth = async () => {
       const token = localStorage.getItem('authToken');
@@ -93,7 +156,6 @@ const Navbar = () => {
       if (token) {
           if (!name) {
               try {
-                  // Fetch user name using the /api/user/me endpoint (protected by JWT)
                   const response = await axiosInstance.get('user/me');
                   const fullName = response.data.fullName;
 
@@ -103,19 +165,16 @@ const Navbar = () => {
                   }
               } catch (error) {
                   console.error("Failed to fetch user details:", error.response?.data || error.message);
-                  // If 401, token is invalid, force logout
                   if (error.response?.status === 401) {
-                       handleLogout();
+                       performLogout(); // Use performLogout to clean up
                        return; 
                   }
-                  // Temporary name if fetch fails but token is valid
                   name = 'User'; 
               }
           }
 
           if (name) {
               setIsLoggedIn(true);
-              // Only show the first name
               const firstName = name.split(' ')[0];
               setUserName(firstName);
           }
@@ -131,16 +190,31 @@ const Navbar = () => {
       setAuthModalOpen(false);
   };
 
+  // <--- MODIFIED AUTH BUTTON HANDLER --->
   const handleAuthButtonClick = () => {
       if (isLoggedIn) {
-          handleLogout();
+          // Toggle the dropdown if logged in
+          setIsDropdownOpen(prev => !prev);
       } else {
+          // Open Auth Modal if logged out
           setAuthModalOpen(true);
       }
       setIsMenuOpen(false);
   };
+  // <--- END MODIFIED AUTH BUTTON HANDLER --->
+  
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+            setIsDropdownOpen(false);
+        }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [dropdownRef]);
 
-  // useEffect: Initial check and focus listener
+
   useEffect(() => {
     handleRecheckAuth();
     
@@ -149,12 +223,9 @@ const Navbar = () => {
 
   }, []);
 
-  // --- START MODIFICATION ---
-  // ADDED LOGIC: Determine button classes dynamically
   const buttonClasses = `navbar-button text-xs px-2 py-1 h-8 w-auto min-w-0 sm:text-base sm:px-4 sm:py-2 sm:h-auto ${
       isLoggedIn ? 'navbar-button-logged-in' : ''
   }`;
-  // --- END MODIFICATION ---
 
   return (
     <>
@@ -164,7 +235,6 @@ const Navbar = () => {
           {/* Left Section (Logo and Mobile Hamburger) */}
           <div className="navbar-header flex justify-between items-center sm:justify-start">
             
-            {/* 🍔 Hamburger/Close Toggle Button (Mobile Only) */}
             <button 
               className="navbar-toggle order-1 sm:order-none sm:hidden" 
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -178,7 +248,6 @@ const Navbar = () => {
               </svg>
             </button>
             
-            {/* Logo (Stays on the left) */}
             <Link to="/" className="navbar-logo order-2 sm:order-none">
               <img ref={logoRef} src="/logo.png" width={80} height={45} alt="Float UI logo" />
             </Link>
@@ -217,49 +286,89 @@ const Navbar = () => {
             </ul>
           </div>
 
-          {/* Right Section (Login/Welcome button) */}
-          <div className="navbar-button-container order-3 sm:order-none ml-auto sm:ml-0"> 
+          {/* Right Section (Login/Welcome button and Dropdown) */}
+          <div className="navbar-button-container order-3 sm:order-none ml-auto sm:ml-0 relative" ref={dropdownRef}> 
             <button
-              // --- MODIFIED: Use dynamic buttonClasses ---
               className={buttonClasses} 
-              // --- END MODIFICATION ---
               ref={loginRef}
               onMouseEnter={() => setIsLoginHovered(true)}
               onMouseLeave={() => setIsLoginHovered(false)}
               onClick={handleAuthButtonClick}
             >
-              <span className="login-content flex items-center">
+              <span className="login-content flex items-center gap-1">
                 
-                {/* [MODIFIED] Login/Welcome Text */}
+                {/* Login/Welcome Text */}
                 <span className={`login-text text sm:text-base ${!isLoggedIn ? 'hidden sm:inline' : 'inline'}`}>
                     {isLoggedIn ? `Welcome ${userName}` : 'Login'}
                 </span>
                 
                 {/* Icon (Visible on mobile only when logged out) */}
                 {!isLoggedIn && (
-                    <svg className="h-4 w-4 sm:hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
+                    <User className="h-4 w-4 sm:hidden" />
                 )}
                 
-                {/* Arrow/Indicator (Desktop only) */}
-                <span className={`login-arrow text-xs ml-1 ${isLoginHovered ? 'login-arrow-visible' : ''} hidden sm:inline`}>
-                    {isLoggedIn ? '' : '→'} 
-                </span>
+                {/* Down Arrow for Logged In State */}
+                {isLoggedIn && (
+                    <ChevronDown className={`w-4 h-4 ml-1 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : 'rotate-0'}`} />
+                )}
+                
+                {/* Arrow/Indicator (Desktop only - Login button) */}
+                {!isLoggedIn && (
+                    <span className={`login-arrow text-xs ml-1 ${isLoginHovered ? 'login-arrow-visible' : ''} hidden sm:inline`}>
+                        → 
+                    </span>
+                )}
               </span>
             </button>
+            
+            {/* Dropdown Menu */}
+            {isLoggedIn && isDropdownOpen && (
+                <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100 z-50 overflow-hidden animate-fade-in-down">
+                    <style jsx>{`
+                        @keyframes fade-in-down {
+                            from { opacity: 0; transform: translateY(-10px); }
+                            to { opacity: 1; transform: translateY(0); }
+                        }
+                        .animate-fade-in-down {
+                            animation: fade-in-down 0.2s ease-out forwards;
+                        }
+                    `}</style>
+                    <div 
+                        className="py-1"
+                        role="menu"
+                        aria-orientation="vertical"
+                    >
+                        <button
+                            onClick={handleLogoutConfirmation}
+                            className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition"
+                            role="menuitem"
+                        >
+                            <LogOut className="w-4 h-4" />
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            )}
           </div>
 
         </div>
       </nav>
 
-      {/* Modal */}
+      {/* Auth Modal (Login/Register) */}
       {authModalOpen && (
         <AuthFlowModal
           isOpen={authModalOpen}
           onClose={handleModalClose}
         />
       )}
+      
+      {/* Logout Confirmation Modal */}
+      <LogoutConfirmModal 
+        isOpen={showLogoutConfirm}
+        onConfirm={performLogout}
+        onCancel={() => setShowLogoutConfirm(false)}
+        userName={userName}
+      />
     </>
   );
 };
