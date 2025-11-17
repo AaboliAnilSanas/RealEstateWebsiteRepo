@@ -9,6 +9,8 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 import CloseIcon from "@mui/icons-material/Close";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const FilterComponent = ({ 
   data: propData, 
@@ -33,7 +35,7 @@ const FilterComponent = ({
   const theme = useTheme();
   // isMobile is true for screens below 'md' (768px by default)
   const isMobile = useMediaQuery(theme.breakpoints.down("md")); 
-
+  const navigate = useNavigate();
   // Different slider ranges for Buy vs Rent
   const [buySliderValue, setBuySliderValue] = useState([0, 100]);
   const [rentSliderValue, setRentSliderValue] = useState([10, 50]);
@@ -116,7 +118,7 @@ const FilterComponent = ({
     }
     return `${value} L`;
   };
-
+  const [searchQuery, setSearchQuery] = useState("");
   // Validate all required fields
   const validateAllFields = () => {
     const newErrors = {
@@ -139,42 +141,42 @@ const FilterComponent = ({
     }
 
     // Validate property type if required
-    if (isFieldRequired("Property Type*")) {
+    if (isFieldRequired("Property Type")) {
       const propertyTypeEmpty = !selectedValues.propertyType || selectedValues.propertyType.length === 0;
       newErrors.propertyType = propertyTypeEmpty;
       if (propertyTypeEmpty) isValid = false;
     }
 
     // Validate bedroom if required
-    if (isFieldRequired("Bedroom*")) {
+    if (isFieldRequired("Bedroom")) {
       const bedroomEmpty = !selectedValues.bedroom || selectedValues.bedroom.length === 0;
       newErrors.bedroom = bedroomEmpty;
       if (bedroomEmpty) isValid = false;
     }
 
     // Validate bathroom if required
-    if (isFieldRequired("Bathroom*")) {
+    if (isFieldRequired("Bathroom")) {
       const bathroomEmpty = !selectedValues.bathroom || selectedValues.bathroom.length === 0;
       newErrors.bathroom = bathroomEmpty;
       if (bathroomEmpty) isValid = false;
     }
 
     // Validate parking if required
-    if (isFieldRequired("Parking*")) {
+    if (isFieldRequired("Parking")) {
       const parkingEmpty = !selectedValues.parking || selectedValues.parking.length === 0;
       newErrors.parking = parkingEmpty;
       if (parkingEmpty) isValid = false;
     }
 
     // Validate possession status if required and transaction type is buy
-    if (transactionType === "buy" && isFieldRequired("Possession*")) {
+    if (transactionType === "buy" && isFieldRequired("Possession")) {
       const possessionEmpty = !selectedValues.possessionStatus || selectedValues.possessionStatus.length === 0;
       newErrors.possessionStatus = possessionEmpty;
       if (possessionEmpty) isValid = false;
     }
 
     // Validate furnishing status if required and transaction type is rent
-    if (transactionType === "rent" && isFieldRequired("Furnishing*")) {
+    if (transactionType === "rent" && isFieldRequired("Furnishing")) {
       const furnishingEmpty = !selectedValues.furnishingStatus || selectedValues.furnishingStatus.length === 0;
       newErrors.furnishingStatus = furnishingEmpty;
       if (furnishingEmpty) isValid = false;
@@ -256,51 +258,92 @@ const FilterComponent = ({
     }
   };
 
-  const handleSearch = () => {
-    // Validate all required fields
-    const isValid = validateAllFields();
-    
-    if (!isValid) {
-      console.log("Validation failed - please fill in all required fields");
-      return; // Stop execution if validation fails
-    }
+const handleSearch = async () => {
+  console.log("HANDLE SEARCH STARTED");
+  const isValid = validateAllFields();
+  if (!isValid) return;
 
-    const currentSliderValue = getCurrentSliderValue();
-    const filterData = {
-      transaction_type: transactionType,
-      filters: {
-        city: selectedValues.city,
-        budget_range: {
-          min: currentSliderValue[0] * 100000,
-          max: currentSliderValue[1] * 100000,
-          display: getRangeText(),
-          unit: transactionType === "buy" ? "buy_price" : "rent_price",
-        },
-        property_type: selectedValues.propertyType,
-        bedroom: selectedValues.bedroom,
-        bathroom: selectedValues.bathroom,
+  const currentSliderValue = getCurrentSliderValue();
+  console.log("hiiiiiii")
+const payload = {
+  transaction_type: transactionType,
+  search_query: searchQuery || "",
+  filters: {
+    location: {
+      city: selectedValues.city || "",
+      locality:
+        selectedValues.propertyType.length > 0
+          ? selectedValues.propertyType
+          : undefined,
+    },
+
+    price: {
+      min: currentSliderValue[0] * 100000,
+      max: currentSliderValue[1] * 100000,
+    },
+
+    property: {
+      ...(selectedValues.propertyType.length > 0 && {
+        type: selectedValues.propertyType,
+      }),
+
+      ...(selectedValues.bedroom.length > 0 && {
+        bedrooms: selectedValues.bedroom,
+      }),
+
+      ...(selectedValues.bathroom.length > 0 && {
+        bathrooms: selectedValues.bathroom,
+      }),
+
+      ...(selectedValues.parking.length > 0 && {
         parking: selectedValues.parking,
-        ...(transactionType === "buy" && {
-          possession_status: selectedValues.possessionStatus,
+      }),
+
+      ...(transactionType === "buy" &&
+        selectedValues.possessionStatus.length > 0 && {
+          possession: selectedValues.possessionStatus,
         }),
-        ...(transactionType === "rent" && {
-          furnishing_status: selectedValues.furnishingStatus,
+
+      ...(transactionType === "rent" &&
+        selectedValues.furnishingStatus.length > 0 && {
+          furnishing: selectedValues.furnishingStatus,
         }),
-      },
-    };
+    },
 
-    console.log("=== FILTER DATA TO SEND TO BACKEND ===");
-    console.log(JSON.stringify(filterData, null, 2));
+    // amenities: [],
+  },
 
-    // Call the onSearch callback if provided
-    if (onSearch) {
-      onSearch(filterData);
-    }
+  sort: {
+    field: "price",
+    order: "asc",
+  },
 
-    if (isMobile) {
-      handleMobileClose();
-    }
-  };
+  pagination: {
+    page: 1,
+    limit: 20,
+  },
+};
+
+
+  console.log("🔥 Final API Payload:", payload);
+
+  try {
+    const response = await axios.post(
+      "http://localhost:7000/api/properties/search",
+      payload
+    );
+  
+    console.log("API SUCCESS:", response.data);
+     navigate("/properties", { state: response.data });
+    if (onSearch) onSearch(response.data);
+
+  } catch (error) {
+    console.error("API ERROR:", error);
+  }
+
+  if (isMobile) handleMobileClose();
+};
+
 
   const handleClearAll = () => {
     setSelectedValues({
@@ -525,7 +568,7 @@ const FilterComponent = ({
         </div>
       )}
 
-      <style jsx>{`
+      <style>{`
         @keyframes floatHexagon1 {
           0%, 100% { transform: translate(0, 0) rotate(0deg); }
           25% { transform: translate(-3px, -5px) rotate(2deg); }
@@ -592,67 +635,83 @@ const FilterComponent = ({
       {/* Content */}
       <div style={{ position: 'relative', zIndex: 1 }}>
         {/* Buy/Rent Toggle Row - Standalone */}
-        <div style={{ 
-          display: 'flex', 
-          gap: isMobile ? '2px' : '4px',
-          marginBottom: isMobile ? '12px' : '8px',
-          width: 'fit-content'
-        }}>
-          <Button
-            variant={transactionType === "buy" ? "contained" : "outlined"}
-            onClick={() => setTransactionType("buy")}
-            size={isMobile ? "small" : "medium"} 
-            sx={{
-              "&.MuiButton-contained": {
-                backgroundColor: "var(--gold-base)",
-                "&:hover": {
-                  backgroundColor: "var(--gold-dark)",
-                },
-              },
-              "&.MuiButton-outlined": {
-                borderColor: "var(--gold-base)",
-                color: "var(--gold-base)",
-                "&:hover": {
-                  borderColor: "var(--gold-dark)",
-                  backgroundColor: "var(--gold-light)",
-                },
-              },
-              fontSize: isMobile ? '12px' : '14px', 
-              padding: isMobile ? '8px 10px' : '13px 23px',
-              minHeight: isMobile ? '30px' : '36px',
-              minWidth: isMobile ? '80px' : '100px'
-            }}
-          >
-            Buy
-          </Button>
-          <Button
-            variant={transactionType === "rent" ? "contained" : "outlined"}
-            onClick={() => setTransactionType("rent")}
-            size={isMobile ? "small" : "medium"}
-            sx={{
-              "&.MuiButton-contained": {
-                backgroundColor: "var(--gold-base)",
-                "&:hover": {
-                  backgroundColor: "var(--gold-dark)",
-                },
-              },
-              "&.MuiButton-outlined": {
-                borderColor: "var(--gold-base)",
-                color: "var(--gold-base)",
-                "&:hover": {
-                  borderColor: "var(--gold-dark)",
-                  backgroundColor: "var(--gold-light)",
-                },
-              },
-              fontSize: isMobile ? '12px' : '14px', 
-              padding: isMobile ? '8px 10px' : '13px 18px',
-              minHeight: isMobile ? '30px' : '36px',
-              minWidth: isMobile ? '80px' : '100px'
-            }}
-          >
-            Rent
-          </Button>
-        </div>
+        <div
+  style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    marginBottom: "12px",
+    flexWrap: "wrap",
+  }}
+>
+  <Button
+    variant={transactionType === "buy" ? "contained" : "outlined"}
+    onClick={() => setTransactionType("buy")}
+    size={isMobile ? "small" : "medium"}
+    sx={{
+      "&.MuiButton-contained": {
+        backgroundColor: "var(--gold-base)",
+        "&:hover": { backgroundColor: "var(--gold-dark)" },
+      },
+      "&.MuiButton-outlined": {
+        borderColor: "var(--gold-base)",
+        color: "var(--gold-base)",
+        "&:hover": {
+          borderColor: "var(--gold-dark)",
+          backgroundColor: "var(--gold-light)",
+        },
+      },
+      fontSize: isMobile ? "12px" : "14px",
+      padding: isMobile ? "8px 10px" : "13px 23px",
+      minHeight: isMobile ? "30px" : "36px",
+      minWidth: isMobile ? "80px" : "100px",
+    }}
+  >
+    Buy
+  </Button>
+
+  <Button
+    variant={transactionType === "rent" ? "contained" : "outlined"}
+    onClick={() => setTransactionType("rent")}
+    size={isMobile ? "small" : "medium"}
+    sx={{
+      "&.MuiButton-contained": {
+        backgroundColor: "var(--gold-base)",
+        "&:hover": { backgroundColor: "var(--gold-dark)" },
+      },
+      "&.MuiButton-outlined": {
+        borderColor: "var(--gold-base)",
+        color: "var(--gold-base)",
+        "&:hover": {
+          borderColor: "var(--gold-dark)",
+          backgroundColor: "var(--gold-light)",
+        },
+      },
+      fontSize: isMobile ? "12px" : "14px",
+      padding: isMobile ? "8px 10px" : "13px 18px",
+      minHeight: isMobile ? "30px" : "36px",
+      minWidth: isMobile ? "80px" : "100px",
+    }}
+  >
+    Rent
+  </Button>
+
+  {/* Search Input */}
+  <input
+    type="text"
+    placeholder="Search by City"
+    value={searchQuery}
+    onChange={(e) => setSearchQuery(e.target.value)}
+    style={{
+      padding: "10px 14px",
+      fontSize: "14px",
+      border: "1px solid var(--gold-base)",
+      borderRadius: "8px",
+      outline: "none",
+      flex: isMobile ? "1 1 100%" : "0 1 250px",
+    }}
+  />
+</div>
 
         {/* 6x6 Grid Layout for Filters */}
         <div style={{
@@ -862,7 +921,10 @@ const FilterComponent = ({
             {/* Search Button */}
             <Button
               className="button"
-              onClick={handleSearch}
+                onClick={() => {
+      console.log("SEARCH BUTTON CLICKED");
+      handleSearch();
+  }}
               sx={{
                 minWidth: isMobile ? '100px' : '120px', 
                 height: isMobile ? "40px" : "53px",

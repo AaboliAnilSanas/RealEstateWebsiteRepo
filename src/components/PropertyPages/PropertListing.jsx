@@ -23,6 +23,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import debounce from "lodash/debounce";
 import { motion, AnimatePresence } from "framer-motion";
 import Loader from "../UIComponents/PageLoader.jsx";
+import { useLocation } from "react-router-dom";
 
 const PropertyListing = () => {
   const [properties, setProperties] = useState([]);
@@ -32,6 +33,9 @@ const PropertyListing = () => {
   const [filterLoading, setFilterLoading] = useState(false);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   
+//navigate
+  const location = useLocation();
+const apiData = location.state?.data || location.state || null;
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [propertiesPerPage] = useState(4); // Show 4 properties per page
