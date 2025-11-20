@@ -369,23 +369,48 @@ const apiData = location.state?.data || location.state || null;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Simulate API call for initial data
-  useEffect(() => {
-    const fetchProperties = async () => {
-      try {
-        setLoading(true);
-        await new Promise((resolve) => setTimeout(resolve, 800));
-        setProperties(dummyProperties);
-        setFilteredProperties(dummyProperties);
-      } catch (error) {
-        console.error("Error fetching properties:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+useEffect(() => {
+  if (apiData) {
+    console.log("API DATA RECEIVED:", apiData);
 
-    fetchProperties();
-  }, []);
+    const list =
+      Array.isArray(apiData) ? apiData :
+      Array.isArray(apiData?.results) ? apiData.results :
+      [];
+
+    setProperties(list);
+    setFilteredProperties(list);
+    setLoading(false);
+  } else {
+    console.log("NO API DATA → USING DUMMY");
+    
+    setLoading(true);
+    setTimeout(() => {
+      setProperties(dummyProperties);
+      setFilteredProperties(dummyProperties);
+      setLoading(false);
+    }, 800);
+  }
+}, [apiData]);
+
+
+  // Simulate API call for initial data
+  // useEffect(() => {
+  //   const fetchProperties = async () => {
+  //     try {
+  //       setLoading(true);
+  //       await new Promise((resolve) => setTimeout(resolve, 800));
+  //       setProperties(dummyProperties);
+  //       setFilteredProperties(dummyProperties);
+  //     } catch (error) {
+  //       console.error("Error fetching properties:", error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchProperties();
+  // }, []);
 
   // Update price range when transaction type changes
   useEffect(() => {
@@ -401,6 +426,7 @@ const apiData = location.state?.data || location.state || null;
           unit: `${prev.transaction_type}_price`
         }
       }
+
     }));
   }, [filters.transaction_type]);
 

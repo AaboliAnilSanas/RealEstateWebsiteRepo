@@ -257,84 +257,106 @@ const FilterComponent = ({
       };
     }
   };
+const buildBackendPayload = (filters, page = 1, limit = 20) => {
+  const payload = {
+    transaction_type: filters.transaction_type,
+    search_query: filters.search_metadata?.text_input || "",
+    filters: {},
+    sort: { field: "price", order: "asc" },
+    pagination: { page, limit }
+  };
+
+  // ---------------- LOCATION ----------------
+  const location = {};
+  if (filters.filters.city) location.city = filters.filters.city;
+  if (filters.filters.locality?.length > 0)
+    location.locality = filters.filters.locality;
+
+  if (Object.keys(location).length > 0)
+    payload.filters.location = location;
+
+  // ---------------- PRICE ----------------
+  const price = {};
+  if (filters.filters.budget_range?.min !== undefined)
+    price.min = filters.filters.budget_range.min;
+  if (filters.filters.budget_range?.max !== undefined)
+    price.max = filters.filters.budget_range.max;
+
+  if (Object.keys(price).length > 0)
+    payload.filters.price = price;
+
+  // ---------------- PROPERTY ----------------
+  const property = {};
+
+  if (filters.filters.property_type?.length > 0)
+    property.type = filters.filters.property_type;
+
+  if (filters.filters.bedroom?.length > 0)
+    property.bedrooms = filters.filters.bedroom.map(Number);
+
+  if (filters.filters.bathroom?.length > 0)
+    property.bathrooms = filters.filters.bathroom.map(Number);
+
+  if (filters.filters.parking?.length > 0)
+    property.parking = filters.filters.parking.map(Number);
+
+  if (filters.filters.possession_status?.length > 0)
+    property.possession = filters.filters.possession_status;
+
+  if (Object.keys(property).length > 0)
+    payload.filters.property = property;
+
+  // ---------------- AMENITIES ----------------
+  if (filters.filters.amenities?.length > 0)
+    payload.filters.amenities = filters.filters.amenities;
+
+  return payload;
+};
 
 const handleSearch = async () => {
   console.log("HANDLE SEARCH STARTED");
-  const isValid = validateAllFields();
-  if (!isValid) return;
 
   const currentSliderValue = getCurrentSliderValue();
-  console.log("hiiiiiii")
-const payload = {
-  transaction_type: transactionType,
-  search_query: searchQuery || "",
-  filters: {
-    location: {
+
+  // Build local filters object
+  const filters = {
+    transaction_type: transactionType,
+    search_metadata: {
+      text_input: searchQuery || ""
+    },
+    filters: {
       city: selectedValues.city || "",
-      locality:
-        selectedValues.propertyType.length > 0
-          ? selectedValues.propertyType
-          : undefined,
-    },
+      locality: [],
 
-    price: {
-      min: currentSliderValue[0] * 100000,
-      max: currentSliderValue[1] * 100000,
-    },
+      budget_range: {
+        min: currentSliderValue[0] * 100000,
+        max: currentSliderValue[1] * 100000
+      },
 
-    property: {
-      ...(selectedValues.propertyType.length > 0 && {
-        type: selectedValues.propertyType,
-      }),
+      property_type: selectedValues.propertyType,
+      bedroom: selectedValues.bedroom,
+      bathroom: selectedValues.bathroom,
+      parking: selectedValues.parking,
 
-      ...(selectedValues.bedroom.length > 0 && {
-        bedrooms: selectedValues.bedroom,
-      }),
+      possession_status:
+        transactionType === "buy" ? selectedValues.possessionStatus : [],
 
-      ...(selectedValues.bathroom.length > 0 && {
-        bathrooms: selectedValues.bathroom,
-      }),
+      furnishing_status:
+        transactionType === "rent" ? selectedValues.furnishingStatus : [],
 
-      ...(selectedValues.parking.length > 0 && {
-        parking: selectedValues.parking,
-      }),
-
-      ...(transactionType === "buy" &&
-        selectedValues.possessionStatus.length > 0 && {
-          possession: selectedValues.possessionStatus,
-        }),
-
-      ...(transactionType === "rent" &&
-        selectedValues.furnishingStatus.length > 0 && {
-          furnishing: selectedValues.furnishingStatus,
-        }),
-    },
-
-    // amenities: [],
-  },
-
-  sort: {
-    field: "price",
-    order: "asc",
-  },
-
-  pagination: {
-    page: 1,
-    limit: 20,
-  },
-};
-
-
-  console.log("🔥 Final API Payload:", payload);
+      amenities: []
+    }
+  };
 
   try {
-    const response = await axios.post(
-      "http://localhost:7000/api/properties/search",
-      payload
-    );
-  
-    console.log("API SUCCESS:", response.data);
-     navigate("/properties", { state: response.data });
+    const payload = buildBackendPayload(filters, 1, 20);
+
+    console.log("FINAL API PAYLOAD:", payload);
+
+    const response = await axios.post("http://localhost:7000/api/properties/search", payload);
+
+    navigate("/properties", { state: response.data });
+
     if (onSearch) onSearch(response.data);
 
   } catch (error) {
@@ -343,6 +365,7 @@ const payload = {
 
   if (isMobile) handleMobileClose();
 };
+
 
 
   const handleClearAll = () => {
@@ -708,7 +731,7 @@ const payload = {
       border: "1px solid var(--gold-base)",
       borderRadius: "8px",
       outline: "none",
-      flex: isMobile ? "1 1 100%" : "0 1 250px",
+      flex: isMobile ? "1 1 100%" : "0 1 430px",
     }}
   />
 </div>
