@@ -5,7 +5,7 @@ import { X, ArrowLeft } from 'lucide-react';
 import RegisterForm from './RegisterForm.jsx'; 
 import OtpForm from './OtpForm.jsx';           
 import DetailsForm from './DetailsFormContent.jsx';   
-import Toast from '../UIComponents/Toast'; 
+import Toast from '../UIComponents/Toast.jsx'; 
 
 // ... (other components and setup remain the same)
 

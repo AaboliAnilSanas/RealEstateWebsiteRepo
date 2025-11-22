@@ -35,11 +35,14 @@ const PropertyListing = () => {
   
 //navigate
   const location = useLocation();
-const apiData = location.state?.data || location.state || null;
+  const isBackendData = !!location.state?.data?.properties;
+
+const apiData = location.state?.properties ? location.state.properties : [];
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [propertiesPerPage] = useState(4); // Show 4 properties per page
-
+console.log("LOCATION STATE:", location.state);
   // Price range configurations
   const priceRanges = {
     buy: {
@@ -370,28 +373,50 @@ const apiData = location.state?.data || location.state || null;
   };
 
 useEffect(() => {
-  if (apiData) {
-    console.log("API DATA RECEIVED:", apiData);
+  console.log("LOCATION STATE:", location.state);
 
-    const list =
-      Array.isArray(apiData) ? apiData :
-      Array.isArray(apiData?.results) ? apiData.results :
-      [];
+  const rawList = location?.state?.data?.properties;
 
-    setProperties(list);
-    setFilteredProperties(list);
+  // If properties are missing → skip and stop loader
+  if (!Array.isArray(rawList)) {
+    console.warn("No backend properties found in location.state.");
+    setProperties([]);
+    setFilteredProperties([]);
     setLoading(false);
-  } else {
-    console.log("NO API DATA → USING DUMMY");
-    
-    setLoading(true);
-    setTimeout(() => {
-      setProperties(dummyProperties);
-      setFilteredProperties(dummyProperties);
-      setLoading(false);
-    }, 800);
+    return;
   }
-}, [apiData]);
+
+  const normalized = rawList.map(p => ({
+    id: p.id,
+    basicDetails: {
+      transactionType: p.transaction_type,
+      propertyCategory: p.property_type,
+      propertyType: p.property_type,
+    },
+    location: {
+      city: p.city,
+      locality: p.locality,
+      subLocality: p.sub_locality,
+    },
+    propertyProfile: {
+      price: p.price,
+      bedrooms: p.bedrooms,
+      bathrooms: p.bathrooms,
+      availability: p.possession,
+      carpetArea: p.area,
+      description: p.description
+    },
+    media: {
+      photos: p.photos || []
+    }
+  }));
+
+  setProperties(normalized);
+  setFilteredProperties(normalized);
+  setLoading(false);
+}, [location.state]);
+
+
 
 
   // Simulate API call for initial data
@@ -550,24 +575,32 @@ useEffect(() => {
   );
 
   // Call API whenever filters change
-  useEffect(() => {
-    const hasActiveFilters = 
-      filters.transaction_type !== "buy" ||
-      filters.filters.city !== "" ||
-      filters.filters.property_type.length > 0 ||
-      filters.filters.bedroom.length > 0 ||
-      filters.filters.bathroom.length > 0 ||
-      filters.filters.parking.length > 0 ||
-      filters.filters.possession_status.length > 0 ||
-      filters.filters.budget_range.min > getCurrentPriceRange().min ||
-      filters.filters.budget_range.max < getCurrentPriceRange().max;
-    
-    if (hasActiveFilters && properties.length > 0) {
-      debouncedApiCall(filters);
-    } else if (properties.length > 0) {
-      setFilteredProperties(properties);
-    }
-  }, [filters, properties, debouncedApiCall]);
+useEffect(() => {
+  const hasActiveFilters =
+    filters.transaction_type !== "buy" ||
+    filters.filters.city !== "" ||
+    filters.filters.property_type.length > 0 ||
+    filters.filters.bedroom.length > 0 ||
+    filters.filters.bathroom.length > 0 ||
+    filters.filters.parking.length > 0 ||
+    filters.filters.possession_status.length > 0 ||
+    filters.filters.budget_range.min > getCurrentPriceRange().min ||
+    filters.filters.budget_range.max < getCurrentPriceRange().max;
+
+  if (isBackendData) {
+    // 🔥 ALWAYS show backend properties
+    setFilteredProperties(properties);
+    return;
+  }
+
+  // 🔥 Only dummyProperties use frontend filtering
+  if (hasActiveFilters && properties.length > 0) {
+    debouncedApiCall(filters);
+  } else if (properties.length > 0) {
+    setFilteredProperties(properties);
+  }
+}, [filters, properties, debouncedApiCall]);
+
 
   // Handle filter changes
   const handleFilterChange = (filterType, value, isNested = false) => {

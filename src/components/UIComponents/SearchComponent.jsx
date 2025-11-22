@@ -17,7 +17,7 @@ const FilterComponent = ({
   filterOptions: propFilterOptions, 
   onSearch 
 }) => {
-  const [transactionType, setTransactionType] = useState("buy");
+  const [transactionType, setTransactionType] = useState("sell");
   const [selectedValues, setSelectedValues] = useState({
     city: "",
     budget: "",
@@ -109,7 +109,7 @@ const FilterComponent = ({
   const handleMobileClose = () => setMobileOpen(false);
 
   const getCurrentSliderValue = () => {
-    return transactionType === "buy" ? buySliderValue : rentSliderValue;
+    return transactionType === "sell" ? buySliderValue : rentSliderValue;
   };
 
   const formatValue = (value) => {
@@ -137,7 +137,14 @@ const FilterComponent = ({
     if (isFieldRequired("City*")) {
       const cityEmpty = !selectedValues.city || selectedValues.city.trim() === '';
       newErrors.city = cityEmpty;
-      if (cityEmpty) isValid = false;
+      const searchEmpty = !searchQuery || searchQuery.trim() === '';
+
+      if (cityEmpty && searchEmpty) {
+        newErrors.city = true;
+        isValid = false;
+      } else {
+        newErrors.city = false;
+      }
     }
 
     // Validate property type if required
@@ -169,7 +176,7 @@ const FilterComponent = ({
     }
 
     // Validate possession status if required and transaction type is buy
-    if (transactionType === "buy" && isFieldRequired("Possession")) {
+    if (transactionType === "sell" && isFieldRequired("Possession")) {
       const possessionEmpty = !selectedValues.possessionStatus || selectedValues.possessionStatus.length === 0;
       newErrors.possessionStatus = possessionEmpty;
       if (possessionEmpty) isValid = false;
@@ -211,7 +218,7 @@ const FilterComponent = ({
   };
 
   const handleSliderChange = (event, newValue) => {
-    if (transactionType === "buy") {
+    if (transactionType === "sell") {
       setBuySliderValue(newValue);
     } else {
       setRentSliderValue(newValue);
@@ -230,7 +237,7 @@ const FilterComponent = ({
   };
 
   const getSliderConfig = () => {
-    if (transactionType === "buy") {
+    if (transactionType === "sell") {
       return {
         min: 0,
         max: 1000,
@@ -267,13 +274,19 @@ const buildBackendPayload = (filters, page = 1, limit = 20) => {
   };
 
   // ---------------- LOCATION ----------------
-  const location = {};
-  if (filters.filters.city) location.city = filters.filters.city;
-  if (filters.filters.locality?.length > 0)
-    location.locality = filters.filters.locality;
+  // ---------------- LOCATION ----------------
+const location = {};
 
-  if (Object.keys(location).length > 0)
-    payload.filters.location = location;
+// ONLY send city when search_query is empty
+if (!payload.search_query && filters.filters.city) {
+  location.city = filters.filters.city;
+}
+
+if (filters.filters.locality?.length > 0)
+  location.locality = filters.filters.locality;
+
+if (Object.keys(location).length > 0)
+  payload.filters.location = location;
 
   // ---------------- PRICE ----------------
   const price = {};
@@ -329,9 +342,14 @@ const handleSearch = async () => {
       locality: [],
 
       budget_range: {
-        min: currentSliderValue[0] * 100000,
-        max: currentSliderValue[1] * 100000
-      },
+  min: transactionType === "sell"
+    ? currentSliderValue[0] * 100000
+    : currentSliderValue[0] * 1000 * 100,
+
+  max: transactionType === "sell"
+    ? currentSliderValue[1] * 100000
+    : currentSliderValue[1] * 1000 * 100,
+},
 
       property_type: selectedValues.propertyType,
       bedroom: selectedValues.bedroom,
@@ -339,7 +357,7 @@ const handleSearch = async () => {
       parking: selectedValues.parking,
 
       possession_status:
-        transactionType === "buy" ? selectedValues.possessionStatus : [],
+        transactionType === "sell" ? selectedValues.possessionStatus : [],
 
       furnishing_status:
         transactionType === "rent" ? selectedValues.furnishingStatus : [],
@@ -668,8 +686,8 @@ const handleSearch = async () => {
   }}
 >
   <Button
-    variant={transactionType === "buy" ? "contained" : "outlined"}
-    onClick={() => setTransactionType("buy")}
+    variant={transactionType === "sell" ? "contained" : "outlined"}
+    onClick={() => setTransactionType("sell")}
     size={isMobile ? "small" : "medium"}
     sx={{
       "&.MuiButton-contained": {
@@ -721,19 +739,21 @@ const handleSearch = async () => {
 
   {/* Search Input */}
   <input
-    type="text"
-    placeholder="Search by City"
-    value={searchQuery}
-    onChange={(e) => setSearchQuery(e.target.value)}
-    style={{
-      padding: "10px 14px",
-      fontSize: "14px",
-      border: "1px solid var(--gold-base)",
-      borderRadius: "8px",
-      outline: "none",
-      flex: isMobile ? "1 1 100%" : "0 1 430px",
-    }}
-  />
+  type="text"
+  placeholder="Search by City"
+  value={searchQuery}
+  onChange={(e) => setSearchQuery(e.target.value)}
+  style={{
+    flexGrow: 1,        // ⭐ makes it full width
+    width: "100%",      // ⭐ ensures full width on mobile + desktop
+    padding: "10px 14px",
+    fontSize: "14px",
+    border: "1px solid var(--gold-base)",
+    borderRadius: "8px",
+    outline: "none",
+    minWidth: isMobile ? "100%" : "250px", // ⭐ force full width on mobile
+  }}
+/>
 </div>
 
         {/* 6x6 Grid Layout for Filters */}
@@ -818,7 +838,7 @@ const handleSearch = async () => {
           </div>
 
           {/* Conditional filters - spans full width on mobile, 3 columns on desktop */}
-          {transactionType === "buy" && (
+          {transactionType === "sell" && (
             <div style={{ 
               gridColumn: isMobile ? '1' : 'span 2'
             }}>
@@ -889,7 +909,7 @@ const handleSearch = async () => {
                 color: 'var(--location-blue-800)',
                 fontSize: isMobile ? '12px' : '14px', 
               }}>
-                {transactionType === "buy" ? "Price:" : "Rent:"}
+                {transactionType === "sell" ? "Price:" : "Rent:"}
               </span>
               <span style={{ 
                 fontWeight: 'bold', 
@@ -904,7 +924,7 @@ const handleSearch = async () => {
             <Box sx={{ width: "100%" }}>
               <Slider
                 getAriaLabel={() =>
-                  transactionType === "buy"
+                  transactionType === "sell"
                     ? "Buy price range"
                     : "Monthly rent range"
                 }
