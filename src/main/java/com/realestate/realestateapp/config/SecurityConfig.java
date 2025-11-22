@@ -37,6 +37,7 @@ public class SecurityConfig {
                         
                         // --- NEW RULE FOR PUBLIC FILTER API ---
                         .requestMatchers("/api/properties/search").permitAll()
+                        .requestMatchers("/api/contact/**").permitAll()
 
                         // --- NEW RULE FOR PUBLIC "GET" (e.g., get by ID) ---
                         .requestMatchers(HttpMethod.GET, "/api/properties/**").permitAll()
