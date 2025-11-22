@@ -1,8 +1,72 @@
 import React, { useState, useEffect, useRef } from 'react';
+// 1. ADD IMPORTS
+import { useNavigate } from 'react-router-dom';
+import axios from "axios"; 
 
 const LocationCard = ({ image, location }) => {
+  // Get navigate function
+  const navigate = useNavigate(); 
+  
+  // 2. ADD CLICK HANDLER
+  const handleCardClick = async () => {
+    // Construct the payload based on the city (location)
+    const payload = {
+      // Default to "buy" (or "sell" which maps to "buy" in PropertyListing.jsx)
+      transaction_type: "buy", 
+      // Use location name as a search query for broader matching
+      search_query: location, 
+      filters: {
+        // Use the location filter for explicit city filtering
+        location: {
+          city: location,
+        },
+        // Set a very wide price range (e.g., 0 to 100 Billion) to ensure no results are excluded by a tight default filter
+        price: { 
+          min: 0, 
+          max: 100000000000 
+        }, 
+        // Send empty array lists for other filters to ensure a broad search
+        property: {
+          type: [], 
+          bedrooms: [], 
+          bathrooms: [], 
+          parking: [], 
+          possession: [] 
+        },
+        amenities: []
+      },
+      // Sort by newest properties first
+      sort: { 
+        field: "date", 
+        order: "desc" 
+      }, 
+      pagination: { 
+        page: 1, 
+        limit: 20 
+      }
+    };
+
+    try {
+      // Call the search API
+      const response = await axios.post("http://localhost:7000/api/properties/search", payload);
+      
+      // Navigate to the listings page and pass the API response data in state
+      navigate("/properties", { state: response.data });
+    } catch (error) {
+      console.error(`API ERROR searching for ${location}:`, error.response?.data || error.message);
+      
+      // Fallback: Navigate to the empty listings page if the API fails
+      navigate("/properties");
+    }
+  };
+
+
   return (
-    <div className="flex flex-col items-center text-center group cursor-pointer relative">
+    // 3. ATTACH HANDLER TO CARD CONTAINER
+    <div 
+      onClick={handleCardClick}
+      className="flex flex-col items-center text-center group cursor-pointer relative"
+    >
       {/* Square Card Container with Rounded Image - Updated hover effect */}
       <div className="relative mb-4 rounded-2xl overflow-hidden border-4 border-white shadow-2xl group-hover:shadow-2xl transition-all duration-300 w-64 h-64 sm:w-64 sm:h-64 lg:w-64 lg:h-64 xl:w-80 xl:h-80 group-hover:-translate-y-4 group-hover:border-b-8 group-hover:border-b-[var(--gold-base)]">
         <img 
